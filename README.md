@@ -2,6 +2,6 @@
 
 ## team members: 
  - Nupur
- - team member #2
+ - Josh
  - team member #3
  - team member #4
