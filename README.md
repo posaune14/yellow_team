@@ -3,4 +3,5 @@
 ## team members: 
  - Nupur
  - Josh
+ - Naisha
  - Michael Youtz
