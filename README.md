@@ -3,5 +3,5 @@
 ## team members: 
  - Nupur
  - Josh
- - team member #3
+ - Naisha
  - team member #4
