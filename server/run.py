@@ -8,5 +8,11 @@ if __name__ == "__main__":
     @app.route("/")
     def hello_world():
         return "<p>Hello, World!</p>"
+<<<<<<< Updated upstream
     
+=======
+    @app.route("/")
+    def test():
+        return "<p>Refwljbnfn</p>"
+>>>>>>> Stashed changes
     app.run(port=3000, debug=True)
