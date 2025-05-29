@@ -13,6 +13,7 @@ struct PantryLinkApp: App {
         WindowGroup {
             //ContentView()
             HomeView()
+            //NavView()
         }
     }
 }
