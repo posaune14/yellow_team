@@ -9,6 +9,14 @@ import SwiftUI
 //add colors here
 
 struct ContentView: View {
+    //data fields
+    @State var first_name: String = ""
+    @State var last_name: String = ""
+    @State var date_of_birth: String = ""
+    @State var email: String = ""
+    @State var phone_number: String = ""
+    @State var zipcode: String = ""
+    
     var body: some View {
         ScrollView {
             
@@ -25,11 +33,63 @@ struct ContentView: View {
             
             //register form
             Form{
-                Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.center)){
-                    //textfield
+                Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.center)){}
+                    
+                //first name
+                Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $first_name
+                        )
+                    }
                 }
+                    
+                //last name
+                Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $last_name
+                        )
+                    }
+                }
+                
+                //date of birth
+                Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $date_of_birth)
+                    }
+                }
+                
+                //email
+                Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $email
+                        )
+                    }
+                }
+                
+                //phone number
+                Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $phone_number
+                        )
+                    }
+                }
+                
+                //zipcode
+                Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                    VStack{
+                        TextField(
+                            "", text: $zipcode
+                        )
+                    }
+                }
+                    
             }
-            .frame(width: 300, height: 1000)
+            .frame(width: 300, height: 750)
             .padding(20)
           
         }
