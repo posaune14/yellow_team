@@ -1,33 +1,25 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Center, Container, Text, Title, Fieldset, TextInput, Button } from '@mantine/core'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Center>
+        <Container style={{ borderRadius: '40px', backgroundColor: '#fff', height: '35rem', width: '30rem', margin: '1rem' }}>
+          <Title order={1} style={{ padding: '2rem'}}>
+            Food Bank Sign In
+          </Title>
+          <Center>
+            <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"20rem", height: "15rem", margin: '2rem'}}>
+              <TextInput label="Food Bank" placeholder="Enter your username here"   size="xl" />
+              <TextInput label="Password" placeholder="Enter your password here"   size="xl" mt="md" type='password'/>
+            </Fieldset>
+          </Center>
+
+            <Button margin="xl" varient="light" color="gray" size="md" radius="xl">Sign in</Button>
+        </Container>
+      </Center>
     </>
   )
 }
