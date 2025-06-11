@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Center } from '@mantine/core'
 import SigninBox from './components/SigninBox'
 import Landing from './pages/Landing'
+import Nav from './components/Nav'
 import Dashboard from './components/Dashboard'
 import './App.css'
 
 function App() {
   return (
+    
     <Router>
       <Routes>
         <Route path="/" element={

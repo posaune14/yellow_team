@@ -1,10 +1,22 @@
 import Hero from '../components/Hero'
-import { Center } from '@mantine/core'
+import Examples from '../components/Examples'
+import { Center, Flex } from '@mantine/core'
+import Nav from '../components/Nav'
 function Landing() {
     return (
-        <Center>
+        <>
+        <Flex   
+            mih={50}
+            gap="xl"
+            justify="center"
+            align="center"
+            direction="column"
+            wrap="wrap">
+            <Nav />
             <Hero />
-        </Center>
+            <Examples />
+        </Flex>
+        </>
     )
 }
 
