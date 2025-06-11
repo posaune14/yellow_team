@@ -12,7 +12,7 @@ function Landing() {
             align="center"
             direction="column"
             wrap="wrap">
-            <Nav />
+            {/* <Nav /> */}
             <Hero />
             <Examples />
         </Flex>
