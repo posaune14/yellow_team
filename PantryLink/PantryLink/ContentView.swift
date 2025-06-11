@@ -87,9 +87,16 @@ struct ContentView: View {
                         )
                     }
                 }
+                
+                //button
+                Section(header: Button(action: {
+                    //button action
+                })  {
+                    Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
+                }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
                     
             }
-            .frame(width: 300, height: 750)
+            .frame(width: 300, height: 850)
             .padding(20)
           
         }
