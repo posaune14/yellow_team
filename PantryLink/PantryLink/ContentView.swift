@@ -28,12 +28,44 @@ struct ContentView: View {
             
             //paragraph
             VStack{
-                Text("Earn community service hours, respect, and a good feeling").font(.system(size: 40, weight: .bold, design: .serif)).foregroundStyle(.white)
+                Text("Earn community service hours, respect, and a good feeling").font(.system(size: 36, weight: .bold, design: .serif)).foregroundStyle(.white).frame(maxWidth: 300)
             }
+            
+            //volunteer oppertunities
+            VStack(spacing: 0){
+                ZStack(){
+                    Rectangle().frame(width: 300, height: 125).foregroundStyle(.white)
+                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.gray)
+                    Text("Food Distribution").font(.system(size: 30, weight: .light))
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.white)
+                    Text("Sorting/Packing").font(.system(size: 30, weight: .light))
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.gray)
+                    Text("Delivery").font(.system(size: 30, weight: .light))
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.white)
+                    Text("Admin Support").font(.system(size: 30, weight: .light))
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.gray)
+                    Text("Fundraising Support").font(.system(size: 30, weight: .light))
+                }
+                ZStack{
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.white)
+                    Text("Cleaning/Sanitation").font(.system(size: 30, weight: .light))
+                }
+            }.padding(20)
             
             //register form
             Form{
-                Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.center)){}
+                Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
                     
                 //first name
                 Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
@@ -97,12 +129,12 @@ struct ContentView: View {
                     
             }
             .frame(width: 300, height: 850)
-            .padding(20)
+            .padding(40)
           
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.gray)
+        .background(.brown)
 
     }
 }
