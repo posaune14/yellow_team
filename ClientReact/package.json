@@ -19,6 +19,7 @@
     "@mantine/notifications": "^8.0.2",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "motion": "^12.18.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
