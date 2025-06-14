@@ -12,12 +12,11 @@ function Hero() {
         position: 'relative',
         overflow: 'hidden',
         minHeight: '100vh',
-        width: '100vw', // full viewport width
-        padding: '3rem 0', // no horizontal padding
+        width: '100vw', 
+        padding: '3rem 0', 
         background: 'linear-gradient(120deg, #d3bdb3, #917f7b)',
       }}
     >
-      {/* Spotlight Gradient Background */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.2 }}
@@ -41,7 +40,6 @@ function Hero() {
         align="center"
         style={{ position: 'relative', zIndex: 2, flexWrap: 'wrap', width: '100%', maxWidth: '100vw', margin: '0 auto' }}
       >
-        {/* Text Side */}
         <Flex
           direction="column"
           gap="md"
@@ -82,7 +80,6 @@ function Hero() {
           </motion.div>
         </Flex>
 
-        {/* Image Side */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -91,11 +88,10 @@ function Hero() {
         >
           <Image
             src={example}
-            // Remove fixed height; let image display at natural size
             style={{
               width: 'auto',
               height: 'auto',
-              maxWidth: '100%', // responsive max width
+              maxWidth: '100%', 
               borderRadius: '1rem',
               objectFit: 'contain',
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
@@ -105,7 +101,6 @@ function Hero() {
         </motion.div>
       </Flex>
 
-      {/* Scroll Down Arrow */}
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ repeat: Infinity, duration: 2 }}
