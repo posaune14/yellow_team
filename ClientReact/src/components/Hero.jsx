@@ -2,8 +2,9 @@ import { Box, Text, Flex, Title, Button, Image, Badge } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import example from '../assets/example.jpeg'
+import { useRef } from 'react'
 
-function Hero() {
+function Hero({ onScrollClick1, onScrollClick2, onScrollClick3 }) {
   const navigate = useNavigate()
 
   return (
@@ -14,6 +15,7 @@ function Hero() {
         minHeight: '100vh',
         width: '100vw', 
         padding: '3rem 0', 
+        margin: '0',
         background: 'linear-gradient(120deg, #d3bdb3, #917f7b)',
       }}
     >
@@ -63,9 +65,15 @@ function Hero() {
             </Text>
 
             <Flex gap="sm" mt="md">
-              <Badge color="dark" variant="filled">Donor Management</Badge>
-              <Badge color="gray" variant="light">Volunteer Scheduling</Badge>
-              <Badge color="gray" variant="light">Inventory Control</Badge>
+              <Button onClick={onScrollClick1} variant="transparent"  padding='-1rem'>
+                <Badge color="dark" variant="filled">Mobile App</Badge>
+              </Button>
+              <Button onClick={onScrollClick2} variant="transparent" padding='-1rem'>
+                <Badge color="dark" variant="light">Volunteer Scheduling</Badge>
+             </Button>
+              <Button onClick={onScrollClick3} variant="transparent" padding='-1rem'>
+                <Badge color="dark" variant="light">Inventory Tracking</Badge>
+              </Button>
             </Flex>
 
             <motion.div

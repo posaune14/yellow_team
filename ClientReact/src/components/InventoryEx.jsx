@@ -1,13 +1,11 @@
+import {forwardRef, useRef} from 'react'
 import { Container, Title, Text, Button, Center, Image, Flex } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
-import homePageBottom from '../assets/homePageBottom.png'
-import homePageTop from '../assets/homePageTop.png'
-import { useEffect } from 'react'
-function Examples() {
-    const navigate = useNavigate()
 
+const InventoryEx = forwardRef((props, ref) => {
+    const navigate = useNavigate()
     return (
-        <Center>
+        <Center ref={ref} {...props}>
             <Flex
                 mih={50}
                 gap={"5rem"}
@@ -16,12 +14,10 @@ function Examples() {
                 direction="row"
                 wrap="wrap"
                 >
-                    <Image h={400} w={'auto'} src={homePageTop}></Image>
-                    <Image h={400} w={'auto'} src={homePageBottom}></Image>
+                    <Image h={400} w={'auto'} alt='inventoryEx' src={} />
                 </Flex>
-                
+
         </Center>
     )
-}
-
-export default Examples 
+})
+export default InventoryEx;
