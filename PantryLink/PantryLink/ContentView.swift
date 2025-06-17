@@ -6,16 +6,24 @@
 //
 
 import SwiftUI
-//add colors here
 
 struct ContentView: View {
-    //data fields
+    //form 1 data fields
     @State var first_name: String = ""
     @State var last_name: String = ""
     @State var date_of_birth: String = ""
     @State var email: String = ""
     @State var phone_number: String = ""
     @State var zipcode: String = ""
+    
+    //form 2 data fields
+    @State var role: String = ""
+    @State var availability: String = ""
+    @State var contact_name: String = ""
+    @State var contact_number: String = ""
+    
+    //pop up variable
+    @State var isClicked = false
     
     var body: some View {
         ScrollView {
@@ -35,7 +43,7 @@ struct ContentView: View {
             VStack(spacing: 0){
                 ZStack(){
                     Rectangle().frame(width: 300, height: 125).foregroundStyle(.white)
-                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)
+                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading).frame(width: 300)
                 }
                 ZStack{
                     Rectangle().frame(width: 300, height: 75).foregroundStyle(.gray)
@@ -64,78 +72,121 @@ struct ContentView: View {
             }.padding(20)
             
             //register form
-            Form{
-                Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
+            ZStack{
+                if !isClicked{
+                    Form{
+                        Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
+                        
+                        //first name
+                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $first_name
+                                )
+                            }
+                        }
+                        
+                        //last name
+                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $last_name
+                                )
+                            }
+                        }
+                        
+                        //date of birth
+                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $date_of_birth)
+                            }
+                        }
+                        
+                        //email
+                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $email
+                                )
+                            }
+                        }
+                        
+                        //phone number
+                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $phone_number
+                                )
+                            }
+                        }
+                        
+                        //zipcode
+                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $zipcode
+                                )
+                            }
+                        }
+                        
+                        //button
+                        Section(header: Button(action: {
+                            isClicked = true
+                            print("click")
+                        })  {
+                            Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
+                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
+                        
+                    }.frame(width: 300, height: 850)
+                        .padding(40)
                     
-                //first name
-                Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $first_name
-                        )
-                    }
-                }
-                    
-                //last name
-                Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $last_name
-                        )
-                    }
-                }
-                
-                //date of birth
-                Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $date_of_birth)
-                    }
-                }
-                
-                //email
-                Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $email
-                        )
-                    }
-                }
-                
-                //phone number
-                Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $phone_number
-                        )
-                    }
+                } else {
+                    Form{
+                        
+                        //Text
+                        Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.black).multilineTextAlignment(.leading)){}
+                        Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
+                        
+                        //preferred roles
+                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $role
+                                )
+                            }
+                        }
+                        
+                        //availability
+                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "", text: $availability
+                                )
+                            }
+                        }
+                        
+                        //Emergency Contact
+                        Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                            VStack{
+                                TextField(
+                                    "Name", text: $contact_name
+                                )
+                                TextField(
+                                    "Phone Number", text: $contact_number
+                                )
+                            }
+                        }
+                        
+                    }.frame(width: 300, height: 700).padding(40)
                 }
                 
-                //zipcode
-                Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
-                    VStack{
-                        TextField(
-                            "", text: $zipcode
-                        )
-                    }
-                }
-                
-                //button
-                Section(header: Button(action: {
-                    //button action
-                })  {
-                    Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
-                    
-            }
-            .frame(width: 300, height: 850)
-            .padding(40)
-          
+            }.animation(.easeIn(duration: 4), value: isClicked)
         }
-        .padding()
+        .padding(0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.brown)
-
+        
     }
 }
 
