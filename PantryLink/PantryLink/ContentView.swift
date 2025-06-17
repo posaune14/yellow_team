@@ -133,7 +133,7 @@ struct ContentView: View {
                         //button
                         Section(header: Button(action: {
                             isClicked = true
-                            print("click")
+                            print("Register")
                         })  {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
@@ -178,7 +178,13 @@ struct ContentView: View {
                             }
                         }
                         
-                    }.frame(width: 300, height: 700).padding(40)
+                        Section(header: Button(action: {
+                            print("continue")
+                        })  {
+                            Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
+                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
+                        
+                    }.frame(width: 300, height: 750).padding(40)
                 }
                 
             }.animation(.easeIn(duration: 4), value: isClicked)
