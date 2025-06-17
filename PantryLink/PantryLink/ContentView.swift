@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+//create colors
+struct Colors {
+    static let customBrown: Color = Color("customBrown")
+    
+    static let customGreen: Color = Color("customGreen")
+}
+
 struct ContentView: View {
     //form 1 data fields
     @State var first_name: String = ""
@@ -31,7 +38,7 @@ struct ContentView: View {
             //title
             VStack{
                 Text("Start Volunteering").font(.system(size: 48, weight: .black, design: .serif)).foregroundStyle(.white).multilineTextAlignment(.center)
-                Text("Today").font(.system(size: 48, weight: .light, design: .rounded)).foregroundStyle(.green)
+                Text("Today").font(.system(size: 48, weight: .light, design: .rounded)).foregroundStyle(.customGreen)
             }.padding(20)
             
             //paragraph
@@ -43,7 +50,7 @@ struct ContentView: View {
             VStack(spacing: 0){
                 ZStack(){
                     Rectangle().frame(width: 300, height: 125).foregroundStyle(.white)
-                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading).frame(width: 300)
+                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading).frame(width: 300)
                 }
                 ZStack{
                     Rectangle().frame(width: 300, height: 75).foregroundStyle(.gray)
@@ -75,7 +82,7 @@ struct ContentView: View {
             ZStack{
                 if !isClicked{
                     Form{
-                        Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
+                        Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //first name
                         Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
@@ -136,7 +143,7 @@ struct ContentView: View {
                             print("Register")
                         })  {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
+                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.white)){}
                         
                     }.frame(width: 300, height: 850)
                         .padding(40)
@@ -146,7 +153,7 @@ struct ContentView: View {
                         
                         //Text
                         Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.black).multilineTextAlignment(.leading)){}
-                        Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.green).multilineTextAlignment(.leading)){}
+                        Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //preferred roles
                         Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
@@ -182,7 +189,7 @@ struct ContentView: View {
                             print("continue")
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.green).foregroundStyle(.white)){}
+                        }.frame(maxWidth: .infinity, alignment: .center).background(.customGreen).foregroundStyle(.white)){}
                         
                     }.frame(width: 300, height: 750).padding(40)
                 }
@@ -191,7 +198,7 @@ struct ContentView: View {
         }
         .padding(0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.brown)
+        .background(.customBrown)
         
     }
 }
