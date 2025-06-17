@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    
     //form 1 data fields
     @State var first_name: String = ""
     @State var last_name: String = ""
