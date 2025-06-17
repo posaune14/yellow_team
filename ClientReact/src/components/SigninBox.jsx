@@ -1,4 +1,4 @@
-import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset } from '@mantine/core'
+import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 
 function SigninBox() {
@@ -18,8 +18,8 @@ function SigninBox() {
             </Title>
             <Center>
                 <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"20rem", height: "15rem", margin: '2rem'}}>
-                <TextInput label="Food Bank" placeholder="Enter your username here"   size="xl" />
-                <TextInput label="Password" placeholder="Enter your password here"   size="xl" mt="md" type='password'/>
+                    <TextInput label="Food Bank" placeholder="Enter your username here"   size="xl" />
+                    <TextInput label="Password" placeholder="Enter your password here"   size="xl" mt="md" type='password'/>
                 </Fieldset>
             </Center>
 
@@ -33,6 +33,9 @@ function SigninBox() {
                 >
                     Sign in
                 </Button>
+                
+                <Text style={{padding: '2rem'}}>New here? <Anchor>Register your food bank today.</Anchor> </Text>
+                
             </Container>
         </Center>
     )

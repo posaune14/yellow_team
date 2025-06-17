@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
     const navigate = useNavigate()
+    // https://dribbble.com/shots/25241984-Task-Management-Dashboard
 
     return (
         <Center>
-            
                 <Text size="lg" style={{ padding: '2rem', textAlign: 'center' }}>
                     You have successfully signed in!
                 </Text>
                 <Center>
-                    <Button 
+                    <Button  
                         onClick={() => navigate('/')} 
                         variant="light" 
                         color="gray" 
