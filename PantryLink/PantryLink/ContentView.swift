@@ -43,7 +43,7 @@ struct ContentView: View {
             
             //paragraph
             VStack{
-                Text("Earn community service hours, respect, and a good feeling").font(.system(size: 36, weight: .bold, design: .serif)).foregroundStyle(.white).frame(maxWidth: 300)
+                Text("Earn community service hours, respect, and a good feeling").font(.system(size: 28, weight: .bold, design: .serif)).foregroundStyle(.white).frame(maxWidth: 300)
             }
             
             //volunteer oppertunities
