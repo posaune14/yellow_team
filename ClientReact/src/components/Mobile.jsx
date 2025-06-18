@@ -1,11 +1,12 @@
-import {Box, Button, Title, Text} from "@mantine/core";
-
+import {Box, Button, Title, Text, Image} from "@mantine/core";
+import { motion } from "framer-motion"
+import appstore from "../assets/appstore.svg"
 function Mobile() {
     return (
-        <Box style={{ backgroundColor: '#fff', padding: '1rem', textAlign: 'center', minHeight: '100vh', minWidth: '100vw'}}>
-            <Title order={2}>Mobile View</Title>
+        <Box style={{ background: 'linear-gradient(120deg, #d3bdb3, #917f7b)', padding: '1rem', textAlign: 'center', minHeight: '100vh', minWidth: '100vw'}}>
+            <Title order={2}>PantryLink</Title>
             <Text>Welcome to the mobile experience!</Text>
-            <Button>Get Started</Button>
+            <Image src="appstore"/>
         </Box>
     )
 }

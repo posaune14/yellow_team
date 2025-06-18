@@ -1,7 +1,6 @@
 import Hero from '../components/Hero'
 import MobileEx from '../components/MobileEx'
 import { Center, Flex, Space } from '@mantine/core'
-import Nav from '../components/Nav'
 import {useMediaQuery} from '@mantine/hooks'
 import Mobile from '../components/Mobile'
 import { useRef } from 'react'
