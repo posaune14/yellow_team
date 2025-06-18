@@ -2,11 +2,14 @@ import { Box, Text, Flex, Title, Button, Image, Badge } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import example from '../assets/example.jpeg'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { TextAnimate } from '@gfazioli/mantine-text-animate'
 
 function Hero({ onScrollClick1, onScrollClick2, onScrollClick3 }) {
   const navigate = useNavigate()
 
+  const [isTypeEnd, setIsTypeEnd] = useState(0);
+  const [isTypeLoop, setIsTypeLoop] = useState(0);
   return (
     <Box
       style={{
@@ -59,10 +62,23 @@ function Hero({ onScrollClick1, onScrollClick2, onScrollClick3 }) {
             <Title order={1} size="3rem" style={{ fontWeight: 800 }}>
               One Platform. Every Tool Your Food Bank Needs.
             </Title>
-
-            <Text size="lg" mt="sm">
-              Track donations, manage inventory, and support your community - effortlessly.
-            </Text>
+            <TextAnimate.Typewriter
+              onTypeEnd={() => {
+                setIsTypeEnd((prev) => prev + 1);
+              }}
+              onTypeLoop={() => {
+                setIsTypeLoop((prev) => prev + 1);
+              }}
+              fw={700}
+              size="xl"
+              pauseDelay={1000}
+              value={[
+                'Track donations',
+                'Manage inventory',
+                'Support your community',
+                'Schedule Volunteers'
+              ]}
+            />
 
             <Flex gap="sm" mt="md">
               <Button onClick={onScrollClick1} variant="transparent"  padding='-1rem'>
@@ -127,76 +143,3 @@ function Hero({ onScrollClick1, onScrollClick2, onScrollClick3 }) {
 }
 
 export default Hero
-
-
-
-{/*import { Box, Text, Flex, Title, Button, Image, Container } from '@mantine/core'
-import { useNavigate } from 'react-router-dom'
-import example from "../assets/example.jpeg"
-import logo from "../assets/PantrylinkLogo.png"
-import { motion } from 'framer-motion';
-function Hero() {
-    const Navigate = useNavigate()
-    return (
-        <Box style={{ padding: '2rem 2rem 2rem 0', marginTop: '-2rem',shrinkToFit: 'true', textAlign: 'center', minHeight: '100vh',minWidth: '100vw', backgroundImage: 'linear-gradient(to right, #D3BDB3, #917F7B)', backgroundRepeat: 'no-repeat',}}>
-            <Flex
-            style={{ height: '100%' }}
-            gap="xl"
-            justify="flex-start"
-            align="flex-start"
-            direction="row"
-            wrap="nowrap"
-            >
-            
-            <Box style={{ flexShrink: 0 }}>
-                <Image
-                h="25rem"
-                w="auto"
-                src={example}
-                style={{
-                    marginLeft: '-10rem',
-                    margin: 0,
-                    borderBottomRightRadius: '500px',
-                    borderTopRightRadius: '500px',
-                    display: 'block',
-                }}
-                />
-            </Box>
-
-            <Flex
-                mih={50}
-                gap="xl"
-                justify="center"
-                align="flex-start"
-                direction="column"
-                style={{ flexGrow: 1 }}
-            >
-                <motion.div
-                    initial={{ opacity: 0, x: 100 }} 
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 1, delay: 0.2, easing: 'ease-in-out' }}
-                >
-                    <Title order={1} color="dark">
-                    A One stop, Food Bank Management System
-                    </Title>
-                    <Title order={2}>Manage your food bank with ease</Title>
-                </motion.div>
-            </Flex>
-            </Flex>
-
-            <Box mt="xl">
-                <motion.div 
-                    whileHover={{ scale: 1.1, rotate: 2 }}
-                    transition={{ type: 'spring', stiffness: 300 }}>
-                        <Button size="xl" color="dark" onClick={() => Navigate('/signin')}>
-                            Get Started
-                        </Button>
-                    </motion.div>
-                
-            </Box>     
-            </Box>
-        );
-
-}
-
-export default Hero*/}

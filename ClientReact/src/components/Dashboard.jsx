@@ -1,66 +1,113 @@
-import { Container, Title, Text, Button, Center, Drawer, AppShell, Menu, NavLink, Space } from '@mantine/core'
-import { useNavigate } from 'react-router-dom'
 import {
+    AppShell,
+    Button,
+    Group,
+    Avatar,
+    Text,
+    Box,
+    ScrollArea,
+    NavLink,
+    Grid,
+    Paper,
+    Stack,
+    Container,
+  } from '@mantine/core'
+  import {
     IconSettings,
-    IconInfoSquareRounded,
-    IconArrowsLeftRight,
-    IconChevronRight,
     IconGauge,
-  } from '@tabler/icons-react';
-
- 
-function Dashboard() {
-    const Navbar = () => {
-        return(
-            <>
-            <Container h='90vh' w='20vw' style={{backgroundColor: '#e3e3e3', margin: '2rem', borderRadius: '20px', paddingTop: '2rem'}}>
-            
-            <NavLink 
-                href="#required-for-focus"
-                label="With right section"
-                leftSection={<IconGauge size={16} stroke={1.5} />}
-                rightSection={<IconChevronRight size={12} stroke={1.5} className="mantine-rotate-rtl" />}
-            />
-            </Container>
-            </>
-        )
-    }
-    const navigate = useNavigate()
-    // https://dribbble.com/shots/25241984-Task-Management-Dashboard
-
+    IconCalendar,
+    IconUser,
+    IconChartBar,
+  } from '@tabler/icons-react'
+  
+ function Dashboard() {
     return (
-        <AppShell withBorder={false}>
-            <AppShell.Header style={{marginLeft: '24vw'}}>
-            <Container w='90vw' h='7vh' style={{backgroundColor: '#e3e3e3', margin: '2rem', borderRadius: '20px'}}>
-            <Menu>
-                <Menu.Target>
-                    <Button variant='light' color='grey' radius='xl'><IconSettings size={30} color='black'/></Button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                    <Menu.Label>Application</Menu.Label>
-                        <Menu.Item>
-                            Itewm
-                        </Menu.Item>
-                    <Menu.Divider />
-                    <Menu.Label>Account</Menu.Label>
-                    <Menu.Item>
-                        Account settings
-                    </Menu.Item>
-                    <Menu.Item onClick={() => navigate('/')} color='red'>
-                        Sign out
-                    </Menu.Item>
-                </Menu.Dropdown>
-            </Menu>
-            </Container>
-            </AppShell.Header>
-            <AppShell.Navbar >
-                <Navbar />
-            </AppShell.Navbar>
-            <AppShell.Main>
-
-            </AppShell.Main>
-        </AppShell>
+      <AppShell
+        padding="md"
+        navbar={{ width: 240 }}
+        header={{ height: 70 }}
+      >
+        {/* Sidebar */}
+        <AppShell.Navbar p="md">
+          <ScrollArea>
+            <Text fw={700} size="xl" mb="lg">
+              Donezo
+            </Text>
+            <NavLink label="Dashboard" icon={<IconGauge size={20} />} />
+            <NavLink label="Inventory" icon={<IconChartBar size={20} />} />
+            <NavLink label="Calendar" icon={<IconCalendar size={20} />} />
+            <NavLink label="Volunteers" icon={<IconChartBar size={20} />} />
+            <NavLink label="Stream" icon={<IconUser size={20} />} />
+            <Box mt="lg">
+              <NavLink label="Settings" icon={<IconSettings size={20} />} />
+              <NavLink label="Logout" color='red'/>
+            </Box>
+          </ScrollArea>
+        </AppShell.Navbar>
+  
+        {/* Header */}
+        <AppShell.Header px="md" style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+          <Group h="100%" position="apart">
+            <Text fw={700} size="lg">Dashboard</Text>
+            <Group>
+              <Button variant="light" color="gray">
+                + Add Project
+              </Button>
+              <Avatar radius="xl" />
+            </Group>
+          </Group>
+        </AppShell.Header>
+  
+        {/* Main Content */}
+        <AppShell.Main>
+          <Stack spacing="md">
+            <Grid>
+              <Grid.Col span={3}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" color="dimmed">Total Volunteers</Text>
+                  <Text size="xl" fw={700}>24</Text>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" color="dimmed">Stock(%)</Text>
+                  <Text size="xl" fw={700}>58</Text>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" color="dimmed">X</Text>
+                  <Text size="xl" fw={700}>12</Text>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" color="dimmed">X</Text>
+                  <Text size="xl" fw={700}>2</Text>
+                </Paper>
+              </Grid.Col>
+            </Grid>
+  
+            <Grid>
+              <Grid.Col span={8}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" fw={500} mb="xs">Analytics</Text>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={4}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                  <Text size="sm" fw={500} mb="xs">Reminders</Text>
+                  <Text>Meeting</Text>
+                  <Text size="xs" color="dimmed">2:00 PM – 4:00 PM</Text>
+                  <Button mt="sm" fullWidth radius="xl" variant="gradient" gradient={{ from: 'teal', to: 'green' }}>
+                    Start Meeting
+                  </Button>
+                </Paper>
+              </Grid.Col>
+            </Grid>
+          </Stack>
+        </AppShell.Main>
+      </AppShell>
     )
-}
-
-export default Dashboard 
+  }
+export default Dashboard  
