@@ -194,7 +194,7 @@ struct ContentView: View {
                     }.frame(width: 300, height: 750).padding(40)
                 }
                 
-            }.animation(.easeIn(duration: 4), value: isClicked)
+            }.animation(.easeIn(duration: 1.5), value: isClicked)
         }
         .padding(0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
