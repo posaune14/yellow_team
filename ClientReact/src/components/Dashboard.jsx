@@ -12,6 +12,7 @@ import {
     Stack,
     Container,
     Flex,
+    Menu,
   } from '@mantine/core'
   import {
     IconSettings,
@@ -107,12 +108,26 @@ import {
   const Inventory = ()=> {
     return(
       <>
-        
+        <Text>Inventory Page</Text>
+      </>
+    )
+  }
+  const Volunteer = ()=> {
+    return(
+      <>
+        <Text>Volunteer Page</Text>
+      </>
+    )
+  }
+  const Stream = ()=> {
+    return(
+      <>
+        <Text>Stream</Text>
       </>
     )
   }
  function Dashboard() {
-    let [page, setPage] = useState("dash")
+    let [page, setPage] = useState("")
     return (
       <AppShell
         padding="md"
@@ -125,10 +140,10 @@ import {
             <Text fw={700} size="xl" mb="lg">
               PantryLink
             </Text>
-            <NavLink label="Dashboard" icon={<IconGauge size={20} />} onClick={setPage ="dash"} />
-            <NavLink label="Inventory" icon={<IconChartBar size={20} />} />
-            <NavLink label="Volunteers" icon={<IconChartBar size={20} />} />
-            <NavLink label="Stream" icon={<IconUser size={20} />} />
+            <NavLink label="Dashboard" icon={<IconGauge size={20} />}  onClick={() => setPage("dash")}  />
+            <NavLink label="Inventory" icon={<IconChartBar size={20} />}  onClick={() => setPage("inv")} />
+            <NavLink label="Volunteers" icon={<IconChartBar size={20} />} onClick={()=> setPage("vol")}/>
+            <NavLink label="Stream" icon={<IconUser size={20} />} onClick={()=> setPage("stream")}/>
             <Box mt="lg">
               <NavLink label="Settings" icon={<IconSettings size={20} />} />
               <NavLink label="Logout" color='red'/>
@@ -142,9 +157,16 @@ import {
             <Text fw={700} size="lg">Dashboard</Text>
             <Group>
               <Button variant="light" color="gray">
-                + Add Project
+                Help
               </Button>
-              <Avatar radius="xl" />
+              <Menu>
+                <Menu.Target>
+                  <Avatar radius="xl" />
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item color='red'>Log Out</Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             </Group>
           </Group>
         </AppShell.Header>
@@ -157,6 +179,10 @@ import {
                 return <DashboardComp />;
               case 'inv':
                 return <Inventory />;
+              case 'vol':
+                return <Volunteer />;
+              case 'stream':
+                return <Stream />
               default:
                 return <DashboardComp />;
             }
