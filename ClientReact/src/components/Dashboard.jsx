@@ -15,6 +15,9 @@ import {
     Menu,
     Select,
     Center,
+    Title,
+    Loader,
+    Blockquote
   } from '@mantine/core'
   import {
     IconSettings,
@@ -170,7 +173,27 @@ import {
   const Stream = ()=> {
     return(
       <>
-        <Text>Stream</Text>
+        <Stack spacing="md">
+          <Title order={1}>TASK's Stream</Title>
+          <Grid>
+            <Grid.Col span={10}>
+              <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+                <Loader />
+                <Text size="sm" color="dimmed">Stream Loading...</Text>
+                <Blockquote p={'sm'} color='blue'>
+                  <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
+                    <Text fw={900}></Text>
+                    <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                      <Text>2nd Volunteer shift starts</Text>
+                    </div>
+                  </Flex>
+                </Blockquote>
+                
+
+              </Paper>
+            </Grid.Col>
+          </Grid>
+        </Stack>
       </>
     )
   }
