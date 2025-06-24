@@ -17,7 +17,8 @@ import {
     Center,
     Title,
     Loader,
-    Blockquote
+    Blockquote,
+    TextInput
   } from '@mantine/core'
   import {
     IconSettings,
@@ -25,6 +26,8 @@ import {
     IconCalendar,
     IconUser,
     IconChartBar,
+    IconMessage,
+    IconSend
   } from '@tabler/icons-react'
   import { useState } from 'react'
   const DashboardComp = ()=>{
@@ -176,22 +179,25 @@ import {
         <Stack spacing="md">
           <Title order={1}>TASK's Stream</Title>
           <Grid>
-            <Grid.Col span={10}>
-              <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+              <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5', width: '100%' }}>
                 <Loader />
                 <Text size="sm" color="dimmed">Stream Loading...</Text>
-                <Blockquote p={'sm'} color='blue'>
-                  <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                    <Text fw={900}></Text>
-                    <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                      <Text>2nd Volunteer shift starts</Text>
-                    </div>
-                  </Flex>
-                </Blockquote>
-                
-
+                <ScrollArea style={{ height: '30rem' }}>
+                <Stack spacing="xs" mt="md">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <Blockquote key={i} p={'sm'} color='blue'>
+                        <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
+                          <Text fw={900}>12.21.2024</Text>
+                          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                            <Text>Tamales and horchata available for a limited time only!</Text>
+                          </div>
+                        </Flex>
+                      </Blockquote>
+                    ))}
+                    </Stack>
+                    </ScrollArea>
+                    <TextInput p={'sm'} radius={'xl'} placeholder="Type your message..." leftSection={<IconMessage size={16} />} rightSection={<Button variant="light" size="xs" radius="xl">Button</Button>} />
               </Paper>
-            </Grid.Col>
           </Grid>
         </Stack>
       </>
