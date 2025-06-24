@@ -13,6 +13,8 @@ import {
     Container,
     Flex,
     Menu,
+    Select,
+    Center,
   } from '@mantine/core'
   import {
     IconSettings,
@@ -105,10 +107,56 @@ import {
     )
   }
 
+  const items = [
+    {name:'Tomatoe', current: 44, full: 50, type: 'Vegetables'},
+    {name:'Brocoli', current: 5, full: 50, type: 'Nonperishable'},
+    {name:'Tomatoe', current: 44, full: 50, type: 'Fruits'},
+    {name:'Tomatoe', current: 15, full: 50, type: 'Proteins'},
+    {name:'Tomatoe', current: 44, full: 50, type: 'Vegetables'},
+  ]
+
+  function InvItems({ item }){
+    return(
+
+      <Grid.Col span={2} key={`${item.name}-${item.type}`}>
+        <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#edf5ed' : '#ffdede' }} >
+          <Text size="lg" color="dimmed">{item.name}</Text>
+          <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>{item.current}/{item.full}</Text>
+        </Paper>
+      </Grid.Col>
+    )}
   const Inventory = ()=> {
+    
+    //maybe use a switch?
+    const [sort, setSort] = useState("")
     return(
       <>
-        <Text>Inventory Page</Text>
+      <Flex mih={50}
+        gap="xl"
+        justify="center"
+        align="center"
+        direction="row"
+        wrap="wrap">
+          <Text>TASK's Inventory</Text>
+          <Button variant='light'>
+          <Text color='Blue' size='1.1em'>Edit</Text></Button>
+        </Flex>
+        <Center>
+        <Select
+          label="Filter"
+          placeholder="Pick value"
+          data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+          searchable
+          style={{width: '10rem'}}
+          value={sort}
+          onChange={setSort}
+          />
+        </Center>
+        <Grid>
+          {items.map((item, index) =>(
+            <InvItems key={index} item={item} />
+          ))}
+        </Grid>
       </>
     )
   }
