@@ -18,7 +18,9 @@ import {
     Title,
     Loader,
     Blockquote,
-    TextInput
+    TextInput,
+    Badge,
+    UnstyledButton
   } from '@mantine/core'
   import {
     IconSettings,
@@ -115,14 +117,21 @@ import {
 
  
 
-  function InvItems({ item }){
+  function InvItems({ item, editing }){
+    
     return(
 
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
           <Text size="lg" color="darks">{item.name}</Text>
           <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>{item.current}/{item.full}</Text>
-          
+          {editing && <Badge color="red">
+            <Center>
+                <TextInput variant="unstyled" placeholder='__' p={0}/>
+                <Text p={0}>/</Text>
+                <TextInput variant="unstyled" placeholder='__' p={0}/>
+            </Center>
+          </Badge>}
         </Paper>
       </Grid.Col>
     )}
@@ -203,7 +212,7 @@ import {
         </Center>
         <Grid p={'xl'}>
           {filteredItems.map((item, index) => (
-            <InvItems key={index} item={item} />
+            <InvItems key={index} item={item} editing={editing} />
           ))}
         </Grid>
       </>
