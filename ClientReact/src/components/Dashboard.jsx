@@ -113,19 +113,13 @@ import {
     )
   }
 
-  const items = [
-    {name:'Tomatoe', current: 44, full: 50, type: 'Vegetables'},
-    {name:'Brocoli', current: 5, full: 50, type: 'Nonperishable'},
-    {name:'Tomatoe', current: 44, full: 50, type: 'Fruits'},
-    {name:'Tomatoe', current: 15, full: 50, type: 'Proteins'},
-    {name:'Tomatoe', current: 44, full: 50, type: 'Vegetables'},
-  ]
+ 
 
   function InvItems({ item }){
     return(
 
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
-        <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#edf5ed' : '#ffdede' }} >
+        <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
           <Text size="lg" color="dimmed">{item.name}</Text>
           <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>{item.current}/{item.full}</Text>
         </Paper>
@@ -134,7 +128,54 @@ import {
   const Inventory = ()=> {
     
     //maybe use a switch?
-    const [sort, setSort] = useState("")
+    const [sort, setSort] = useState("") 
+    const [editing, setEditing] = useState(false)
+    const items = [
+    { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
+    { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
+    { name: 'Tomatoe', current: 44, full: 50, type: 'Fruits' },
+    { name: 'Tomatoe', current: 15, full: 50, type: 'Proteins' },
+    { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
+    { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
+    { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
+    { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' },
+    { name: 'Chicken Breast', current: 22, full: 50, type: 'Proteins' },
+    { name: 'Bananas', current: 18, full: 50, type: 'Fruits' },
+    { name: 'Spinach', current: 35, full: 50, type: 'Vegetables' },
+    { name: 'Beans (Dry)', current: 44, full: 50, type: 'Nonperishable' },
+    { name: 'Eggs', current: 10, full: 30, type: 'Proteins' },
+    { name: 'Oranges', current: 27, full: 50, type: 'Fruits' },
+    { name: 'Canned Corn', current: 8, full: 50, type: 'Nonperishable' },
+    { name: 'Beef Patties', current: 20, full: 50, type: 'Proteins' },
+    { name: 'Zucchini', current: 12, full: 50, type: 'Vegetables' },
+    { name: 'Canned Soup', current: 41, full: 50, type: 'Nonperishable' },
+    { name: 'Grapes', current: 29, full: 50, type: 'Fruits' },
+    { name: 'Canned Beans', current: 45, full: 50, type: 'Nonperishable' },
+    { name: 'Turkey Slices', current: 9, full: 50, type: 'Proteins' },
+    { name: 'Peppers', current: 40, full: 50, type: 'Vegetables' },
+    { name: 'Strawberries', current: 33, full: 50, type: 'Fruits' },
+    { name: 'Rice', current: 36, full: 50, type: 'Nonperishable' },
+    { name: 'Lentils', current: 23, full: 50, type: 'Nonperishable' }
+  ]
+
+  let filteredItems;
+  switch (sort) {
+    case 'Fruits':
+      filteredItems = items.filter((item) => item.type === 'Fruits');
+      break;
+    case 'Vegetables':
+      filteredItems = items.filter((item) => item.type === 'Vegetables');
+      break;
+    case 'Proteins':
+      filteredItems = items.filter((item) => item.type === 'Proteins');
+      break;
+    case 'Nonperishable':
+      filteredItems = items.filter((item) => item.type === 'Nonperishable');
+      break;
+    default:
+      filteredItems = items; 
+  }
+
     return(
       <>
       <Flex mih={50}
@@ -144,7 +185,7 @@ import {
         direction="row"
         wrap="wrap">
           <Text>TASK's Inventory</Text>
-          <Button variant='light'>
+          <Button variant='light' onClick={()=> setEditing(!editing)}>
           <Text color='Blue' size='1.1em'>Edit</Text></Button>
         </Flex>
         <Center>
@@ -153,13 +194,14 @@ import {
           placeholder="Pick value"
           data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
           searchable
+          clearable
           style={{width: '10rem'}}
           value={sort}
           onChange={setSort}
           />
         </Center>
-        <Grid>
-          {items.map((item, index) =>(
+        <Grid p={'xl'}>
+          {filteredItems.map((item, index) => (
             <InvItems key={index} item={item} />
           ))}
         </Grid>
@@ -196,7 +238,7 @@ import {
                     ))}
                     </Stack>
                     </ScrollArea>
-                    <TextInput p={'sm'} radius={'xl'} placeholder="Type your message..." leftSection={<IconMessage size={16} />} rightSection={<Button variant="light" size="xs" radius="xl">Button</Button>} />
+                    <TextInput p={'sm'} radius={'xl'} placeholder="Type your message..." leftSection={<IconMessage size={16} />} rightSection={<Button p={0} variant="light" size="xs" radius="xl"><IconSend /></Button>} />
               </Paper>
           </Grid>
         </Stack>
