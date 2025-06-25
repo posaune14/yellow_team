@@ -120,8 +120,9 @@ import {
 
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
-          <Text size="lg" color="dimmed">{item.name}</Text>
+          <Text size="lg" color="darks">{item.name}</Text>
           <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>{item.current}/{item.full}</Text>
+          
         </Paper>
       </Grid.Col>
     )}
