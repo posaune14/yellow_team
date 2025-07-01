@@ -40,7 +40,7 @@ struct ContentView: View {
             //title
             VStack{
                 Text("Start Volunteering").font(.system(size: 48, weight: .black, design: .serif)).foregroundStyle(.white).multilineTextAlignment(.center)
-                Text("Today").font(.system(size: 48, weight: .light, design: .rounded)).foregroundStyle(.customGreen)
+                Text("Today").font(.system(size: 48, weight: .light, design: .rounded)).foregroundStyle(.green)
             }.padding(20)
             
             //paragraph
@@ -147,7 +147,10 @@ struct ContentView: View {
                             print("Register")
                         })  {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.white)){}
+                        }.frame(maxWidth: .infinity, alignment: .center).contentShape(Rectangle, eoFill: .false)
+                            
+                            //.background(Color.customGreen).foregroundStyle(.white)
+                        ){}
                         
                     }.frame(width: 300, height: 850)
                         .padding(40).scrollContentBackground(.hidden)
@@ -193,7 +196,8 @@ struct ContentView: View {
                             print("continue")
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(.customGreen).foregroundStyle(.white)){}
+                        }.frame(maxWidth: .infinity, alignment: .center)
+                            .background(.customGreen).foregroundStyle(.white)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
                 }
