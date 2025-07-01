@@ -26,10 +26,10 @@ struct ContentView: View {
     @State var zipcode: String = ""
     
     //form 2 data fields
-    @State var role: String = ""
+    @State var roles: String = ""
     @State var availability: String = ""
-    @State var contact_name: String = ""
-    @State var contact_number: String = ""
+    @State var emergency_name: String = ""
+    @State var emergency_number: String = ""
     
     //pop up variable
     @State var isClicked = false
@@ -163,7 +163,7 @@ struct ContentView: View {
                         Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
                             VStack{
                                 TextField(
-                                    "", text: $role
+                                    "", text: $roles
                                 )
                             }
                         }
@@ -181,10 +181,10 @@ struct ContentView: View {
                         Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
                             VStack{
                                 TextField(
-                                    "Name", text: $contact_name
+                                    "Name", text: $emergency_name
                                 )
                                 TextField(
-                                    "Phone Number", text: $contact_number
+                                    "Phone Number", text: $emergency_number
                                 )
                             }
                         }
