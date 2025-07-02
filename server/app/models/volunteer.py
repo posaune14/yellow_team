@@ -18,7 +18,7 @@ class volunteer_model:
             "emergency_number": emergency_number,
         }
         result = self.collection.insert_one(volunteer_data)
-        return str(result.inserted_id())
+        return str(result.inserted_id)
     
     def find_volunteer_by_id(self, id):
         return list(
