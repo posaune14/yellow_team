@@ -10,5 +10,9 @@ def init_config(app):
     mongo = PyMongo(app)
     app.mongo = mongo 
     app.db = mongo.cx["test"]
-    mongo.cx.admin.command["ping"]
-    print("MongoDB connected")
+    try:
+        mongo.cx.admin.command("ping")
+        print("MongoDB connected")
+
+    except Exception as e:
+        print(f"Mongo DB Connection Failed: {e}")
