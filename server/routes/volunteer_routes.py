@@ -12,7 +12,7 @@ def create_volunteer():
         data = request.get_json()
         first_name = data["first_name"]
         last_name = data["last_name"]
-        date_of_birth = data["data_of_birth"]
+        date_of_birth = data["date_of_birth"]
         email = data["email"]
         phone_number = data["phone_number"]
         zipcode = data["zipcode"]
@@ -30,6 +30,6 @@ def create_volunteer():
     
     return jsonify(
         {
-            "_id": response 
+            "_id": response,
         }
     ), 201
