@@ -20,7 +20,9 @@ import {
     Blockquote,
     TextInput,
     Badge,
-    UnstyledButton
+    UnstyledButton,
+    Table,
+    Modal
   } from '@mantine/core'
   import {
     IconSettings,
@@ -29,7 +31,8 @@ import {
     IconUser,
     IconChartBar,
     IconMessage,
-    IconSend
+    IconSend,
+    IconInfoCircle
   } from '@tabler/icons-react'
   import { useState } from 'react'
   const DashboardComp = ()=>{
@@ -219,9 +222,180 @@ import {
     )
   }
   const Volunteer = ()=> {
+    const [volunteerInfo, setVolunteerInfo] = useState(false)
+    const [inboxInfo, setInboxInfo] = useState(false)
     return(
       <>
-        <Text>Volunteer Page</Text>
+        <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+          <Title order={1}>TASK's Volunteer Page</Title>
+        </Paper>
+        <Grid>
+          <Grid.Col span={6}>
+            <Paper mt={'xl'} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+              <Title order={3}>Volunteers</Title>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Name</Table.Th>
+                    <Table.Th>Email</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  <Table.Tr>
+                    <Modal p={0} opened={volunteerInfo} onClose={()=> setVolunteerInfo(false)} centered size="lg" radius="md" padding="lg">
+                      
+                        <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+                          <Group align="center" mb="md" spacing="lg">
+                            <Avatar size={64} radius="xl" color="blue">JD</Avatar>
+                            <div>
+                              <Title order={3} mb={2}>John Doe</Title>
+                              <Text size="sm" color="dimmed">john.doe@example.com</Text>
+                            </div>
+                          </Group>
+                          <Grid gutter="md" mb="md">
+                            <Grid.Col span={6}>
+                              <Text size="sm" fw={500}><b>Phone:</b> 123-456-7890</Text>
+                              <Text size="sm" fw={500}><b>Town:</b> Belle Mead</Text>
+                              <Text size="sm" fw={500}><b>State:</b> NJ</Text>
+                              <Text size="sm" fw={500}><b>Zip:</b> 08502</Text>
+                            </Grid.Col>
+                            <Grid.Col span={6}>
+                              <Text size="sm" fw={500}><b>Shift:</b> Morning</Text>
+                              <Text size="sm" fw={500}><b>Date of Birth:</b> 01/01/1990</Text>
+                              <Text size="sm" fw={500}><b>Preferred Role:</b> Server</Text>
+                            </Grid.Col>
+                            
+                          </Grid>
+                          <Paper p="sm" radius="md" withBorder bg="gray.0">
+                            <Title order={5} mb={4} color="blue">Emergency Contact</Title>
+                            <Text size="sm" fw={500}><b>Name:</b> Jane Doe</Text>
+                            <Text size="sm" fw={500}><b>Phone:</b> 123-456-7890</Text>
+                          </Paper>
+                        </Paper>
+                    </Modal>
+                    <Table.Td>John Doe</Table.Td>
+                    <Table.Td>john.doe@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl" onClick={()=> setVolunteerInfo(true)}><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                </Table.Tbody>
+              </Table>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col mt={'xl'} span={6}>
+            <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+              <Title order={3}>Inbox</Title>
+              <Button variant="gradient" gradient={{ from: 'teal', to: 'green' }} radius="xl" onClick={()=> setInboxInfo(true)}>Open Inbox<Badge p={5} m={5} color="red">3</Badge></Button>
+              <Modal p={0} opened={inboxInfo} onClose={()=> setInboxInfo(false)} centered size="lg" radius="md" padding="lg">
+                <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+                  <Title order={3}>Inbox</Title>
+                  <Table>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Name</Table.Th>
+                        <Table.Th>Email</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {[
+                        {
+                          name: "John Doe",
+                          email: "john.doe@example.com",
+                          phone: "123-456-7890",
+                          town: "Belle Mead",
+                          state: "NJ",
+                          zip: "08502",
+                          shift: "Mornings and Tuesdays",
+                          dob: "01/01/1990",
+                          role: "Server",
+                          emergency: { name: "Jane Doe", phone: "123-456-7890" },
+                          bio: "I want to volunteer because I want to help people and I want to make a difference."
+                        },
+                        {
+                          name: "Jane Doe",
+                          email: "jane.doe@example.com",
+                          phone: "987-654-3210",
+                          town: "Princeton",
+                          state: "NJ",
+                          zip: "08540",
+                          shift: "Afternoons and Weekends",
+                          dob: "02/02/1992",
+                          role: "Cook",
+                          emergency: { name: "John Doe", phone: "987-654-3210" },
+                          bio: "I want to volunteer because I want to help people and I want to make a difference."
+                        }
+                      ].map((applicant, idx) => {
+                        const [expanded, setExpanded] = useState(false);
+                        // To allow per-row expansion, use a component per row
+                        function ApplicantRow() {
+                          const [expanded, setExpanded] = useState(false);
+                          return (
+                            <>
+                              <Table.Tr style={{ cursor: "pointer" }} onClick={() => setExpanded((e) => !e)}>
+                                <Table.Td>
+                                  <Button
+                                    variant="subtle"
+                                    size="xs"
+                                    onClick={e => { e.stopPropagation(); setExpanded(exp => !exp); }}
+                                    style={{ marginRight: 8 }}
+                                  >
+                                    {expanded ? "▼" : "▶"}
+                                  </Button>
+                                  {applicant.name}
+                                </Table.Td>
+                                <Table.Td>{applicant.email}</Table.Td>
+                              </Table.Tr>
+                              <tr>
+                                <td colSpan={2} style={{
+                                  background: "#f8fafc",
+                                  padding: 0,
+                                  border: 0,
+                                  height: 0,
+                                  transition: "height 0.3s cubic-bezier(.4,0,.2,1)"
+                                }}>
+                                  <div
+                                    style={{
+                                      maxHeight: expanded ? 500 : 0,
+                                      overflow: "hidden",
+                                      transition: "max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s cubic-bezier(.4,0,.2,1)",
+                                      opacity: expanded ? 1 : 0,
+                                    }}
+                                  >
+                                    <Paper p="md" radius="md"  style={{ margin: 0, background: "#f8fafc" }}>
+                                      <Grid gutter="md" mb="md">
+                                        <Grid.Col span={6}>
+                                          <Text size="sm" fw={500}><b>Phone:</b> {applicant.phone}</Text>
+                                          <Text size="sm" fw={500}><b>Town:</b> {applicant.town}</Text>
+                                          <Text size="sm" fw={500}><b>State:</b> {applicant.state}</Text>
+                                          <Text size="sm" fw={500}><b>Zip:</b> {applicant.zip}</Text>
+                                        </Grid.Col>
+                                        <Grid.Col span={6}>
+                                          <Text size="sm" fw={500}><b>Availability:</b> {applicant.shift}</Text>
+                                          <Text size="sm" fw={500}><b>Date of Birth:</b> {applicant.dob}</Text>
+                                          <Text size="sm" fw={500}><b>Role:</b> {applicant.role}</Text>
+                                          <Text size="sm" fw={500}><b>Bio:</b> {applicant.bio}</Text>
+                                        </Grid.Col>
+                                      </Grid>
+            
+                                      <Group mt="md">
+                                        <Button color="green" variant="light" radius="xl">Accept</Button>
+                                        <Button color="red" variant="light" radius="xl">Decline</Button>
+                                      </Group>
+                                    </Paper>
+                                  </div>
+                                </td>
+                              </tr>
+                            </>
+                          );
+                        }
+                        return <ApplicantRow key={applicant.email} />;
+                      })}
+                    </Table.Tbody>
+                  </Table>
+                </Paper>
+              </Modal>
+            </Paper>
+          </Grid.Col>
+        </Grid>
       </>
     )
   }
