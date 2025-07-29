@@ -34,8 +34,41 @@ import {
     IconSend,
     IconInfoCircle
   } from '@tabler/icons-react'
+  import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
+  import { Button, Center, Code, Divider, Group, Stack, Text, Title } from '@mantine/core';
+  import { useDisclosure } from '@mantine/hooks';
   import { useState } from 'react'
   const DashboardComp = ()=>{
+    const [started, { open, close }] = useDisclosure(false);
+
+  const onboardingSteps: OnboardingTourStep[] = [
+    {
+      id: 'welcome',
+      title: 'Welcome to the Admin Dashboard',
+      content:
+        'This is a tutorial for the Admin dashboard, which allows you to control what clients see on your app and manage your food bank in one, clean, space.',
+    },
+    {
+      id: 'subtitle',
+      title: 'Subtitle',
+      content: (
+        <Text>
+          You can select any component by using the <Code>data-onboarding-tour-id</Code> attribute
+        </Text>
+      ),
+    },
+    {
+      id: 'button-see-all',
+      title: 'New Features',
+      content: 'Now you can click on the button "See all" to display all the testimonials',
+    },
+    {
+      id: 'testimonial-2',
+      title: 'New Testimonial Layout',
+      content: 'We have improved the Testimonial layout',
+    },
+  ];
+
     return(
       <Stack spacing="md">
             <Grid>
