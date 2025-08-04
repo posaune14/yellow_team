@@ -41,7 +41,8 @@ const MobileEx = forwardRef((props, ref) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                boxShadow: '0 25px 50px rgba(240, 147, 251, 0.5), 0 15px 30px rgba(245, 87, 108, 0.4)'
               }}
             >
             <motion.div
