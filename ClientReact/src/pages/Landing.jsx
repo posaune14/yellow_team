@@ -7,6 +7,7 @@ import { useRef } from 'react'
 import InventoryEx from '../components/InventoryEx'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import VolunteerEx from '../components/VolunteerEx'
 function Landing() {
     const MobileExRef = useRef(null);
 
@@ -60,7 +61,16 @@ function Landing() {
               >
                 <InventoryEx />
               </motion.div>
-              
+              <Space h='2rem'/>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                whileHover={{ scale: 1.02 }}
+                style={{ cursor: 'pointer' }}
+              >
+                <VolunteerEx />
+              </motion.div>
               {/* Features Section */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
