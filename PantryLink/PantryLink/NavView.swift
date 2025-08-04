@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct NavView: View {
     @State private var searchText = ""

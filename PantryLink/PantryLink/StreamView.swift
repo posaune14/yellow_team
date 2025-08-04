@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct StreamView: View {
     var body: some View {
