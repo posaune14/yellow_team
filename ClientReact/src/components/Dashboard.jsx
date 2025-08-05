@@ -32,9 +32,12 @@ import {
     IconChartBar,
     IconMessage,
     IconSend,
-    IconInfoCircle
+    IconInfoCircle,
+    IconCheck,
+    IconDeviceFloppy
   } from '@tabler/icons-react'
   import { useState } from 'react'
+  import { notifications } from '@mantine/notifications'
   const DashboardComp = ()=>{
     return(
       <Stack spacing="md">
@@ -130,56 +133,171 @@ import {
 
  
 
-  function InvItems({ item, editing }){
+  function InvItems({ item, editing, onSave }){
+    const [currentValue, setCurrentValue] = useState(item.current)
+    const [fullValue, setFullValue] = useState(item.full)
+    const [isEditing, setIsEditing] = useState(false)
+    
+    const handleSave = () => {
+      onSave(item.name, currentValue, fullValue)
+      setIsEditing(false)
+    }
+    
+    const handleCancel = () => {
+      setCurrentValue(item.current)
+      setFullValue(item.full)
+      setIsEditing(false)
+    }
     
     return(
-
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
           <Text size="lg" color="darks">{item.name}</Text>
-          <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>{item.current}/{item.full}</Text>
-          {editing && <Badge color="red">
-            <Center>
-                <TextInput variant="unstyled" placeholder='__' p={0}/>
-                <Text p={0}>/</Text>
-                <TextInput variant="unstyled" placeholder='__' p={0}/>
-            </Center>
-          </Badge>}
+          {!isEditing ? (
+            <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>
+              {item.current}/{item.full}
+            </Text>
+          ) : (
+            <Stack spacing="xs" mt="xs">
+              <Group gap="xs" justify="center">
+                <TextInput
+                  variant="filled"
+                  size="xs"
+                  placeholder={item.current.toString()}
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(parseInt(e.target.value) || 0)}
+                  style={{ width: '60px' }}
+                  styles={{
+                    input: {
+                      textAlign: 'center',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }
+                  }}
+                />
+                <Text size="sm" fw={600}>/</Text>
+                <TextInput
+                  variant="filled"
+                  size="xs"
+                  placeholder={item.full.toString()}
+                  value={fullValue}
+                  onChange={(e) => setFullValue(parseInt(e.target.value) || 0)}
+                  style={{ width: '60px' }}
+                  styles={{
+                    input: {
+                      textAlign: 'center',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }
+                  }}
+                />
+              </Group>
+              <Group gap="xs" justify="center">
+                <Button 
+                  size="xs" 
+                  color="green" 
+                  onClick={handleSave}
+                  radius="sm"
+                >
+                  Save
+                </Button>
+                <Button 
+                  size="xs" 
+                  variant="light" 
+                  color="gray" 
+                  onClick={handleCancel}
+                  radius="sm"
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Stack>
+          )}
+          {editing && !isEditing && (
+            <Button 
+              size="xs" 
+              variant="light" 
+              color="blue" 
+              onClick={() => setIsEditing(true)}
+              mt="xs"
+              radius="sm"
+              fullWidth
+            >
+              Edit
+            </Button>
+          )}
         </Paper>
       </Grid.Col>
-    )}
+    )
+  }
   const Inventory = ()=> {
     
     //maybe use a switch?
     const [sort, setSort] = useState("") 
     const [editing, setEditing] = useState(false)
-    const items = [
-    { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
-    { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
-    { name: 'Tomatoe', current: 44, full: 50, type: 'Fruits' },
-    { name: 'Tomatoe', current: 15, full: 50, type: 'Proteins' },
-    { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
-    { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
-    { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
-    { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' },
-    { name: 'Chicken Breast', current: 22, full: 50, type: 'Proteins' },
-    { name: 'Bananas', current: 18, full: 50, type: 'Fruits' },
-    { name: 'Spinach', current: 35, full: 50, type: 'Vegetables' },
-    { name: 'Beans (Dry)', current: 44, full: 50, type: 'Nonperishable' },
-    { name: 'Eggs', current: 10, full: 30, type: 'Proteins' },
-    { name: 'Oranges', current: 27, full: 50, type: 'Fruits' },
-    { name: 'Canned Corn', current: 8, full: 50, type: 'Nonperishable' },
-    { name: 'Beef Patties', current: 20, full: 50, type: 'Proteins' },
-    { name: 'Zucchini', current: 12, full: 50, type: 'Vegetables' },
-    { name: 'Canned Soup', current: 41, full: 50, type: 'Nonperishable' },
-    { name: 'Grapes', current: 29, full: 50, type: 'Fruits' },
-    { name: 'Canned Beans', current: 45, full: 50, type: 'Nonperishable' },
-    { name: 'Turkey Slices', current: 9, full: 50, type: 'Proteins' },
-    { name: 'Peppers', current: 40, full: 50, type: 'Vegetables' },
-    { name: 'Strawberries', current: 33, full: 50, type: 'Fruits' },
-    { name: 'Rice', current: 36, full: 50, type: 'Nonperishable' },
-    { name: 'Lentils', current: 23, full: 50, type: 'Nonperishable' }
-  ]
+    const [confirmSave, setConfirmSave] = useState(false)
+    const [items, setItems] = useState([
+      { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
+      { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
+      { name: 'Tomatoe', current: 44, full: 50, type: 'Fruits' },
+      { name: 'Tomatoe', current: 15, full: 50, type: 'Proteins' },
+      { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
+      { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
+      { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
+      { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' },
+      { name: 'Chicken Breast', current: 22, full: 50, type: 'Proteins' },
+      { name: 'Bananas', current: 18, full: 50, type: 'Fruits' },
+      { name: 'Spinach', current: 35, full: 50, type: 'Vegetables' },
+      { name: 'Beans (Dry)', current: 44, full: 50, type: 'Nonperishable' },
+      { name: 'Eggs', current: 10, full: 30, type: 'Proteins' },
+      { name: 'Oranges', current: 27, full: 50, type: 'Fruits' },
+      { name: 'Canned Corn', current: 8, full: 50, type: 'Nonperishable' },
+      { name: 'Beef Patties', current: 20, full: 50, type: 'Proteins' },
+      { name: 'Zucchini', current: 12, full: 50, type: 'Vegetables' },
+      { name: 'Canned Soup', current: 41, full: 50, type: 'Nonperishable' },
+      { name: 'Grapes', current: 29, full: 50, type: 'Fruits' },
+      { name: 'Canned Beans', current: 45, full: 50, type: 'Nonperishable' },
+      { name: 'Turkey Slices', current: 9, full: 50, type: 'Proteins' },
+      { name: 'Peppers', current: 40, full: 50, type: 'Vegetables' },
+      { name: 'Strawberries', current: 33, full: 50, type: 'Fruits' },
+      { name: 'Rice', current: 36, full: 50, type: 'Nonperishable' },
+      { name: 'Lentils', current: 23, full: 50, type: 'Nonperishable' }
+    ])
+
+    const handleSaveItem = (itemName, current, full) => {
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.name === itemName 
+            ? { ...item, current, full }
+            : item
+        )
+      )
+      
+      // Show success notification
+      notifications.show({
+        title: 'Inventory Updated!',
+        message: `${itemName} quantity has been updated to ${current}/${full}`,
+        color: 'green',
+        icon: <IconCheck size={16} />,
+        autoClose: 3000,
+        withCloseButton: true,
+      })
+    }
+
+    const handleSaveAll = () => {
+      setConfirmSave(false)
+      setEditing(false)
+      
+      // Show success notification
+      notifications.show({
+        title: 'All Changes Saved!',
+        message: 'Your inventory has been updated successfully.',
+        color: 'green',
+        icon: <IconCheck size={16} />,
+        autoClose: 3000,
+        withCloseButton: true,
+      })
+    }
 
   let filteredItems;
   switch (sort) {
@@ -208,8 +326,26 @@ import {
         direction="row"
         wrap="wrap">
           <Text>TASK's Inventory</Text>
-          <Button variant='light' onClick={()=> setEditing(!editing)}>
-          <Text color='Blue' size='1.1em'>Edit</Text></Button>
+          <Group gap="md">
+            <Button 
+              variant={editing ? 'filled' : 'light'} 
+              color={editing ? 'green' : 'blue'}
+              onClick={()=> setEditing(!editing)}
+              leftSection={editing ? <IconCheck size={16} /> : <IconSettings size={16} />}
+            >
+              {editing ? 'Save All' : 'Edit'}
+            </Button>
+            {editing && (
+              <Button 
+                variant="light" 
+                color="gray"
+                onClick={() => setConfirmSave(true)}
+                leftSection={<IconDeviceFloppy size={16} />}
+              >
+                Confirm Save
+              </Button>
+            )}
+          </Group>
         </Flex>
         <Center>
         <Select
@@ -225,9 +361,53 @@ import {
         </Center>
         <Grid p={'xl'}>
           {filteredItems.map((item, index) => (
-            <InvItems key={index} item={item} editing={editing} />
+            <InvItems 
+              key={index} 
+              item={item} 
+              editing={editing} 
+              onSave={handleSaveItem}
+            />
           ))}
         </Grid>
+
+        {/* Confirmation Modal */}
+        <Modal 
+          opened={confirmSave} 
+          onClose={() => setConfirmSave(false)} 
+          centered 
+          size="sm" 
+          radius="md" 
+          padding="lg"
+        >
+          <Paper m={0} p="xl" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+            <Stack spacing="lg" align="center">
+              <IconCheck size={48} color="#40c057" />
+              <Title order={3} ta="center">Confirm Inventory Changes</Title>
+              <Text size="sm" color="dimmed" ta="center">
+                Are you sure you want to save all the changes made to your inventory?
+              </Text>
+              
+              <Group justify="center" gap="md" mt="md">
+                <Button 
+                  variant="light" 
+                  color="gray" 
+                  onClick={() => setConfirmSave(false)}
+                  radius="md"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSaveAll}
+                  leftSection={<IconCheck size={16} />}
+                  radius="md"
+                  color="green"
+                >
+                  Confirm Save
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        </Modal>
       </>
     )
   }
