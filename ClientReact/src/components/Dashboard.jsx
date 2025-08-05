@@ -236,6 +236,13 @@ import {
     const [sort, setSort] = useState("") 
     const [editing, setEditing] = useState(false)
     const [confirmSave, setConfirmSave] = useState(false)
+    const [addNewModal, setAddNewModal] = useState(false)
+    const [newItem, setNewItem] = useState({
+      name: '',
+      current: 0,
+      full: 0,
+      type: 'Vegetables'
+    })
     const [items, setItems] = useState([
       { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
       { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
@@ -299,6 +306,78 @@ import {
       })
     }
 
+    const handleAddNewItem = () => {
+      if (!newItem.name.trim()) {
+        notifications.show({
+          title: 'Error!',
+          message: 'Please enter a name for the item.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        })
+        return
+      }
+
+      if (newItem.current > newItem.full) {
+        notifications.show({
+          title: 'Error!',
+          message: 'Current quantity cannot be greater than full capacity.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        })
+        return
+      }
+
+      // Check if item already exists
+      const itemExists = items.some(item => item.name.toLowerCase() === newItem.name.toLowerCase())
+      if (itemExists) {
+        notifications.show({
+          title: 'Error!',
+          message: 'An item with this name already exists.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        })
+        return
+      }
+
+      setItems(prevItems => [...prevItems, { ...newItem, name: newItem.name.trim() }])
+      
+      // Reset form
+      setNewItem({
+        name: '',
+        current: 0,
+        full: 0,
+        type: 'Vegetables'
+      })
+      
+      setAddNewModal(false)
+      
+      // Show success notification
+      notifications.show({
+        title: 'Item Added!',
+        message: `${newItem.name.trim()} has been added to your inventory.`,
+        color: 'green',
+        icon: <IconCheck size={16} />,
+        autoClose: 3000,
+        withCloseButton: true,
+      })
+    }
+
+    const handleCancelAdd = () => {
+      setNewItem({
+        name: '',
+        current: 0,
+        full: 0,
+        type: 'Vegetables'
+      })
+      setAddNewModal(false)
+    }
+
   let filteredItems;
   switch (sort) {
     case 'Fruits':
@@ -328,21 +407,29 @@ import {
           <Text>TASK's Inventory</Text>
           <Group gap="md">
             <Button 
+              variant="light" 
+              color="green"
+              onClick={() => setAddNewModal(true)}
+              leftSection={<IconCheck size={16} />}
+            >
+              Add New Item
+            </Button>
+            <Button 
               variant={editing ? 'filled' : 'light'} 
               color={editing ? 'green' : 'blue'}
               onClick={()=> setEditing(!editing)}
               leftSection={editing ? <IconCheck size={16} /> : <IconSettings size={16} />}
             >
-              {editing ? 'Save All' : 'Edit'}
+              {editing ? 'Exit Edit Mode' : 'Edit'}
             </Button>
             {editing && (
               <Button 
-                variant="light" 
-                color="gray"
+                variant="filled" 
+                color="green"
                 onClick={() => setConfirmSave(true)}
                 leftSection={<IconDeviceFloppy size={16} />}
               >
-                Confirm Save
+                Save Changes
               </Button>
             )}
           </Group>
@@ -369,6 +456,128 @@ import {
             />
           ))}
         </Grid>
+
+        {/* Add New Item Modal */}
+        <Modal 
+          opened={addNewModal} 
+          onClose={handleCancelAdd} 
+          centered 
+          size="md" 
+          radius="md" 
+          padding="lg"
+          title={
+            <Group>
+              <IconCheck size={20} />
+              <Text fw={600}>Add New Inventory Item</Text>
+            </Group>
+          }
+        >
+          <Paper m={0} p="xl" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+            <Stack spacing="lg">
+              <Text size="sm" color="dimmed" mb="md">
+                Enter the details for the new inventory item.
+              </Text>
+              
+              <TextInput 
+                label="Item Name"
+                placeholder="Enter item name" 
+                value={newItem.name}
+                onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                radius="md"
+                size="md"
+                required
+                styles={{
+                  input: {
+                    border: '1px solid #e9ecef',
+                    '&:focus': {
+                      borderColor: '#228be6',
+                    }
+                  }
+                }}
+              />
+              
+              <Select
+                label="Item Type"
+                placeholder="Select item type"
+                data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+                value={newItem.type}
+                onChange={(value) => setNewItem({...newItem, type: value})}
+                radius="md"
+                size="md"
+                required
+                styles={{
+                  input: {
+                    border: '1px solid #e9ecef',
+                    '&:focus': {
+                      borderColor: '#228be6',
+                    }
+                  }
+                }}
+              />
+              
+              <Group grow>
+                <TextInput 
+                  label="Current Quantity"
+                  placeholder="0" 
+                  type="number"
+                  min={0}
+                  value={newItem.current}
+                  onChange={(e) => setNewItem({...newItem, current: parseInt(e.target.value) || 0})}
+                  radius="md"
+                  size="md"
+                  required
+                  styles={{
+                    input: {
+                      border: '1px solid #e9ecef',
+                      '&:focus': {
+                        borderColor: '#228be6',
+                      }
+                    }
+                  }}
+                />
+                
+                <TextInput 
+                  label="Full Capacity"
+                  placeholder="0" 
+                  type="number"
+                  min={0}
+                  value={newItem.full}
+                  onChange={(e) => setNewItem({...newItem, full: parseInt(e.target.value) || 0})}
+                  radius="md"
+                  size="md"
+                  required
+                  styles={{
+                    input: {
+                      border: '1px solid #e9ecef',
+                      '&:focus': {
+                        borderColor: '#228be6',
+                      }
+                    }
+                  }}
+                />
+              </Group>
+              
+              <Group justify="flex-end" mt="xl" gap="md">
+                <Button 
+                  variant="light" 
+                  color="gray" 
+                  onClick={handleCancelAdd}
+                  radius="md"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleAddNewItem}
+                  leftSection={<IconCheck size={16} />}
+                  radius="md"
+                  color="green"
+                >
+                  Add Item
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        </Modal>
 
         {/* Confirmation Modal */}
         <Modal 
