@@ -18,5 +18,8 @@ struct Colors {
     static let customOrange: Color = Color("customOrange")
     static let customBlue: Color = Color("customBlue")
     static let customWhite: Color = Color("customWhite")
+    static let customLightTan: Color = Color("customLightTan")
+    static let customDarkTan: Color = Color("customDarkTan")
+    static let customDarkBrown: Color = Color("customDarkBrown")
     
 }
