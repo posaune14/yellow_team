@@ -505,6 +505,12 @@ import {
   }
  function Dashboard() {
     let [page, setPage] = useState("")
+    let [settings, setSettings] = useState(false)
+    const [foodBankName, setFoodBankName] = useState("TASK Food Bank")
+    const [foodBankAddress, setFoodBankAddress] = useState("123 Main St, Belle Mead, NJ 08502")
+    const [foodBankPhone, setFoodBankPhone] = useState("(609) 123-4567")
+    const [foodBankEmail, setFoodBankEmail] = useState("info@taskfoodbank.org")
+    
     return (
       <AppShell
         padding="md"
@@ -522,11 +528,60 @@ import {
             <NavLink label="Volunteers" icon={<IconChartBar size={20} />} onClick={()=> setPage("vol")}/>
             <NavLink label="Stream" icon={<IconUser size={20} />} onClick={()=> setPage("stream")}/>
             <Box mt="lg">
-              <NavLink label="Settings" icon={<IconSettings size={20} />} />
-              <NavLink label="Logout" color='red'/>
+              <NavLink label="Settings" icon={<IconSettings size={20} />} onClick={()=> {
+                setSettings(true)
+              }}/>
+              <NavLink label="Logout" color='red' onClick={()=> {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+              }}/>
             </Box>
           </ScrollArea>
         </AppShell.Navbar>
+        
+        <Modal opened={settings} onClose={()=> setSettings(false)} centered size="lg" radius="md" padding="lg">
+          <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+            <Title order={3} mb="lg">Settings</Title>
+            <Stack spacing="md">
+              <TextInput 
+                label="Food Bank Name"
+                placeholder="Food Bank Name" 
+                value={foodBankName}
+                onChange={(e) => setFoodBankName(e.target.value)}
+              />
+              <TextInput 
+                label="Food Bank Address"
+                placeholder="Food Bank Address" 
+                value={foodBankAddress}
+                onChange={(e) => setFoodBankAddress(e.target.value)}
+              />
+              <TextInput 
+                label="Food Bank Phone"
+                placeholder="Food Bank Phone" 
+                value={foodBankPhone}
+                onChange={(e) => setFoodBankPhone(e.target.value)}
+              />
+              <TextInput 
+                label="Food Bank Email"
+                placeholder="Food Bank Email" 
+                value={foodBankEmail}
+                onChange={(e) => setFoodBankEmail(e.target.value)}
+              />
+              <Group justify="flex-end" mt="md">
+                <Button variant="light" onClick={() => setSettings(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => {
+                  // Here you would typically save the settings
+                  console.log('Saving settings:', { foodBankName, foodBankAddress, foodBankPhone, foodBankEmail });
+                  setSettings(false);
+                }}>
+                  Save Changes
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        </Modal>
   
 
         <AppShell.Header px="md" style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
@@ -541,7 +596,10 @@ import {
                   <Avatar radius="xl" />
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item color='red'>Log Out</Menu.Item>
+                  <Menu.Item color='red' onClick={()=> {
+                    localStorage.removeItem('token');
+                    window.location.href = '/';
+                  }}>Log Out</Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             </Group>
