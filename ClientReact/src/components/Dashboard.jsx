@@ -107,10 +107,20 @@ import {
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
                   <Text size="sm" fw={500} mb="xs">Reminders</Text>
                   <Text>Meeting</Text>
-                  <Text size="xs" color="dimmed">2:00 PM – 4:00 PM</Text>
+                  <Text size="xs" colo="dimmed">2:00 PM – 4:00 PM</Text>
                   <Button mt="sm" fullWidth radius="xl" variant="gradient" gradient={{ from: 'teal', to: 'green' }}>
                     Start Meeting
                   </Button>
+                </Paper>
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5', marginTop: '1rem' }}>
+                  <Text fw={700} size="md" mb="xs">Current Stream Post</Text>
+                  <Blockquote color="blue" p="md" rightSection={<Text>12.24.2025 12:00 PM</Text>}>
+                    <Text>
+                      Latest Stream Post goes here
+                    </Text>
+                  </Blockquote>
                 </Paper>
               </Grid.Col>
             </Grid>
