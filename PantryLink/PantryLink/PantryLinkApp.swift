@@ -12,7 +12,9 @@ struct PantryLinkApp: App {
     var body: some Scene {
         WindowGroup {
             //ContentView()
-            HomeView()
+
+            //StockView()
+            //HomeView()
             //NavView()
         }
     }
