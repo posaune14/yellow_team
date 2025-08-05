@@ -1,6 +1,6 @@
-import { Center, Flex, Space, Text, Container, Group, Paper } from '@mantine/core'
+import { Center, Flex, Space, Text, Container, Group, Paper, Image } from '@mantine/core'
 import { motion } from 'framer-motion'
-// import VolunteerExImg from '../assets/VolunteerExample.png'
+import VolunteerExImg from '../assets/VolunteerEx.png'
 
 export default function VolunteerEx() {
     return (
@@ -94,10 +94,12 @@ export default function VolunteerEx() {
                     transition={{ duration: 0.6, delay: 0.8 }}
                     whileHover={{ scale: 1.1, y: -15, rotate: -2 }}
                     style={{ cursor: 'pointer' }}
-                    >
-                    <Text>
-                        Image
-                    </Text>
+                  >
+                    <Image 
+                      src={VolunteerExImg} 
+                      alt="VolunteerEx" 
+                      style={{ width: '40rem', height: 'auto', maxWidth: '40rem', objectFit: 'contain' }} 
+                    />
                   </motion.div>
                 </Flex>
               </motion.div>
