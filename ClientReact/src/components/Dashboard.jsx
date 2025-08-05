@@ -34,48 +34,15 @@ import {
     IconSend,
     IconInfoCircle
   } from '@tabler/icons-react'
-  import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
-  import { Button, Center, Code, Divider, Group, Stack, Text, Title } from '@mantine/core';
-  import { useDisclosure } from '@mantine/hooks';
   import { useState } from 'react'
   const DashboardComp = ()=>{
-    const [started, { open, close }] = useDisclosure(false);
-
-  const onboardingSteps: OnboardingTourStep[] = [
-    {
-      id: 'welcome',
-      title: 'Welcome to the Admin Dashboard',
-      content:
-        'This is a tutorial for the Admin dashboard, which allows you to control what clients see on your app and manage your food bank in one, clean, space.',
-    },
-    {
-      id: 'subtitle',
-      title: 'Subtitle',
-      content: (
-        <Text>
-          You can select any component by using the <Code>data-onboarding-tour-id</Code> attribute
-        </Text>
-      ),
-    },
-    {
-      id: 'button-see-all',
-      title: 'New Features',
-      content: 'Now you can click on the button "See all" to display all the testimonials',
-    },
-    {
-      id: 'testimonial-2',
-      title: 'New Testimonial Layout',
-      content: 'We have improved the Testimonial layout',
-    },
-  ];
-
     return(
       <Stack spacing="md">
             <Grid>
               <Grid.Col span={3}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
                   <Text size="sm" color="dimmed">Total Volunteers</Text>
-                  <Text size="xl" fw={700}>24</Text>
+                  <Text size="xl" fw={700}>8</Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={3}>
@@ -310,13 +277,48 @@ import {
                     <Table.Td>john.doe@example.com</Table.Td>
                     <Table.Td><Button variant="light" color="gray" radius="xl" onClick={()=> setVolunteerInfo(true)}><IconInfoCircle size={20} /></Button></Table.Td>
                   </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Sarah Johnson</Table.Td>
+                    <Table.Td>sarah.johnson@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Mike Chen</Table.Td>
+                    <Table.Td>mike.chen@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Emily Rodriguez</Table.Td>
+                    <Table.Td>emily.rodriguez@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>David Thompson</Table.Td>
+                    <Table.Td>david.thompson@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Lisa Wang</Table.Td>
+                    <Table.Td>lisa.wang@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Robert Martinez</Table.Td>
+                    <Table.Td>robert.martinez@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
+                  <Table.Tr>
+                    <Table.Td>Jennifer Lee</Table.Td>
+                    <Table.Td>jennifer.lee@example.com</Table.Td>
+                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
+                  </Table.Tr>
                 </Table.Tbody>
               </Table>
             </Paper>
-          </Grid.Col>
-          <Grid.Col mt={'xl'} span={6}>
-            <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-              <Title order={3}>Inbox</Title>
+            
+            {/* Inbox Section under Volunteers List */}
+            <Paper mt={'xl'} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+              <Title order={3} mb="md">Inbox</Title>
               <Button variant="gradient" gradient={{ from: 'teal', to: 'green' }} radius="xl" onClick={()=> setInboxInfo(true)}>Open Inbox<Badge p={5} m={5} color="red">3</Badge></Button>
               <Modal p={0} opened={inboxInfo} onClose={()=> setInboxInfo(false)} centered size="lg" radius="md" padding="lg">
                 <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
@@ -408,7 +410,7 @@ import {
                                           <Text size="sm" fw={500}><b>Bio:</b> {applicant.bio}</Text>
                                         </Grid.Col>
                                       </Grid>
-            
+                
                                       <Group mt="md">
                                         <Button color="green" variant="light" radius="xl">Accept</Button>
                                         <Button color="red" variant="light" radius="xl">Decline</Button>
@@ -426,6 +428,45 @@ import {
                   </Table>
                 </Paper>
               </Modal>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col mt={'xl'} span={6}>
+            <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
+              <Title order={3} mb="md">Today's Volunteer Schedule</Title>
+              <Stack spacing="md">
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
+                  <Text fw={700} size="lg" mb="xs">8:00 AM - 12:00 PM</Text>
+                  <Text size="sm" color="dimmed">Morning Shift</Text>
+                  <Stack mt="sm" spacing="xs">
+                    <Text size="sm"><b>John Doe</b> - Server</Text>
+                    <Text size="sm"><b>Sarah Johnson</b> - Cook</Text>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
+                  <Text fw={700} size="lg" mb="xs">12:00 PM - 4:00 PM</Text>
+                  <Text size="sm" color="dimmed">Afternoon Shift</Text>
+                  <Stack mt="sm" spacing="xs">
+                    <Text size="sm"><b>Mike Chen</b> - Server</Text>
+                    <Text size="sm"><b>Emily Rodriguez</b> - Cook</Text>
+                    <Text size="sm"><b>David Thompson</b> - Server</Text>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
+                  <Text fw={700} size="lg" mb="xs">4:00 PM - 8:00 PM</Text>
+                  <Text size="sm" color="dimmed">Evening Shift</Text>
+                  <Stack mt="sm" spacing="xs">
+                    <Text size="sm"><b>Lisa Wang</b> - Server</Text>
+                    <Text size="sm"><b>Robert Martinez</b> - Cook</Text>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
+                  <Text fw={700} size="lg" mb="xs">On Call</Text>
+                  <Text size="sm" color="dimmed">Backup Volunteers</Text>
+                  <Stack mt="sm" spacing="xs">
+                    <Text size="sm"><b>Jennifer Lee</b> - Server</Text>
+                  </Stack>
+                </Paper>
+              </Stack>
             </Paper>
           </Grid.Col>
         </Grid>
@@ -523,6 +564,7 @@ import {
                 return <DashboardComp />;
             }
           })()}
+          
         </AppShell.Main>
       </AppShell>
     )
