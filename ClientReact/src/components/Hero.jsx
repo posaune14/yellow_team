@@ -80,18 +80,6 @@ function Hero({ onScrollClick1, onScrollClick2, onScrollClick3 }) {
               ]}
             />
 
-            <Flex gap="sm" mt="md">
-              <Button onClick={onScrollClick1} variant="transparent"  padding='-1rem'>
-                <Badge color="dark" variant="filled">Mobile App</Badge>
-              </Button>
-              <Button onClick={onScrollClick2} variant="transparent" padding='-1rem'>
-                <Badge color="dark" variant="light">Volunteer Scheduling</Badge>
-             </Button>
-              <Button onClick={onScrollClick3} variant="transparent" padding='-1rem'>
-                <Badge color="dark" variant="light">Inventory Tracking</Badge>
-              </Button>
-            </Flex>
-
             <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 300 }}
