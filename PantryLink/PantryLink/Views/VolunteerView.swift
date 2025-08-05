@@ -184,7 +184,9 @@ struct VolunteerView: View {
                         }
                         
                         Section(header: Button(action: {
-                            ViewModel.register_volunteer()
+                            let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number)
+                            
+                            ViewModel.register_volunteer(volunteer: new_volunteer)
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center)
