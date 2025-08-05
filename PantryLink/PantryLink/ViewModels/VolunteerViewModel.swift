@@ -9,6 +9,7 @@ import Foundation
 
 class VolunteerViewModel: ObservableObject {
     
+    func register_volunteer(){
+        print("test")
+    }
 }
-
-func register_volunteer: 

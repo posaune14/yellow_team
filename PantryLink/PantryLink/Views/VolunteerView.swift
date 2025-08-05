@@ -25,6 +25,9 @@ struct VolunteerView: View {
     //pop up variable
     @State var isClicked = false
     
+    //viewmodel
+    @StateObject private var ViewModel = VolunteerViewModel()
+    
     var body: some View {
         ScrollView {
             
@@ -135,7 +138,6 @@ struct VolunteerView: View {
                         //button
                         Section(header: Button(action: {
                             isClicked = true
-                            print("Register")
                         })  {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.customWhite)
@@ -182,7 +184,7 @@ struct VolunteerView: View {
                         }
                         
                         Section(header: Button(action: {
-                            print("continue")
+                            ViewModel.register_volunteer()
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center)
