@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-//create colors
-struct Colors {
-    static let customBrown: Color = Color("customBrown")
-    static let customGreen: Color = Color("customGreen")
-    static let customLightGray: Color = Color("customLightGray")
-    static let customDarkGray: Color = Color("customDarkGray")
-    
-}
-
 struct VolunteerView: View {
     //form 1 data fields
     @State var first_name: String = ""
