@@ -11,7 +11,7 @@ import SwiftUI
 struct PantryLinkApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            //ContentView()
 
             //StockView()
             //HomeView()

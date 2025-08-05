@@ -20,15 +20,15 @@ struct SignUpView: View {
             Text("Create Account")
                 .multilineTextAlignment(.center)
                 .font(.system(size: 58, weight: .bold))
-                .foregroundColor(Color(red: 175/255, green: 0/255, blue: 0/255))
+                .foregroundColor(.customRed)
                 .frame(maxWidth: .infinity, alignment: .center)
             Form{
-                Section(header:Text("Login Details")){
+                Section(header: Text("Login Details").foregroundStyle(.customBlack).fontWeight(.bold)){
                     TextField("Email (Optional)", text: $email)
                     SecureField("Password", text: $password)
                         .textContentType(.password)
                 }
-                Section(header:Text("Account Information")){
+                Section(header:Text("Account Information").foregroundStyle(.customBlack).fontWeight(.bold)){
                     TextField("First Name", text: $firstname)
                     TextField("Last Name", text: $lastname)
                     TextField("Username", text: $username)
@@ -44,17 +44,18 @@ struct SignUpView: View {
                 }
                 .frame(width: 350, height: 80)
                 .font(.system(size: 30, weight: .bold))
-                .background(Color.orange)
+                .background(.customOrange)
                 .tint(.white)
                 .cornerRadius(15)
                 
                 Section(header:HStack{
-                    Text("Already have an account?")
+                    Text("Already have an account?").foregroundStyle(.customBlack).fontWeight(.bold)
                     Button("Sign In"){
                         print("Sign in button pressed")
                     }
                         .buttonStyle(.plain)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.customBlue)
+                        .fontWeight(.bold)
                 }){
                     
                 }
