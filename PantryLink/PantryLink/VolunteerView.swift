@@ -16,7 +16,7 @@ struct Colors {
     
 }
 
-struct ContentView: View {
+struct VolunteerView: View {
     //form 1 data fields
     @State var first_name: String = ""
     @State var last_name: String = ""
@@ -210,6 +210,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    VolunteerView()
     
 }
