@@ -45,3 +45,7 @@ struct StreamView: View {
     }
     
 }
+
+#Preview {
+    StreamView()
+}

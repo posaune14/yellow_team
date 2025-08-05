@@ -50,3 +50,6 @@ struct NavView: View {
     }
 }
     
+#Preview {
+    NavView()
+}
