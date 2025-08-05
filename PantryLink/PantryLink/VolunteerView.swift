@@ -80,7 +80,7 @@ struct VolunteerView: View {
                         Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //first name
-                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $first_name
@@ -89,7 +89,7 @@ struct VolunteerView: View {
                         }
                         
                         //last name
-                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $last_name
@@ -98,7 +98,7 @@ struct VolunteerView: View {
                         }
                         
                         //date of birth
-                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $date_of_birth)
@@ -106,7 +106,7 @@ struct VolunteerView: View {
                         }
                         
                         //email
-                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $email
@@ -115,7 +115,7 @@ struct VolunteerView: View {
                         }
                         
                         //phone number
-                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $phone_number
@@ -124,7 +124,7 @@ struct VolunteerView: View {
                         }
                         
                         //zipcode
-                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $zipcode
@@ -138,7 +138,7 @@ struct VolunteerView: View {
                             print("Register")
                         })  {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.white)
+                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.customWhite)
                         ){}
                         
                     }.frame(width: 300, height: 850)
@@ -148,11 +148,11 @@ struct VolunteerView: View {
                     
                     Form{
                         //Text
-                        Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.black).multilineTextAlignment(.leading)){}
+                        Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.customBlack).multilineTextAlignment(.leading)){}
                         Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //preferred roles
-                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $roles
@@ -161,7 +161,7 @@ struct VolunteerView: View {
                         }
                         
                         //availability
-                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $availability
@@ -170,7 +170,7 @@ struct VolunteerView: View {
                         }
                         
                         //Emergency Contact
-                        Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.black)){
+                        Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
                                     "Name", text: $emergency_name
@@ -186,7 +186,7 @@ struct VolunteerView: View {
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center)
-                            .background(.customGreen).foregroundStyle(.white)){}
+                            .background(.customGreen).foregroundStyle(.customWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
                 }
