@@ -22,7 +22,7 @@
     "@tabler/icons-react": "^3.34.0",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^12.18.1",
+    "framer-motion": "^12.23.12",
     "motion": "^12.18.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

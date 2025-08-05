@@ -14,51 +14,55 @@ struct SignUpView: View {
     @State private var lastname: String = ""
     @State private var username: String = ""
     @State private var phonenumber: String = ""
-
+    
     var body: some View {
         VStack{
             Text("Create Account")
                 .multilineTextAlignment(.center)
                 .font(.system(size: 58, weight: .bold))
-                .foregroundColor(Color(red: 175/255, green: 0/255, blue: 0/255))
+                .foregroundColor(.customRed)
                 .frame(maxWidth: .infinity, alignment: .center)
-
             Form{
-                Section(header:Text("Login Details")){
+                Section(header: Text("Login Details").foregroundStyle(.customBlack).fontWeight(.bold)){
                     TextField("Email (Optional)", text: $email)
                     SecureField("Password", text: $password)
                         .textContentType(.password)
                 }
-                
-                Section(header:Text("Account Information")){
+                Section(header:Text("Account Information").foregroundStyle(.customBlack).fontWeight(.bold)){
                     TextField("First Name", text: $firstname)
                     TextField("Last Name", text: $lastname)
                     TextField("Username", text: $username)
                     TextField("Phone Number (Optional)", text: $phonenumber)
                 }
-                Section(header:                    Button("Sign Up"){
+                Section(header:Button("Sign Up"){
+                    print("sign up button pessed")
+                }){
                     // Rectangle()
                     // .fill(Color(red: 255/255, green: 178/255, blue: 102/255))
                     //.frame(width: 350, height: 80)
-                    print("Sign Up")
+                    
                 }
                 .frame(width: 350, height: 80)
                 .font(.system(size: 30, weight: .bold))
-){
-                }
-                .background(Color.orange)
+                .background(.customOrange)
                 .tint(.white)
+                .cornerRadius(15)
+                
+                Section(header:HStack{
+                    Text("Already have an account?").foregroundStyle(.customBlack).fontWeight(.bold)
+                    Button("Sign In"){
+                        print("Sign in button pressed")
+                    }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.customBlue)
+                        .fontWeight(.bold)
+                }){
+                    
+                }
             }
-            
-            
         }
-     //   Form{
-     
-         //
-      //  }
     }
 }
-
-#Preview {
-    SignUpView()
-}
+        #Preview {
+            SignUpView()
+        }

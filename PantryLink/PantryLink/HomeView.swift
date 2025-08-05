@@ -5,7 +5,6 @@
 //  Created by Joshua Sambol on 5/27/25.
 //
 import SwiftUI
-import UIKit
 
 struct HomeView: View {
     @State private var searchText = ""
@@ -16,4 +15,8 @@ struct HomeView: View {
             
         }
     }
+}
+
+#Preview {
+    HomeView()
 }
