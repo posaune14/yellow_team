@@ -11,7 +11,7 @@ struct StreamView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
-                .fill(.customDarkBrown)
+                .fill(.flexibleDarkBrown)
                 .frame(width: 350, height: 700)
             ScrollView{
                 VStack(spacing: 10){
@@ -21,7 +21,7 @@ struct StreamView: View {
                         .font(.title)
                     ForEach(1...10, id: \.self) {i in
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(.customLightGray)
+                            .fill(.flexibleLightGray)
                             .frame(width:300, height:150)
                             .overlay(
                                 VStack {
