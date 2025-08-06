@@ -38,7 +38,7 @@ struct StockView: View{
                 .frame(width:350, height:650)
             VStack{
                 Text("Stock")
-                    .foregroundColor(.flexibleRed)
+                    .foregroundColor(.stockRed)
                     .bold()
                     .font(.title)
                 ScrollView{
