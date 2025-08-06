@@ -22,26 +22,26 @@ struct NavView: View {
                             .bold()}
                             
                             .padding()
-                            .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
+                            .foregroundColor(.stockOrange)
                             .cornerRadius(25)
-                            .overlay(
+                            .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4)
+                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
                             )
                         Button {print("volunteer button clicked")} label: {Text("Volunteer").bold()}
                             .padding()
-                            .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
-                            .cornerRadius(25)                         .overlay(
+                            .foregroundColor(.stockOrange)
+                            .cornerRadius(25)                         .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4)
+                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
                             )
                         Button {print("order button clicked")} label: {Text("Order").bold()}
                             .padding()
-                            .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
+                            .foregroundColor(.stockOrange)
                             .cornerRadius(25)
-                            .overlay(
+                            .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4)
+                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
                             )
                     }
                 }
