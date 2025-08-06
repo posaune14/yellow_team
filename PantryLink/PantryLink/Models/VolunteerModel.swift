@@ -9,16 +9,19 @@ import Foundation
 
 struct Volunteer: Codable {
     //form 1 data fields
-    let first_name: String
-    let last_name: String
-    let date_of_birth: String
-    let email: String
-    let phone_number: String
-    let zipcode: String
+    var first_name: String
+    var last_name: String
+    var date_of_birth: String
+    var email: String
+    var phone_number: String
+    var zipcode: String
     
     //form 2 data fields
-    let roles: String
-    let availability: String
-    let emergency_name: String
-    let emergency_number: String
+    var roles: String
+    var availability: String
+    var emergency_name: String
+    var emergency_number: String
+    
+    var alert_message: String
+    var show_alert: Bool
 }

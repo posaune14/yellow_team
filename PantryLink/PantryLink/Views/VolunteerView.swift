@@ -25,8 +25,14 @@ struct VolunteerView: View {
     //pop up variable
     @State var isClicked = false
     
-    //viewmodel
-    @StateObject private var ViewModel = VolunteerViewModel()
+    //alert
+    @State var alert_message = ""
+    @State var show_alert = false
+    
+    //unfinished
+    @State var empty_field = false
+    
+ 
     
     var body: some View {
         ScrollView {
@@ -83,7 +89,7 @@ struct VolunteerView: View {
                         Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //first name
-                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(first_name.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $first_name
@@ -137,8 +143,13 @@ struct VolunteerView: View {
                         
                         //button
                         Section(header: Button(action: {
+                            guard !first_name.isEmpty, !last_name.isEmpty else {
+                                empty_field = true
+                                return
+                            }
                             isClicked = true
-                        })  {
+                        })
+                        {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.customWhite)
                         ){}
@@ -184,15 +195,18 @@ struct VolunteerView: View {
                         }
                         
                         Section(header: Button(action: {
-                            let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number)
+                            let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
                             
-                            ViewModel.register_volunteer(volunteer: new_volunteer)
+                                register_volunteer(volunteer: new_volunteer)
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }.frame(maxWidth: .infinity, alignment: .center)
                             .background(.customGreen).foregroundStyle(.customWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
+                    //.alert(isPresented: $show_alert){
+                    //Alert(title: Text("Form"), message: Text(alert_message))
+                    //  }
                 }
                 
             }.animation(.easeIn(duration: 1.5), value: isClicked)
