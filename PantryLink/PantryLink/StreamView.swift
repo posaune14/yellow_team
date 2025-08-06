@@ -10,6 +10,7 @@ import SwiftUI
 struct StreamView: View {
     var body: some View {
         ZStack {
+            //new colors I created for stock are in dark mode branch, so make sure I (or you) add them
             RoundedRectangle(cornerRadius: 10)
                 .fill(.customDarkTan)
                 .frame(width: 350, height: 700)
