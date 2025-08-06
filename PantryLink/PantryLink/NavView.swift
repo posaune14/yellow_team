@@ -10,10 +10,11 @@ import SwiftUI
 struct NavView: View {
     @State private var searchText = ""
     var body: some View {
-        ZStack {
-            Color(red: 238/255, green: 222/255, blue: 215/255)
-                       .ignoresSafeArea()
+        
             NavigationView {
+                ZStack {
+                    Color(red: 238/255, green: 222/255, blue: 215/255)
+                            .ignoresSafeArea()
                 VStack {
                     HStack{
                         Button{print("home button clicked")}
@@ -30,8 +31,7 @@ struct NavView: View {
                         Button {print("volunteer button clicked")} label: {Text("Volunteer").bold()}
                             .padding()
                             .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
-                            .cornerRadius(25)
-                            .overlay(
+                            .cornerRadius(25)                         .overlay(
                                 RoundedRectangle(cornerRadius: 25)
                                     .stroke(.customBlack, lineWidth: 4)
                             )
