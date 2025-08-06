@@ -20,7 +20,7 @@ struct SignUpView: View {
             Text("Create Account")
                 .multilineTextAlignment(.center)
                 .font(.system(size: 58, weight: .bold))
-                .foregroundColor(.flexibleRed)
+                .foregroundColor(.maroonWhite)
                 .frame(maxWidth: .infinity, alignment: .center)
             Form{
                 Section(header: Text("Login Details").foregroundStyle(.flexibleBlack).fontWeight(.bold)){

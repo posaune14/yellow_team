@@ -21,6 +21,7 @@ struct Colors {
     static let stockLightTan: Color = Color("stockLightTan")
     static let stockDarkTan: Color = Color("stockDarkTan")
     static let flexibleDarkBrown: Color = Color("flexibleDarkBrown")
+    static let maroonWhite: Color = Color("maroonWhite")
     //nomenclature (someone should probably change this):
     //flexible: changes shades from light to dark for darkmode
     //view+color: only used in that view
