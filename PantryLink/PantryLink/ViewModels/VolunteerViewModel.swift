@@ -10,12 +10,11 @@ extension VolunteerView {
     //allows you to edit the properties of another view/class in a different structure, so in here, lets us edit alert_message
     
     func register_volunteer(volunteer: Volunteer){
-        guard let url = URL(string: "http://127.0.0.1:5000") else {
-            return
-        }
+        guard let url = URL(string: "http://127.0.0.1:5000") else
+        { return }
         
         //request: takes inputed data, changes it to json, and sends it to the database
-        var request = URLRequest(url:url)
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         

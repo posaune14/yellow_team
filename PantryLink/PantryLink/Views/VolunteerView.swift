@@ -93,60 +93,61 @@ struct VolunteerView: View {
                             VStack{
                                 TextField(
                                     "", text: $first_name
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //last name
-                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(last_name.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $last_name
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //date of birth
-                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(date_of_birth.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $date_of_birth)
-                            }
+                            }.autocorrectionDisabled(true)
                         }
                         
                         //email
-                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(email.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $email
-                                )
+                                ).autocorrectionDisabled(true).textInputAutocapitalization(.never)
                             }
                         }
                         
                         //phone number
-                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(phone_number.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $phone_number
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //zipcode
-                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(zipcode.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $zipcode
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //button
                         Section(header: Button(action: {
-                            guard !first_name.isEmpty, !last_name.isEmpty else {
+                            guard !first_name.isEmpty, !last_name.isEmpty, !date_of_birth.isEmpty, !email.isEmpty, !phone_number.isEmpty, !zipcode.isEmpty else {
                                 empty_field = true
                                 return
                             }
+                            empty_field = false
                             isClicked = true
                         })
                         {
@@ -158,6 +159,7 @@ struct VolunteerView: View {
                         .padding(40).scrollContentBackground(.hidden)
                     
                 } else {
+                    //neutralizing this
                     
                     Form{
                         //Text
@@ -165,20 +167,20 @@ struct VolunteerView: View {
                         Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
                         
                         //preferred roles
-                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $roles
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //availability
-                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .customBlack)){
                             VStack{
                                 TextField(
                                     "", text: $availability
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
@@ -187,14 +189,19 @@ struct VolunteerView: View {
                             VStack{
                                 TextField(
                                     "Name", text: $emergency_name
-                                )
+                                ).border(emergency_name.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
                                 TextField(
                                     "Phone Number", text: $emergency_number
-                                )
+                                ).border(emergency_number.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
                             }
                         }
                         
                         Section(header: Button(action: {
+                            guard !availability.isEmpty, !roles.isEmpty, !emergency_name.isEmpty, !emergency_number.isEmpty else {
+                                empty_field = true
+                                return
+                            }
+                            
                             let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
                             
                                 register_volunteer(volunteer: new_volunteer)
@@ -204,9 +211,9 @@ struct VolunteerView: View {
                             .background(.customGreen).foregroundStyle(.customWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
-                    //.alert(isPresented: $show_alert){
-                    //Alert(title: Text("Form"), message: Text(alert_message))
-                    //  }
+                    .alert(isPresented: $show_alert){
+                    Alert(title: Text("Error"), message: Text(alert_message))
+                    }
                 }
                 
             }.animation(.easeIn(duration: 1.5), value: isClicked)
