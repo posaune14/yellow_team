@@ -1,14 +1,32 @@
 import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
-
+import { axios } from axios
+import { useState } from 'react'
 function SigninBox() {
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
     const navigate = useNavigate()
+    
+    const handleSignIn = async() => {
+         axios.post("http://localhost:8080/pantry",{
+            username: username,
+            password: password,
 
-    const handleSignIn = () => {
-       //backend stuff here - Naisha working on it
-        navigate('/dashboard')
+         })
+         .then(function(response){
+            console.log(response)
+            if(response.status == 200){
+                navigate('/dashboard')
+            }else{
+                console.log("incorrect user/pass")
+            }
+         })
+         .catch(function(error){
+            console.error(error)
+         }
+         )
     }
-
+    
     return (
 
         <Center>
@@ -18,8 +36,8 @@ function SigninBox() {
             </Title>
             <Center>
                 <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"20rem", height: "15rem", margin: '2rem'}}>
-                    <TextInput label="Food Bank" placeholder="Enter your username here"   size="xl" />
-                    <TextInput label="Password" placeholder="Enter your password here"   size="xl" mt="md" type='password'/>
+                    <TextInput label="Food Bank" placeholder="Enter your username here"  value={username} onChange={(e)=>{setUsername(e.target.value)}} size="xl" />
+                    <TextInput label="Password" placeholder="Enter your password here"  value={password} onChange={(e)=>{setPassword(e.target.value)}} size="xl" mt="md" type='password'/>
                 </Fieldset>
             </Center>
 
