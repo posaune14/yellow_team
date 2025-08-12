@@ -155,7 +155,7 @@ struct VolunteerView: View {
                         Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $roles
+                                    "Delivery, Admin Support, ect.", text: $roles
                                 )
                             }
                         }
