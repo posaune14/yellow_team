@@ -164,7 +164,7 @@ struct VolunteerView: View {
                         Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $availability
+                                    "Ex: M-F 9AM to 5AM", text: $availability
                                 )
                             }
                         }
