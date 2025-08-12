@@ -38,6 +38,7 @@ import {
   } from '@tabler/icons-react'
   import { useState } from 'react'
   import { notifications } from '@mantine/notifications'
+  import {axios} from axios
   const DashboardComp = ()=>{
     return(
       <Stack spacing="md">
@@ -621,8 +622,11 @@ import {
     )
   }
   const Volunteer = ()=> {
+
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
+
+    const volunteers = [{name: "Big M", email: "BigM@gmail.com", phone: "9083315271", zip:"08502", dob:"3/11/2011", town: "Belle Mead", state: "NJ", shift:"Mornings", role:"Server", emergencyName: "Mike", emergencyPhone:"9179683021"}]
     return(
       <>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
@@ -675,41 +679,6 @@ import {
                     <Table.Td>John Doe</Table.Td>
                     <Table.Td>john.doe@example.com</Table.Td>
                     <Table.Td><Button variant="light" color="gray" radius="xl" onClick={()=> setVolunteerInfo(true)}><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Sarah Johnson</Table.Td>
-                    <Table.Td>sarah.johnson@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Mike Chen</Table.Td>
-                    <Table.Td>mike.chen@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Emily Rodriguez</Table.Td>
-                    <Table.Td>emily.rodriguez@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>David Thompson</Table.Td>
-                    <Table.Td>david.thompson@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Lisa Wang</Table.Td>
-                    <Table.Td>lisa.wang@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Robert Martinez</Table.Td>
-                    <Table.Td>robert.martinez@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td>Jennifer Lee</Table.Td>
-                    <Table.Td>jennifer.lee@example.com</Table.Td>
-                    <Table.Td><Button variant="light" color="gray" radius="xl"><IconInfoCircle size={20} /></Button></Table.Td>
                   </Table.Tr>
                 </Table.Tbody>
               </Table>
