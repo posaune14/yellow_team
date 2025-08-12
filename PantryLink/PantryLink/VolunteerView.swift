@@ -173,7 +173,7 @@ struct VolunteerView: View {
                         Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
                             VStack{
                                 TextField(
-                                    "Name", text: $emergency_name
+                                    "Full Name", text: $emergency_name
                                 )
                                 TextField(
                                     "Phone Number", text: $emergency_number
