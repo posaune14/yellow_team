@@ -171,7 +171,7 @@ struct VolunteerView: View {
                             VStack{
                                 TextField(
                                     "Delivery, Admin Support, ect.", text: $roles
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
@@ -180,7 +180,7 @@ struct VolunteerView: View {
                             VStack{
                                 TextField(
                                     "Ex: M-F 9AM to 5AM", text: $availability
-                                )
+                                ).autocorrectionDisabled(true)
                             }
                         }
                         
@@ -189,7 +189,7 @@ struct VolunteerView: View {
                             VStack{
                                 TextField(
                                     "Full Name", text: $emergency_name
-                                )
+                                ).autocorrectionDisabled(true)
                                 TextField(
                                     "Phone Number", text: $emergency_number
                                 ).border(emergency_number.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
