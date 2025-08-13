@@ -3,6 +3,7 @@ import { Center } from '@mantine/core'
 import SignIn from './pages/SignIn'
 import Landing from './pages/Landing'
 import Dashboard from './components/Dashboard'
+import Credits from './pages/Credits'
 import './App.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         } />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/credits" element={<Credits />} />
       </Routes>
     </Router>
   )
