@@ -38,7 +38,7 @@ import {
   } from '@tabler/icons-react'
   import { useState } from 'react'
   import { notifications } from '@mantine/notifications'
-  import {axios} from axios
+  import axios from 'axios'
   const DashboardComp = ()=>{
     return(
       <Stack spacing="md">
@@ -626,7 +626,8 @@ import {
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
 
-    const volunteers = [{name: "Big M", email: "BigM@gmail.com", phone: "9083315271", zip:"08502", dob:"3/11/2011", town: "Belle Mead", state: "NJ", shift:"Mornings", role:"Server", emergencyName: "Mike", emergencyPhone:"9179683021"}]
+    //const volunteers = [{name: "Big M", email: "BigM@gmail.com", phone: "9083315271", zip:"08502", dob:"3/11/2011", town: "Belle Mead", state: "NJ", shift:"Mornings", role:"Server", emergencyName: "Mike", emergencyPhone:"9179683021"}]
+    
     return(
       <>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
@@ -644,42 +645,58 @@ import {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  <Table.Tr>
+                  {[{
+                      name: "Big M", 
+                      email: "BigM@gmail.com", 
+                      phone: "9083315271", 
+                      zip:"08502",
+                      dob:"3/11/2011", 
+                      town: "Belle Mead", 
+                      state: "NJ", 
+                      shift:"Mornings", 
+                      role:"Server",
+                      emergencyName: "Mike", 
+                      emergencyPhone:"9179683021"
+                  }].map((volunteer, idx)=> {
+                  return(
+                    <Table.Tr>
                     <Modal p={0} opened={volunteerInfo} onClose={()=> setVolunteerInfo(false)} centered size="lg" radius="md" padding="lg">
                       
                         <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
                           <Group align="center" mb="md" spacing="lg">
                             <Avatar size={64} radius="xl" color="blue">JD</Avatar>
                             <div>
-                              <Title order={3} mb={2}>John Doe</Title>
-                              <Text size="sm" color="dimmed">john.doe@example.com</Text>
+                              <Title order={3} mb={2}>{volunteer.name}</Title>
+                              <Text size="sm" color="dimmed">{volunteer.email}</Text>
                             </div>
                           </Group>
                           <Grid gutter="md" mb="md">
                             <Grid.Col span={6}>
-                              <Text size="sm" fw={500}><b>Phone:</b> 123-456-7890</Text>
-                              <Text size="sm" fw={500}><b>Town:</b> Belle Mead</Text>
-                              <Text size="sm" fw={500}><b>State:</b> NJ</Text>
-                              <Text size="sm" fw={500}><b>Zip:</b> 08502</Text>
+                              <Text size="sm" fw={500}><b>Phone:</b> {volunteer.phone}</Text>
+                              <Text size="sm" fw={500}><b>Town:</b> {volunteer.town}</Text>
+                              <Text size="sm" fw={500}><b>State:</b> {volunteer.state}</Text>
+                              <Text size="sm" fw={500}><b>Zip:</b> {volunteer.zip}</Text>
                             </Grid.Col>
                             <Grid.Col span={6}>
-                              <Text size="sm" fw={500}><b>Shift:</b> Morning</Text>
-                              <Text size="sm" fw={500}><b>Date of Birth:</b> 01/01/1990</Text>
-                              <Text size="sm" fw={500}><b>Preferred Role:</b> Server</Text>
+                              <Text size="sm" fw={500}><b>Shift:</b> {volunteer.shift}</Text>
+                              <Text size="sm" fw={500}><b>Date of Birth:</b> {volunteer.dob}</Text>
+                              <Text size="sm" fw={500}><b>Preferred Role:</b> {volunteer.role}</Text>
                             </Grid.Col>
                             
                           </Grid>
                           <Paper p="sm" radius="md" withBorder bg="gray.0">
                             <Title order={5} mb={4} color="blue">Emergency Contact</Title>
-                            <Text size="sm" fw={500}><b>Name:</b> Jane Doe</Text>
-                            <Text size="sm" fw={500}><b>Phone:</b> 123-456-7890</Text>
+                            <Text size="sm" fw={500}><b>Name:</b> {volunteer.emergencyName}</Text>
+                            <Text size="sm" fw={500}><b>Phone:</b> {volunteer.emergencyPhone}</Text>
                           </Paper>
                         </Paper>
                     </Modal>
-                    <Table.Td>John Doe</Table.Td>
-                    <Table.Td>john.doe@example.com</Table.Td>
+                    <Table.Td>{volunteer.name}</Table.Td>
+                    <Table.Td>{volunteer.email}</Table.Td>
                     <Table.Td><Button variant="light" color="gray" radius="xl" onClick={()=> setVolunteerInfo(true)}><IconInfoCircle size={20} /></Button></Table.Td>
                   </Table.Tr>
+                  )})}
+                  
                 </Table.Tbody>
               </Table>
             </Paper>

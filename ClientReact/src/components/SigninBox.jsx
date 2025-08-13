@@ -1,6 +1,6 @@
 import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
-import { axios } from axios
+import axios from 'axios'
 import { useState } from 'react'
 function SigninBox() {
     const [username, setUsername] = useState("")
@@ -51,7 +51,8 @@ function SigninBox() {
                 >
                     Sign in
                 </Button>
-                
+                <button
+                onClick={navigate('/dashboard')}>Dev Button</button>
                 <Text style={{padding: '2rem'}}>New here? <Anchor>Register your food bank today.</Anchor> </Text>
                 
             </Container>
