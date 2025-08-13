@@ -89,7 +89,7 @@ struct VolunteerView: View {
                         Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.flexibleGreen).multilineTextAlignment(.leading)){}
                         
                         //first name
-                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(first_name.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(first_name.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $first_name
@@ -98,7 +98,7 @@ struct VolunteerView: View {
                         }
                         
                         //last name
-                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(last_name.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(last_name.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $last_name
@@ -107,7 +107,7 @@ struct VolunteerView: View {
                         }
                         
                         //date of birth
-                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(date_of_birth.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(date_of_birth.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $date_of_birth)
@@ -115,7 +115,7 @@ struct VolunteerView: View {
                         }
                         
                         //email
-                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(email.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(email.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $email
@@ -124,7 +124,7 @@ struct VolunteerView: View {
                         }
                         
                         //phone number
-                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(phone_number.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(phone_number.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $phone_number
@@ -133,7 +133,7 @@ struct VolunteerView: View {
                         }
                         
                         //zipcode
-                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(zipcode.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(zipcode.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $zipcode
@@ -167,7 +167,7 @@ struct VolunteerView: View {
                         Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.flexibleGreen).multilineTextAlignment(.leading)){}
                         
                         //preferred roles
-                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $roles
@@ -176,7 +176,7 @@ struct VolunteerView: View {
                         }
                         
                         //availability
-                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $availability
