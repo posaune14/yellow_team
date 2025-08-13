@@ -33,14 +33,40 @@ def log_in():
 
         is_valid = bcrypt.check_password_hash(hashed_password, password)
         if is_valid and user_database["username"]==username:
-            user_database.pop("password", None)
+            user_database.pop("password", None) 
+            #Generate a token
+            access_token = create_access_token(identify=username)
+            refresh_token = create_refresh_token(identity=username)
+            return jsonify(
+                {
+                    "user_database": user_database,
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
 
-   
-   
-   
-   
-   
+                }
+            )
+        else:
+            return jsonify({"error": "Error incorrect password or username"}), 401
     except Exception as error:
-        return jsonify({"error": str(error)})
+        return jsonify({"error": str(error)}), 400
+    
+@auth_routes.route("/log_out")
+def log_out():
+    return jsonify({"message": "List will be here"})
+
+@auth_routes.route("/refresh/", methods=["POST"])
+@jwt_required(refresh=True) #ensures only refresh tokens can be used
+def refresh():
+    try:
+        # get the identity from the refresh token
+        user_id = get_jwt_identity()
+
+        #create a new access token
+        new_access_token = create_access_token(identity=user_id)
+
+        return jsonify({"access_token": new_access_token}), 200
+    except Exception as error:
+        return jsonify({"error": str(e)}), 400
+
         
         
