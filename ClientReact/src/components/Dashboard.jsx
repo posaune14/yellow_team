@@ -689,6 +689,8 @@ import {
                             <Text size="sm" fw={500}><b>Name:</b> {volunteer.emergencyName}</Text>
                             <Text size="sm" fw={500}><b>Phone:</b> {volunteer.emergencyPhone}</Text>
                           </Paper>
+                          <Button color='blue' m={'2rem'} onClick={(e) => window.location.href = `mailto:${volunteer.email}`}>Email</Button>
+                          <Button color='red' m={'2rem'}>DELETE</Button>
                         </Paper>
                     </Modal>
                     <Table.Td>{volunteer.name}</Table.Td>
