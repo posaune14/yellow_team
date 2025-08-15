@@ -9,9 +9,23 @@ import SwiftUI
 struct HomeView: View {
     @State private var searchText = ""
     var body: some View {
-        ScrollView{
-            NavView()
-            StreamView()
+        ZStack{
+            Rectangle()
+                .fill(.customLightTan)
+                .ignoresSafeArea()
+            ScrollView{
+                VStack{
+                    
+                    NavView()
+                    LocalPantryView()
+                        .padding()
+                    StreamView()
+                        .padding()
+                    StockView()
+                        .padding()
+                }
+            }
+            .padding(1.0)
             
         }
     }

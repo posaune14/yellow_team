@@ -36,6 +36,7 @@ struct StockView: View{
             RoundedRectangle(cornerRadius: 15)
                 .fill(.stockDarkTan)
                 .frame(width:350, height:650)
+                .shadow(radius: 10)
             VStack{
                 Text("Stock")
                     .foregroundColor(.stockRed)
