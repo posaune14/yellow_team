@@ -23,6 +23,8 @@ struct Colors {
     static let flexibleDarkBrown: Color = Color("flexibleDarkBrown")
     static let maroonWhite: Color = Color("maroonWhite")
     static let stockRed: Color = Color("stockRed")
+    static let stockOrange: Color = Color("stockOrange")
+    static let clearBlack: Color = Color("clearBlack")
     //nomenclature (someone should probably change this):
     //flexible: changes shades from light to dark for darkmode
     //view+color: only used in that view

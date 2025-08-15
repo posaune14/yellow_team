@@ -26,14 +26,14 @@ struct NavView: View {
                             .cornerRadius(25)
                             .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
+                                    .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                             )
                         Button {print("volunteer button clicked")} label: {Text("Volunteer").bold()}
                             .padding()
                             .foregroundColor(.stockOrange)
                             .cornerRadius(25)                         .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
+                                    .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                             )
                         Button {print("order button clicked")} label: {Text("Order").bold()}
                             .padding()
@@ -41,7 +41,7 @@ struct NavView: View {
                             .cornerRadius(25)
                             .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .stroke(.customBlack, lineWidth: 4).fill(.clearBlack)
+                                    .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                             )
                     }
                 }
