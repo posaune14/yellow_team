@@ -625,6 +625,106 @@ import {
 
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
+    
+    // Volunteer Schedule State
+    const [volunteerSchedule, setVolunteerSchedule] = useState([
+      {
+        id: 1,
+        time: "8:00 AM - 12:00 PM",
+        shift: "Morning Shift",
+        volunteers: [
+          { name: "John Doe", role: "Server" },
+          { name: "Sarah Johnson", role: "Cook" }
+        ]
+      },
+      {
+        id: 2,
+        time: "12:00 PM - 4:00 PM",
+        shift: "Afternoon Shift",
+        volunteers: [
+          { name: "Mike Chen", role: "Server" },
+          { name: "Emily Rodriguez", role: "Cook" },
+          { name: "David Thompson", role: "Server" }
+        ]
+      },
+      {
+        id: 3,
+        time: "4:00 PM - 8:00 PM",
+        shift: "Evening Shift",
+        volunteers: [
+          { name: "Lisa Wang", role: "Server" },
+          { name: "Robert Martinez", role: "Cook" }
+        ]
+      },
+      {
+        id: 4,
+        time: "On Call",
+        shift: "Backup Volunteers",
+        volunteers: [
+          { name: "Jennifer Lee", role: "Server" }
+        ]
+      }
+    ]);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingSchedule, setEditingSchedule] = useState([]);
+
+    const handleEdit = () => {
+      setEditingSchedule(JSON.parse(JSON.stringify(volunteerSchedule)));
+      setIsEditing(true);
+    };
+
+    const handleSave = () => {
+      setVolunteerSchedule(editingSchedule);
+      setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+      setIsEditing(false);
+    };
+
+    const updateVolunteer = (shiftId, volunteerIndex, field, value) => {
+      setEditingSchedule(prev => 
+        prev.map(shift => 
+          shift.id === shiftId 
+            ? {
+                ...shift,
+                volunteers: shift.volunteers.map((vol, idx) => 
+                  idx === volunteerIndex 
+                    ? { ...vol, [field]: value }
+                    : vol
+                )
+              }
+            : shift
+        )
+      );
+    };
+
+    const addVolunteer = (shiftId) => {
+      setEditingSchedule(prev => 
+        prev.map(shift => 
+          shift.id === shiftId 
+            ? {
+                ...shift,
+                volunteers: [...shift.volunteers, { name: "", role: "" }]
+              }
+            : shift
+        )
+      );
+    };
+
+    const removeVolunteer = (shiftId, volunteerIndex) => {
+      setEditingSchedule(prev => 
+        prev.map(shift => 
+          shift.id === shiftId 
+            ? {
+                ...shift,
+                volunteers: shift.volunteers.filter((_, idx) => idx !== volunteerIndex)
+              }
+            : shift
+        )
+      );
+    };
 
     //const volunteers = [{name: "Big M", email: "BigM@gmail.com", phone: "9083315271", zip:"08502", dob:"3/11/2011", town: "Belle Mead", state: "NJ", shift:"Mornings", role:"Server", emergencyName: "Mike", emergencyPhone:"9179683021"}]
     
@@ -821,41 +921,75 @@ import {
             <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Title order={3} mb="md">Today's Volunteer Schedule</Title>
 
-              <Stack spacing="md">
-                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
-                  <Text fw={700} size="lg" mb="xs">8:00 AM - 12:00 PM</Text>
-                  <Text size="sm" color="dimmed">Morning Shift</Text>
-                  <Stack mt="sm" spacing="xs">
-                    <Text size="sm"><b>John Doe</b> - Server</Text>
-                    <Text size="sm"><b>Sarah Johnson</b> - Cook</Text>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
-                  <Text fw={700} size="lg" mb="xs">12:00 PM - 4:00 PM</Text>
-                  <Text size="sm" color="dimmed">Afternoon Shift</Text>
-                  <Stack mt="sm" spacing="xs">
-                    <Text size="sm"><b>Mike Chen</b> - Server</Text>
-                    <Text size="sm"><b>Emily Rodriguez</b> - Cook</Text>
-                    <Text size="sm"><b>David Thompson</b> - Server</Text>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
-                  <Text fw={700} size="lg" mb="xs">4:00 PM - 8:00 PM</Text>
-                  <Text size="sm" color="dimmed">Evening Shift</Text>
-                  <Stack mt="sm" spacing="xs">
-                    <Text size="sm"><b>Lisa Wang</b> - Server</Text>
-                    <Text size="sm"><b>Robert Martinez</b> - Cook</Text>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
-                  <Text fw={700} size="lg" mb="xs">On Call</Text>
-                  <Text size="sm" color="dimmed">Backup Volunteers</Text>
-                  <Stack mt="sm" spacing="xs">
-                    <Text size="sm"><b>Jennifer Lee</b> - Server</Text>
-                  </Stack>
-                </Paper>
-                <Button variant='light'>Edit</Button>
-              </Stack>
+                             <Stack spacing="md">
+                 {(isEditing ? editingSchedule : volunteerSchedule).map((shift) => (
+                   <Paper key={shift.id} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
+                     <Text fw={700} size="lg" mb="xs">{shift.time}</Text>
+                     <Text size="sm" color="dimmed">{shift.shift}</Text>
+                     <Stack mt="sm" spacing="xs">
+                       {shift.volunteers.map((volunteer, volIndex) => (
+                         <div key={volIndex} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                           {isEditing ? (
+                             <>
+                               <TextInput
+                                 size="xs"
+                                 placeholder="Name"
+                                 value={volunteer.name}
+                                 onChange={(e) => updateVolunteer(shift.id, volIndex, 'name', e.target.value)}
+                                 style={{ flex: 1 }}
+                               />
+                               <TextInput
+                                 size="xs"
+                                 placeholder="Role"
+                                 value={volunteer.role}
+                                 onChange={(e) => updateVolunteer(shift.id, volIndex, 'role', e.target.value)}
+                                 style={{ flex: 1 }}
+                               />
+                               <Button
+                                 size="xs"
+                                 color="red"
+                                 variant="light"
+                                 onClick={() => removeVolunteer(shift.id, volIndex)}
+                               >
+                                 Remove
+                               </Button>
+                             </>
+                           ) : (
+                             <Text size="sm"><b>{volunteer.name}</b> - {volunteer.role}</Text>
+                           )}
+                         </div>
+                       ))}
+                       {isEditing && (
+                         <Button
+                           size="xs"
+                           variant="light"
+                           onClick={() => addVolunteer(shift.id)}
+                           style={{ alignSelf: 'flex-start' }}
+                         >
+                           + Add Volunteer
+                         </Button>
+                       )}
+                     </Stack>
+                   </Paper>
+                 ))}
+                 
+                 <Group>
+                   {isEditing ? (
+                     <>
+                       <Button variant="light" onClick={handleSave} color="green">
+                         Save
+                       </Button>
+                       <Button variant="light" onClick={handleCancel} color="gray">
+                         Cancel
+                       </Button>
+                     </>
+                   ) : (
+                     <Button variant="light" onClick={handleEdit}>
+                       Edit
+                     </Button>
+                   )}
+                 </Group>
+               </Stack>
             </Paper>
           </Grid.Col>
         </Grid>
