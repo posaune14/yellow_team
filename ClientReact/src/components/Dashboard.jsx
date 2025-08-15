@@ -820,6 +820,7 @@ import {
           <Grid.Col mt={'xl'} span={6}>
             <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Title order={3} mb="md">Today's Volunteer Schedule</Title>
+
               <Stack spacing="md">
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
                   <Text fw={700} size="lg" mb="xs">8:00 AM - 12:00 PM</Text>
@@ -853,6 +854,7 @@ import {
                     <Text size="sm"><b>Jennifer Lee</b> - Server</Text>
                   </Stack>
                 </Paper>
+                <Button variant='light'>Edit</Button>
               </Stack>
             </Paper>
           </Grid.Col>
