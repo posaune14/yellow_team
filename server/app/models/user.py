@@ -18,5 +18,5 @@ class UserModel:
         #Sends the users data into the database
         result = self.collection.insert_one(user_data)
         #Returns the id of the document as a string
-        return str(result.inserted_id())
+        return str(result.inserted_id)
     
