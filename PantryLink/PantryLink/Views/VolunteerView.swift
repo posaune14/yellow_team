@@ -203,9 +203,9 @@ struct VolunteerView: View {
                                 return
                             }
                             
-                            /*let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
+                            let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
                             
-                                register_volunteer(volunteer: new_volunteer)*/
+                                register_volunteer(volunteer: new_volunteer)
                             
                             path.removeLast()
                         
