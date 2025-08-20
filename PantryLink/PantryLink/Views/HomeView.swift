@@ -8,11 +8,14 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var searchText = ""
+    
     var body: some View {
-        ScrollView{
-            NavView()
-            StreamView()
-            
+        NavigationStack(){
+            ScrollView{
+                NavView()
+                StreamView()
+                
+            }
         }
     }
 }

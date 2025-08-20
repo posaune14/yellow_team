@@ -21,5 +21,16 @@ struct Colors {
     static let customLightTan: Color = Color("customLightTan")
     static let customDarkTan: Color = Color("customDarkTan")
     static let customDarkBrown: Color = Color("customDarkBrown")
+}
+
+struct ContentView: View {
     
+    var body: some View {
+        //if logged in or not, show login view path or home path
+        HomeView()
+    }
+}
+
+#Preview {
+    ContentView()
 }

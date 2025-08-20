@@ -32,7 +32,8 @@ struct VolunteerView: View {
     //unfinished
     @State var empty_field = false
     
- 
+    //navigation
+    @Binding var path: NavigationPath
     
     var body: some View {
         ScrollView {
@@ -202,12 +203,16 @@ struct VolunteerView: View {
                                 return
                             }
                             
-                            let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
+                            /*let new_volunteer = Volunteer(first_name: first_name, last_name: last_name, date_of_birth: date_of_birth, email: email, phone_number: phone_number, zipcode: zipcode, roles: roles, availability: availability, emergency_name: emergency_name, emergency_number: emergency_number, alert_message: alert_message, show_alert: show_alert)
                             
-                                register_volunteer(volunteer: new_volunteer)
+                                register_volunteer(volunteer: new_volunteer)*/
+                            
+                            path.removeLast()
+                        
                         })  {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center)
+                        }
+                            .frame(maxWidth: .infinity, alignment: .center)
                             .background(.customGreen).foregroundStyle(.customWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
@@ -225,7 +230,8 @@ struct VolunteerView: View {
     }
 }
 
-#Preview {
-    VolunteerView()
+/* #Preview {
+    VolunteerView(path: path)
     
 }
+*/
