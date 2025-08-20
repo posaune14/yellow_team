@@ -226,7 +226,7 @@ struct VolunteerView: View {
         .padding(0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.customBrown)
-        .toolbarBackground(.customBrown)
+        .toolbarBackground(.customDarkGray)
         
     }
 }
