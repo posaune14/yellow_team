@@ -79,8 +79,10 @@ struct SignInView: View {
                 
                     
                 
-                Section(header:Button("Create One Today"){
-                    print("Create One Today")
+                Section(header:Button(action: {
+                    path.append("SignUp")
+                }){
+                    Text("Create One Today")
                 }
                     
                     .frame(width: 250, height: 50)
