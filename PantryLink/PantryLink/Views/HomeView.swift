@@ -15,6 +15,7 @@ struct HomeView: View {
             ScrollView{
                 NavView(path: $path)
                 StreamView()
+                StockView()
             }
         }.toolbar(.hidden)
     }
