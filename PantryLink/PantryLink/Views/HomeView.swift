@@ -8,18 +8,19 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var searchText = ""
+    @Binding var path: NavigationPath
     
     var body: some View {
-        NavigationStack(){
+        VStack(){
             ScrollView{
-                NavView()
+                NavView(path: $path)
                 StreamView()
-                
             }
-        }
+        }.toolbar(.hidden)
     }
 }
 
-#Preview {
+/*#Preview {
     HomeView()
 }
+*/

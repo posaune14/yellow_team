@@ -10,6 +10,8 @@ import SwiftUI
 struct SignInView: View {
     @State private var username: String = ""
     @State private var password: String = ""
+    @Binding var path: NavigationPath
+    
     var body: some View {
         VStack {
             Text("Sign In")
@@ -36,8 +38,10 @@ struct SignInView: View {
                     TextField("Password",text:$password)
                 }
                 
-                    Section(header:Button("Sign In"){
-                        print("Sign In")
+                Section(header:Button(action: {
+                    path.append("Home")
+                }){
+                    Text("Sign In")
                 }
                     
                     .frame(width: 350, height: 80)
@@ -143,6 +147,7 @@ struct SignInView: View {
 
                 
    
-#Preview {
+/*#Preview {
     SignInView()
 }
+*/

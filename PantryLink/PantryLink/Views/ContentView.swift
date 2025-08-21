@@ -24,10 +24,21 @@ struct Colors {
 }
 
 struct ContentView: View {
+    @State private var path = NavigationPath()
     
     var body: some View {
         //if logged in or not, show login view path or home path
-        HomeView()
+        NavigationStack(path: $path){
+            SignInView(path: $path)
+            .navigationDestination(for: String.self){value in
+                if value == "Home" {
+                    HomeView(path: $path)
+                } else if value == "Volunteer"{
+                    VolunteerView(path: $path)
+                }
+            }
+        }
+    
     }
 }
 
