@@ -170,7 +170,7 @@ struct VolunteerView: View {
                         Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $roles
+                                    "Delivery, Admin Support, ect.", text: $roles
                                 ).autocorrectionDisabled(true)
                             }
                         }
@@ -179,7 +179,7 @@ struct VolunteerView: View {
                         Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $availability
+                                    "Ex: M-F 9AM to 5AM", text: $availability
                                 ).autocorrectionDisabled(true)
                             }
                         }
@@ -188,8 +188,8 @@ struct VolunteerView: View {
                         Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "Name", text: $emergency_name
-                                ).border(emergency_name.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
+                                    "Full Name", text: $emergency_name
+                                ).autocorrectionDisabled(true)
                                 TextField(
                                     "Phone Number", text: $emergency_number
                                 ).border(emergency_number.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
