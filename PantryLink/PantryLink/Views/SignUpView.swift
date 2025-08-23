@@ -51,11 +51,13 @@ struct SignUpView: View {
                 
                 Section(header:HStack{
                     Text("Already have an account?")
+
                     Button("Sign In"){
                         print("Sign in button pressed")
                     }
                         .buttonStyle(.plain)
                         .foregroundStyle(.blue)
+
                 }){
                     
                 }
