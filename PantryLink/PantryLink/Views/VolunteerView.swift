@@ -213,7 +213,7 @@ struct VolunteerView: View {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .background(.customGreen).foregroundStyle(.flexibleWhite)){}
+                            .background(.flexibleGreen).foregroundStyle(.flexibleWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
                     .alert(isPresented: $show_alert){
