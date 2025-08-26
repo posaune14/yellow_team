@@ -29,7 +29,7 @@ struct NavView: View {
                     .cornerRadius(25)
                     .overlay(
                         RoundedRectangle(cornerRadius: 25)
-                            .stroke(.customBlack, lineWidth: 4)
+                            .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                     )
                     Button(action: {
                         go_to_volunteer = true
@@ -39,19 +39,19 @@ struct NavView: View {
                     }*/
                         .bold()
                         .padding()
-                        .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
+                        .foregroundColor(.stockOrange)
                         .cornerRadius(25)
-                        .overlay(
+                        .background(
                             RoundedRectangle(cornerRadius: 25)
-                                .stroke(.customBlack, lineWidth: 4)
+                                .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                         )
                     Button {print("order button clicked")} label: {Text("Order").bold()}
                         .padding()
-                        .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
+                        .foregroundColor(.stockOrange)
                         .cornerRadius(25)
-                        .overlay(
+                        .background(
                             RoundedRectangle(cornerRadius: 25)
-                                .stroke(.customBlack, lineWidth: 4)
+                                .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                         )
                 }
             }

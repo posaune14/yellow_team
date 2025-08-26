@@ -9,18 +9,26 @@ import SwiftUI
 
 //create colors
 struct Colors {
-    static let customBrown: Color = Color("customBrown")
-    static let customGreen: Color = Color("customGreen")
-    static let customLightGray: Color = Color("customLightGray")
-    static let customDarkGray: Color = Color("customDarkGray")
-    static let customBlack: Color = Color("customBlack")
-    static let customRed: Color = Color("customRed")
-    static let customOrange: Color = Color("customOrange")
-    static let customBlue: Color = Color("customBlue")
-    static let customWhite: Color = Color("customWhite")
-    static let customLightTan: Color = Color("customLightTan")
-    static let customDarkTan: Color = Color("customDarkTan")
-    static let customDarkBrown: Color = Color("customDarkBrown")
+    static let brownBlack: Color = Color("brownBlack")
+    static let flexibleGreen: Color = Color("flexibleGreen")
+    static let flexibleLightGray: Color = Color("flexibleLightGray")
+    static let flexibleDarkGray: Color = Color("flexibleDarkGray")
+    static let flexibleBlack: Color = Color("flexibleBlack")
+    static let flexibleRed: Color = Color("flexibleRed")
+    static let flexibleOrange: Color = Color("flexibleOrange")
+    static let flexibleBlue: Color = Color("flexibleBlue")
+    static let flexibleWhite: Color = Color("flexibleWhite")
+    static let stockLightTan: Color = Color("stockLightTan")
+    static let stockDarkTan: Color = Color("stockDarkTan")
+    static let flexibleDarkBrown: Color = Color("flexibleDarkBrown")
+    static let maroonWhite: Color = Color("maroonWhite")
+    static let stockRed: Color = Color("stockRed")
+    static let stockOrange: Color = Color("stockOrange")
+    static let clearBlack: Color = Color("clearBlack")
+    //nomenclature (someone should probably change this):
+    //flexible: changes shades from light to dark for darkmode
+    //view+color: only used in that view
+    //two colors: switches from one color to that color
 }
 
 struct ContentView: View {
@@ -40,7 +48,6 @@ struct ContentView: View {
                 }
             }
         }
-    
     }
 }
 

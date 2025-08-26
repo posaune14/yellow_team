@@ -52,45 +52,45 @@ struct VolunteerView: View {
             //volunteer oppertunities
             VStack(spacing: 0){
                 ZStack(){
-                    Rectangle().frame(width: 300, height: 125).foregroundStyle(.customLightGray)
-                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading).frame(width: 300)
+                    Rectangle().frame(width: 300, height: 125).foregroundStyle(.flexibleLightGray)
+                    Text("Volunteer Opportunities").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.flexibleGreen).multilineTextAlignment(.leading).frame(width: 300)
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customDarkGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleDarkGray)
                     Text("Food Distribution").font(.system(size: 30, weight: .light))
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customLightGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleLightGray)
                     Text("Sorting/Packing").font(.system(size: 30, weight: .light))
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customDarkGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleDarkGray)
                     Text("Delivery").font(.system(size: 30, weight: .light))
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customLightGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleLightGray)
                     Text("Admin Support").font(.system(size: 30, weight: .light))
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customDarkGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleDarkGray)
                     Text("Fundraising Support").font(.system(size: 30, weight: .light))
                 }
                 ZStack{
-                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.customLightGray)
+                    Rectangle().frame(width: 300, height: 75).foregroundStyle(.flexibleLightGray)
                     Text("Cleaning/Sanitation").font(.system(size: 30, weight: .light))
                 }
             }.padding(20).frame(width: 400, height: 675)
             
             //register form
             ZStack{
-                RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)).foregroundStyle(.customLightGray).frame(width: 300, height: isClicked ? 775:875)
+                RoundedRectangle(cornerSize: CGSize(width: 25, height: 25)).foregroundStyle(.flexibleLightGray).frame(width: 300, height: isClicked ? 775:875)
                 
                 if !isClicked{
                     Form{
-                        Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
+                        Section(header: Text("Register as a Volunteer").font(.system(size: 36, weight: .thin, design: .rounded)).foregroundStyle(.flexibleGreen).multilineTextAlignment(.leading)){}
                         
                         //first name
-                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(first_name.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("First Name").font(.system(size: 16, weight: .bold)).foregroundStyle(first_name.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $first_name
@@ -99,7 +99,7 @@ struct VolunteerView: View {
                         }
                         
                         //last name
-                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(last_name.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Last Name").font(.system(size: 16, weight: .bold)).foregroundStyle(last_name.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $last_name
@@ -108,7 +108,7 @@ struct VolunteerView: View {
                         }
                         
                         //date of birth
-                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(date_of_birth.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Date of Birth").font(.system(size: 16, weight: .bold)).foregroundStyle(date_of_birth.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $date_of_birth)
@@ -116,7 +116,7 @@ struct VolunteerView: View {
                         }
                         
                         //email
-                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(email.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Email").font(.system(size: 16, weight: .bold)).foregroundStyle(email.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $email
@@ -125,7 +125,7 @@ struct VolunteerView: View {
                         }
                         
                         //phone number
-                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(phone_number.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Phone Number").font(.system(size: 16, weight: .bold)).foregroundStyle(phone_number.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $phone_number
@@ -134,7 +134,7 @@ struct VolunteerView: View {
                         }
                         
                         //zipcode
-                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(zipcode.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Zipcode").font(.system(size: 16, weight: .bold)).foregroundStyle(zipcode.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
                                     "", text: $zipcode
@@ -153,7 +153,7 @@ struct VolunteerView: View {
                         })
                         {
                             Text("Register").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
-                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.customGreen).foregroundStyle(.customWhite)
+                        }.frame(maxWidth: .infinity, alignment: .center).background(Color.flexibleGreen).foregroundStyle(.flexibleWhite)
                         ){}
                         
                     }.frame(width: 300, height: 850)
@@ -164,33 +164,33 @@ struct VolunteerView: View {
                     
                     Form{
                         //Text
-                        Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.customBlack).multilineTextAlignment(.leading)){}
-                        Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.customGreen).multilineTextAlignment(.leading)){}
+                        Section(header: Text("We're Glad You Are Interested").font(.system(size: 32, weight: .light, design: .rounded)).foregroundStyle(.flexibleBlack).multilineTextAlignment(.leading)){}
+                        Section(header: Text("Before you continue, we need more information").font(.system(size: 28, weight: .regular, design: .serif)).foregroundStyle(.flexibleGreen).multilineTextAlignment(.leading)){}
                         
                         //preferred roles
-                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Preferred Roles").font(.system(size: 16, weight: .bold)).foregroundStyle(roles.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $roles
+                                    "Delivery, Admin Support, ect.", text: $roles
                                 ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //availability
-                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .customBlack)){
+                        Section(header: Text("Availability").font(.system(size: 16, weight: .bold)).foregroundStyle(availability.isEmpty && empty_field ? .red : .flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "", text: $availability
+                                    "Ex: M-F 9AM to 5AM", text: $availability
                                 ).autocorrectionDisabled(true)
                             }
                         }
                         
                         //Emergency Contact
-                        Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.customBlack)){
+                        Section(header: Text("Emergency Contact").font(.system(size: 16, weight: .bold)).foregroundStyle(.flexibleBlack)){
                             VStack{
                                 TextField(
-                                    "Name", text: $emergency_name
-                                ).border(emergency_name.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
+                                    "Full Name", text: $emergency_name
+                                ).autocorrectionDisabled(true)
                                 TextField(
                                     "Phone Number", text: $emergency_number
                                 ).border(emergency_number.isEmpty && empty_field ? .red : .clear).autocorrectionDisabled(true)
@@ -213,7 +213,7 @@ struct VolunteerView: View {
                             Text("Continue").font(.system(size: 20, weight: .bold, design: .rounded)).frame(height: 40)
                         }
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .background(.customGreen).foregroundStyle(.customWhite)){}
+                            .background(.customGreen).foregroundStyle(.flexibleWhite)){}
                         
                     }.frame(width: 300, height: 750).padding(40).scrollContentBackground(.hidden)
                     .alert(isPresented: $show_alert){
@@ -225,8 +225,8 @@ struct VolunteerView: View {
         }
         .padding(0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.customBrown)
-        .toolbarBackground(.customDarkGray)
+        .background(.brownBlack)
+        .toolbarBackground(.flexibleDarkGray)
         
     }
 }

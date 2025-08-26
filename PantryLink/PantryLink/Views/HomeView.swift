@@ -11,12 +11,24 @@ struct HomeView: View {
     @Binding var path: NavigationPath
     
     var body: some View {
-        VStack(){
+        ZStack{
+            Rectangle()
+                .fill(.stockLightTan)
+                .ignoresSafeArea()
             ScrollView{
-                NavView(path: $path)
-                StreamView()
-                StockView()
+                VStack{
+                    
+                    NavView(path: $path)
+                    LocalPantryView()
+                        .padding()
+                    StreamView()
+                        .padding()
+                    StockView()
+                        .padding()
+                }
             }
+            .padding(1.0)
+            
         }.toolbar(.hidden)
     }
 }

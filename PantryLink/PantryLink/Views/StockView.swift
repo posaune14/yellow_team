@@ -31,14 +31,15 @@ struct StockView: View{
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.customLightTan)
+                .fill(.stockLightTan)
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 15)
-                .fill(.customDarkTan)
+                .fill(.stockDarkTan)
                 .frame(width:350, height:650)
+                .shadow(radius: 10)
             VStack{
                 Text("Stock")
-                    .foregroundColor(.customRed)
+                    .foregroundColor(.stockRed)
                     .bold()
                     .font(.title)
                 ScrollView{
@@ -46,7 +47,7 @@ struct StockView: View{
                         ForEach(pantries, id: \.name){ pantry in //this ForEach thing was fairly easy to do with the data structs
                             VStack{
                                 RoundedRectangle(cornerRadius: 15)
-                                    .fill(.customWhite)
+                                    .fill(.flexibleWhite)
                                     .frame(width:325, height:110)
                                     .overlay(
                                         VStack{
@@ -65,7 +66,7 @@ struct StockView: View{
                                             HStack{
                                                 ForEach(pantry.items, id: \.self){ item in
                                                     RoundedRectangle(cornerRadius: 10)
-                                                        .fill(.customLightGray)
+                                                        .fill(.flexibleLightGray)
                                                         .frame(width: 75, height: 30)
                                                         .overlay(
                                                             Text(item)
