@@ -10,6 +10,12 @@ import SwiftUI
 struct SignInView: View {
     @State private var username: String = ""
     @State private var password: String = ""
+    @State var alert_message = ""
+    @State var show_alert = false
+    
+    //unfinished
+    @State var empty_field  = false
+    //@StateObject var viewModel = SignInViewModel()
     var body: some View {
         VStack {
             Text("Sign In")
@@ -30,14 +36,29 @@ struct SignInView: View {
                 //.fill(Color(red: 191/255, green: 191/255, blue: 191/255))
                 //.frame(width: 350, height: 100)
                 //.ignoresSafeArea()
+//            if !viewModel.errorMessage.isEmpty {
+//                Text(viewModel.errorMessage)
+//                    .foregroundColor(Color.red)
+//        
+            //}
+            
             Form{
-                Section(header:Text("User Info").font(.system(size: 20, weight: .bold))){
+                Section(header:Text("User Info").font(.system(size: 20, weight: .bold)).foregroundStyle(username.isEmpty && password.isEmpty && empty_field ? .red: .black)){
                     TextField("Username",text:$username)
                     TextField("Password",text:$password)
                 }
                 
                     Section(header:Button("Sign In"){
                         print("Sign In")
+                        //viewModel.login()
+                        guard !username.isEmpty, !password.isEmpty else {
+                            empty_field = true
+                            return
+                            
+                        }
+                        let user = User(username: username, password: password, alert_message: alert_message, show_alert: show_alert)
+                        
+                    register_user(user: user)
                 }
                     
                     .frame(width: 350, height: 80)
@@ -90,11 +111,16 @@ struct SignInView: View {
                     
                 }
                 
+                
+                
                         
         
                 
             } //move this and close the form after the creation of the "remember me" and "sign in" buttons
             .background(Color.white) //figure out how to change this so the background will be white
+            .alert(isPresented: $show_alert){
+                Alert(title: Text("Error"), message: Text(alert_message))
+            }
             
             
             
