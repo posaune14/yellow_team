@@ -90,6 +90,7 @@ struct StockView: View{
     }
 }
                                             
-#Preview {
+/*#Preview {
     StockView()
 }
+*/

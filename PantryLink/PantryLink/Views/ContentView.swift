@@ -29,5 +29,30 @@ struct Colors {
     //flexible: changes shades from light to dark for darkmode
     //view+color: only used in that view
     //two colors: switches from one color to that color
+}
+
+struct ContentView: View {
+    @State private var path = NavigationPath()
     
+    var body: some View {
+        //if logged in or not, show login view path or home path
+        NavigationStack(path: $path){
+            SignInView(path: $path)
+            .navigationDestination(for: String.self){value in
+                if value == "Home" {
+                    HomeView(path: $path)
+                } else if value == "Volunteer"{
+                    VolunteerView(path: $path)
+                } else if value == "SignUp"{
+                    SignUpView(path: $path)
+                } else if value == "Stock"{
+                    StockView()
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    ContentView()
 }

@@ -8,6 +8,8 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var searchText = ""
+    @Binding var path: NavigationPath
+    
     var body: some View {
         ZStack{
             Rectangle()
@@ -16,21 +18,20 @@ struct HomeView: View {
             ScrollView{
                 VStack{
                     
-                    NavView()
+                    NavView(path: $path)
                     LocalPantryView()
                         .padding()
                     StreamView()
-                        .padding()
-                    StockView()
                         .padding()
                 }
             }
             .padding(1.0)
             
-        }
+        }.toolbar(.hidden)
     }
 }
 
-#Preview {
+/*#Preview {
     HomeView()
 }
+*/

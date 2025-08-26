@@ -15,6 +15,8 @@ struct SignUpView: View {
     @State private var username: String = ""
     @State private var phonenumber: String = ""
     
+    @Binding var path: NavigationPath
+    
     var body: some View {
         VStack{
             Text("Create Account")
@@ -24,19 +26,21 @@ struct SignUpView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
             Form{
                 Section(header: Text("Login Details").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
-                    TextField("Email (Optional)", text: $email)
+                    TextField("Username", text: $username)
                     SecureField("Password", text: $password)
                         .textContentType(.password)
                 }
                 Section(header:Text("Account Information").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
                     TextField("First Name", text: $firstname)
                     TextField("Last Name", text: $lastname)
-                    TextField("Username", text: $username)
+                    TextField("Email (Optional", text: $email)
                     TextField("Phone Number (Optional)", text: $phonenumber)
                 }
-                Section(header:Button("Sign Up"){
-                    print("sign up button pessed")
+                Section(header: Button(action: {
+                    path.removeLast()
+                    path.append("Home")
                 }){
+                    Text("Sign Up")
                     // Rectangle()
                     // .fill(Color(red: 255/255, green: 178/255, blue: 102/255))
                     //.frame(width: 350, height: 80)
@@ -46,9 +50,9 @@ struct SignUpView: View {
                 .font(.system(size: 30, weight: .bold))
                 .background(.flexibleOrange)
                 .tint(.white)
-                .cornerRadius(15)
+                .cornerRadius(15)){}
                 
-                Section(header:HStack{
+                /*Section(header:HStack{
                     Text("Already have an account?").foregroundStyle(.flexibleBlack).fontWeight(.bold)
                     Button("Sign In"){
                         print("Sign in button pressed")
@@ -58,11 +62,12 @@ struct SignUpView: View {
                         .fontWeight(.bold)
                 }){
                     
-                }
+                }*/
             }
         }
     }
 }
-        #Preview {
+        /*#Preview {
             SignUpView()
         }
+*/
