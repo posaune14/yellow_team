@@ -23,8 +23,6 @@ struct HomeView: View {
                         .padding()
                     StreamView()
                         .padding()
-                    StockView()
-                        .padding()
                 }
             }
             .padding(1.0)

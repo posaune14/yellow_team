@@ -45,6 +45,8 @@ struct ContentView: View {
                     VolunteerView(path: $path)
                 } else if value == "SignUp"{
                     SignUpView(path: $path)
+                } else if value == "Stock"{
+                    StockView()
                 }
             }
         }

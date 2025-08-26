@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NavView: View {
     @State private var searchText = ""
-    @State var go_to_volunteer = false
     @Binding var path: NavigationPath
     
     var body: some View {
@@ -27,12 +26,11 @@ struct NavView: View {
                     .padding()
                     .foregroundColor(Color(red: 236/255, green: 120/255, blue: 93/255))
                     .cornerRadius(25)
-                    .overlay(
+                    .background(
                         RoundedRectangle(cornerRadius: 25)
                             .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                     )
                     Button(action: {
-                        go_to_volunteer = true
                         path.append("Volunteer")
                     }){Text("Volunteer")}/*.navigationDestination(isPresented: $go_to_volunteer){
                         VolunteerView(path: $path)
@@ -53,6 +51,11 @@ struct NavView: View {
                             RoundedRectangle(cornerRadius: 25)
                                 .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                         )
+                    Button(action: {
+                        path.append("Stock")
+                    }){
+                        Text("Stock")
+                    }.bold().padding().foregroundColor(.stockOrange).cornerRadius(25).background(RoundedRectangle(cornerRadius: 25).stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack))
                 }
             }
         }
