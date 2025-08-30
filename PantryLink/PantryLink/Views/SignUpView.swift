@@ -8,14 +8,10 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @State private var email: String = ""
-    @State private var password: String = ""
-    @State private var firstname: String = ""
-    @State private var lastname: String = ""
-    @State private var username: String = ""
-    @State private var phonenumber: String = ""
     
+    @StateObject var viewModel = SignUpViewViewModel()
     @Binding var path: NavigationPath
+    
     
     var body: some View {
         VStack{
@@ -26,15 +22,15 @@ struct SignUpView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
             Form{
                 Section(header: Text("Login Details").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
-                    TextField("Username", text: $username)
-                    SecureField("Password", text: $password)
+                    TextField("Username", text: $viewModel.username)
+                    SecureField("Password", text: $viewModel.password)
                         .textContentType(.password)
                 }
                 Section(header:Text("Account Information").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
-                    TextField("First Name", text: $firstname)
-                    TextField("Last Name", text: $lastname)
-                    TextField("Email (Optional", text: $email)
-                    TextField("Phone Number (Optional)", text: $phonenumber)
+                    TextField("First Name", text: $viewModel.firstname)
+                    TextField("Last Name", text: $viewModel.lastname)
+                    TextField("Username", text: $viewModel.username)
+                    TextField("Phone Number (Optional)", text: $viewModel.phonenumber)
                 }
                 Section(header: Button(action: {
                     path.removeLast()
