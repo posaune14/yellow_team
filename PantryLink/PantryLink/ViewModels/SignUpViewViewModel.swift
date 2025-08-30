@@ -8,34 +8,9 @@
 import Foundation
 
 
-class SignUpViewViewModel: ObservableObject{
-    @Published  var email: String = ""
-    @Published  var password: String = ""
-    @Published  var firstname: String = ""
-    @Published  var lastname: String = ""
-    @Published  var username: String = ""
-    @Published  var phonenumber: String = ""
+extension SignUpView{    
     
-    init(){}
-    
-    func SignUp() {
-        guard validate() else{
-            return
-        }
-        //HERE ADD OUR OWN VERSION OF "Auth.auth create user..."
-        //self?.insertUserRecord(id: userId)
-        
-        
-    }
-    
-    private func insertUserRecord(id: String){
-        let newUser = User(id: id,
-                           firstname: firstname,
-                           lastname: lastname,
-                           email: email,
-                           username: username,
-                           password: password,
-                           phonenumber: phonenumber,)
+    private func signUp(user: User){
         
         
         // Add new code
@@ -52,7 +27,7 @@ class SignUpViewViewModel: ObservableObject{
         //doing something
         do{
             //turn it into JSON
-            let jsonData = try JSONEncoder().encode(newUser)
+            let jsonData = try JSONEncoder().encode(user)
             
             //attatching JSON data to the message that is sent to the server
             request.httpBody = jsonData
@@ -85,29 +60,4 @@ class SignUpViewViewModel: ObservableObject{
         }
         
     }
-        
-        // now insert into database
-        
-        private func validate() -> Bool{
-            //makes sure that the user imputs somthing for each thing
-            guard !email.trimmingCharacters(in: .whitespaces).isEmpty,
-                  !password.trimmingCharacters(in: .whitespaces).isEmpty,
-                  !firstname.trimmingCharacters(in: .whitespaces).isEmpty,
-                  !lastname.trimmingCharacters(in: .whitespaces).isEmpty,
-                  !username.trimmingCharacters(in: .whitespaces).isEmpty else {
-                return false
-            }
-            
-            //makes sure that email contains an "@" and a "."
-            guard email.contains("@") && email.contains(".") else {
-                return false
-            }
-            
-            //makes sure that password has at least 6 characters
-            guard password.count >= 6 else {
-                return false
-            }
-            
-            return true
-        }
-    }
+}
