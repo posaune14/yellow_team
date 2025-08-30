@@ -15,28 +15,32 @@ struct SignUpView: View {
     @State private var username: String = ""
     @State private var phonenumber: String = ""
     
+    @Binding var path: NavigationPath
+    
     var body: some View {
         VStack{
             Text("Create Account")
                 .multilineTextAlignment(.center)
                 .font(.system(size: 58, weight: .bold))
-                .foregroundColor(.customRed)
+                .foregroundColor(.maroonWhite)
                 .frame(maxWidth: .infinity, alignment: .center)
             Form{
-                Section(header: Text("Login Details").foregroundStyle(.customBlack).fontWeight(.bold)){
-                    TextField("Email (Optional)", text: $email)
+                Section(header: Text("Login Details").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
+                    TextField("Username", text: $username)
                     SecureField("Password", text: $password)
                         .textContentType(.password)
                 }
-                Section(header:Text("Account Information").foregroundStyle(.customBlack).fontWeight(.bold)){
+                Section(header:Text("Account Information").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
                     TextField("First Name", text: $firstname)
                     TextField("Last Name", text: $lastname)
-                    TextField("Username", text: $username)
+                    TextField("Email (Optional", text: $email)
                     TextField("Phone Number (Optional)", text: $phonenumber)
                 }
-                Section(header:Button("Sign Up"){
-                    print("sign up button pessed")
+                Section(header: Button(action: {
+                    path.removeLast()
+                    path.append("Home")
                 }){
+                    Text("Sign Up")
                     // Rectangle()
                     // .fill(Color(red: 255/255, green: 178/255, blue: 102/255))
                     //.frame(width: 350, height: 80)
@@ -44,25 +48,26 @@ struct SignUpView: View {
                 }
                 .frame(width: 350, height: 80)
                 .font(.system(size: 30, weight: .bold))
-                .background(.customOrange)
+                .background(.flexibleOrange)
                 .tint(.white)
-                .cornerRadius(15)
+                .cornerRadius(15)){}
                 
-                Section(header:HStack{
-                    Text("Already have an account?").foregroundStyle(.customBlack).fontWeight(.bold)
+                /*Section(header:HStack{
+                    Text("Already have an account?").foregroundStyle(.flexibleBlack).fontWeight(.bold)
                     Button("Sign In"){
                         print("Sign in button pressed")
                     }
                         .buttonStyle(.plain)
-                        .foregroundStyle(.customBlue)
+                        .foregroundStyle(.flexibleBlue)
                         .fontWeight(.bold)
                 }){
                     
-                }
+                }*/
             }
         }
     }
 }
-        #Preview {
+        /*#Preview {
             SignUpView()
         }
+*/
