@@ -12,7 +12,7 @@ struct StreamView: View {
         ZStack {
             //new colors I created for stock are in dark mode branch, so make sure I (or you) add them
             RoundedRectangle(cornerRadius: 10)
-                .fill(.customDarkTan)
+                .fill(.stockDarkTan)
                 .frame(width: 350, height: 700)
                 .shadow(radius: 10)
             ScrollView{
@@ -48,6 +48,7 @@ struct StreamView: View {
     
 }
 
-#Preview {
+/*#Preview {
     StreamView()
 }
+*/
