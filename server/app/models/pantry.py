@@ -15,16 +15,16 @@ class pantry_model:
         result = self.collection.insert_one(pantry_data)
         return str(result.inserted_id)
 
-    def update_pantry(self, id, update_data):
-        result = self.collection.update_one({"_id": id}, {"$set": update_data})
+    def update_pantry(self, pantry_id, update_data):
+        result = self.collection.update_one({"_id": pantry_id}, {"$set": update_data})
         return result
     
-    def get_stock(self, id):
-        return list(
+    def get_stock(self, pantry_id):
+        return (
             self.collection.aggregate(
                 [
                     {
-                        "$match": {"_id": id}
+                        "$match": {"_id": pantry_id}
                     },
                     {
                         "$project": {
