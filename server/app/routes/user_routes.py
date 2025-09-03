@@ -2,7 +2,13 @@ from flask import Blueprint, jsonify, current_app, request
 #Check these lines of code (lines 4+)
 #These lines should "register the blueprint"
 from flask import Flask
+from flask_bcrypt import Bcrypt
+#import cloudinary 
+#from cloudinary.utils import cloudinary_url
+#from flask_jwt_extended import jwt_required
 from app.models.user import UserModel
+#from app.models.judge import JudgeModel - we don't have this, what does it do and do we need it??
+#from bson import ObjectId
 user_routes = Blueprint("user_routes", __name__)
 
 app = Flask(__name__)
@@ -31,11 +37,14 @@ def post_users():
         email = data["email"]
         phone_number = data["phone_number"]
 
+        bcrypt = Bcrypt(current_app)
+        hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+
         #creating an object from UserModel
         new_user = UserModel(current_app.mongo)
         
         #creates the new user
-        response = new_user.create_user(first_name, last_name, email, phone_number, username, password)
+        response = new_user.create_user(first_name, last_name, email, phone_number, username, hashed_password)
     
     #Checks to make sure no errors occur and break code
     except Exception as e:
