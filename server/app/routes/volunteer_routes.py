@@ -61,3 +61,14 @@ def update_volunteer(volunteer_id):
         return jsonify({"message": "Error updating volunteer", "error": str(e)}), 400
     
     return jsonify({"_id": volunteer_id}), 200
+
+@volunteer_routes.route("/get", methods=["GET"])
+def get_volunteers():
+    try:
+        volunteer_instance = volunteer_model(current_app.mongo)
+        volunteers = volunteer_instance.get_volunteers()
+
+    except Exception as e:
+        return jsonify({"message": "Error getting volunteers", "error": str(e)}), 400
+    
+    return jsonify(volunteers)

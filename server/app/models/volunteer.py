@@ -38,6 +38,19 @@ class volunteer_model:
             )
         )
     
+    def get_volunteers(self):
+        return (
+            self.collection.aggregate(
+                [
+                    {
+                        "$project": {
+                            "_id": 0,
+                        }
+                    }
+                ]
+            )
+        )
+    
     def update_volunteer(self, volunteer_id, update_data):
         result = self.collection.update_one({"_id": volunteer_id}, {"$set": update_data})
         return result
