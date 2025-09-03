@@ -20,7 +20,6 @@ def get_users():
 #A post route for posting the users into the database
 @user_routes.route("/create", methods=["POST"])
 def post_users(): 
-   
     #try takes the data and puts it into variables
     try: 
         data = request.get_json()
