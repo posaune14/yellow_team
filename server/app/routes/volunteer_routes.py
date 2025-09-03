@@ -72,3 +72,14 @@ def get_volunteers():
         return jsonify({"message": "Error getting volunteers", "error": str(e)}), 400
     
     return jsonify(volunteers)
+
+@volunteer_routes.route("/delete/<string:volunteer_id>", methods=["DELETE"])
+def delete_volunteer(volunteer_id):
+    try:
+        volunteer = volunteer_model(current_app.mongo)
+        response = volunteer.delete_volunteer(ObjectId(volunteer_id))
+
+    except Exception as e:
+        return jsonify({"message": "Error deleting volunteer", "error": str(e)}), 400
+    
+    return jsonify({"_id": volunteer_id})

@@ -55,6 +55,6 @@ class volunteer_model:
         result = self.collection.update_one({"_id": volunteer_id}, {"$set": update_data})
         return result
 
-    def delete_volunteer(self, id):
-        result = self.collection.delete_one({"_id": id})
+    def delete_volunteer(self, volunteer_id):
+        result = self.collection.delete_one({"_id": volunteer_id})
         return result 
