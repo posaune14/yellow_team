@@ -30,6 +30,20 @@ struct NavView: View {
                         RoundedRectangle(cornerRadius: 25)
                             .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                     )
+                    /*Button {print("order button clicked")} label: {Text("Order").bold()}
+                        .padding()
+                        .foregroundColor(.stockOrange)
+                        .cornerRadius(25)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25)
+                                .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
+                        )*/
+                    Button(action: {
+                        path.append("Stock")
+                    }){
+                        Text("Stock")
+                    }.bold().padding().foregroundColor(.stockOrange).cornerRadius(25).background(RoundedRectangle(cornerRadius: 25).stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack))
+                    
                     Button(action: {
                         path.append("Volunteer")
                     }){Text("Volunteer")}/*.navigationDestination(isPresented: $go_to_volunteer){
@@ -43,22 +57,9 @@ struct NavView: View {
                             RoundedRectangle(cornerRadius: 25)
                                 .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
                         )
-                    Button {print("order button clicked")} label: {Text("Order").bold()}
-                        .padding()
-                        .foregroundColor(.stockOrange)
-                        .cornerRadius(25)
-                        .background(
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack)
-                        )
-                    Button(action: {
-                        path.append("Stock")
-                    }){
-                        Text("Stock")
-                    }.bold().padding().foregroundColor(.stockOrange).cornerRadius(25).background(RoundedRectangle(cornerRadius: 25).stroke(.flexibleBlack, lineWidth: 4).fill(.clearBlack))
                 }
             }
-        }
+        }.padding(20)
     }
 }
     
