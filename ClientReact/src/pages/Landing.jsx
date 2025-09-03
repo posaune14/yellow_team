@@ -232,7 +232,7 @@ function Landing() {
                       Ready to Transform Your Food Bank?
                     </Text>
                     <Text size="lg" ta="center" mb="xl" style={{ opacity: 0.9 }}>
-                      Join hundreds of organizations already using PantryLink to serve their communities better.
+                      Join PantryLink today to serve your community better.
                     </Text>
                     <Center>
                       <motion.div
