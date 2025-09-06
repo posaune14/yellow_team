@@ -10,7 +10,7 @@ import Foundation
 
 extension SignUpView{    
     
-    private func signUp(user: User){
+     func signUp(user: User){
         
         
         // Add new code
