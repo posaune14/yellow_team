@@ -8,14 +8,26 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @State private var email: String = ""
-    @State private var password: String = ""
-    @State private var firstname: String = ""
-    @State private var lastname: String = ""
-    @State private var username: String = ""
-    @State private var phonenumber: String = ""
-    
+    //navigation
     @Binding var path: NavigationPath
+    
+    //check volunteerview lines 200 - 208
+    //user
+    @State var first_name: String = ""
+    @State var last_name: String = ""
+    @State var username: String = ""
+    @State var password: String = ""
+    @State var date_of_birth: String = ""
+    @State var email: String = ""
+    @State var phone_number: String = ""
+    //unfinished
+    @State var empty_field = false
+    //alert
+    @State var alert_message = false
+    @State var show_alert = false
+    
+    //@Binding var path: NavigationPath
+    
     
     var body: some View {
         VStack{
@@ -31,16 +43,28 @@ struct SignUpView: View {
                         .textContentType(.password)
                 }
                 Section(header:Text("Account Information").foregroundStyle(.flexibleBlack).fontWeight(.bold)){
-                    TextField("First Name", text: $firstname)
-                    TextField("Last Name", text: $lastname)
-                    TextField("Email (Optional", text: $email)
-                    TextField("Phone Number (Optional)", text: $phonenumber)
+                    TextField("First Name", text: $first_name)
+                    TextField("Last Name", text: $last_name)
+                    TextField("Username", text: $username)
+                    TextField("Email", text: $email)
+                    TextField("Phone Number (Optional)", text: $phone_number)
                 }
                 Section(header: Button(action: {
-                    path.removeLast()
-                    path.append("Home")
-                }){
+                    guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !phone_number.isEmpty, !email.isEmpty else {
+                        empty_field = true
+                        return
+                    }
+                    
+                    let new_user = User(firstname: first_name, lastname: last_name, email: email, username: username, password: password, phonenumber: phone_number)
+                    
+                        signUp(user: new_user)
+
+                    //path.removeLast()
+                    //path.append("Home")
+                    })  {
                     Text("Sign Up")
+                    
+                    
                     // Rectangle()
                     // .fill(Color(red: 255/255, green: 178/255, blue: 102/255))
                     //.frame(width: 350, height: 80)
@@ -67,7 +91,7 @@ struct SignUpView: View {
         }
     }
 }
-        /*#Preview {
-            SignUpView()
-        }
-*/
+//        #Preview {
+//            SignUpView(path:path)
+//        }
+
