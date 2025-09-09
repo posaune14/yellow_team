@@ -1,21 +1,41 @@
 from flask_pymongo import PyMongo
 
-class PantryModel:
+class pantry_model: 
     def __init__(self, mongo: PyMongo):
-        #syntax from mongo stating which colection in the database that we want to use
-        self.collection = mongo.cx["test"]["pantrys"]
-        
+        self.collection = mongo.cx["test"]["pantries"]
 
-    def create_user(self, password, pantry_name, pantry_email, phone_number, address): 
+    def create_pantry(self, name, address, email, phone_number, password):
         pantry_data = {
-            "password": password, 
-            "pantry_name": pantry_name, 
-            "pantry_email": pantry_email, 
-            "phone_number": phone_number, 
-            "address": address,
+            "name": name,
+            "address": address, 
+            "email": email,
+            "phone_number": phone_number,
+            "password": password,
         }
-        #Sends the pantrys data into the database
         result = self.collection.insert_one(pantry_data)
-        #Returns the id of the document as a string
         return str(result.inserted_id)
+
+    def update_pantry(self, pantry_id, update_data):
+        result = self.collection.update_one({"_id": pantry_id}, {"$set": update_data})
+        return result
     
+    def get_stock(self, pantry_id):
+        return (
+            self.collection.aggregate(
+                [
+                    {
+                        "$match": {"_id": pantry_id}
+                    },
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "name": 0,
+                            "address": 0,
+                            "email": 0, 
+                            "phone_number": 0,
+                            "password": 0,
+                        }
+                    }
+                ]
+            )
+        )
