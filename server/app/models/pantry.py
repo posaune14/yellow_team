@@ -39,3 +39,13 @@ class pantry_model:
                 ]
             )
         )
+    def find_user_by_username(self, username):
+        return self.collection.find_one(
+            {"username": username},
+            {
+                "_id": {"$toString": "$_id"},
+                "username": 1,
+                "password": 1,
+                
+            },
+        )
