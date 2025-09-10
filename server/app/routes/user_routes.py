@@ -43,7 +43,7 @@ def post_users():
         new_user = UserModel(current_app.mongo)
         
         #creates the new user
-        response = new_user.create_user(first_name, last_name, email, phone_number, username, hashed_password)
+        response = new_user.create_user(hashed_password, username, first_name, last_name, email, phone_number)
     
     #Checks to make sure no errors occur and break code
     except Exception as e:

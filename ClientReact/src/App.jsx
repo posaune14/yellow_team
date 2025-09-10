@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Center } from '@mantine/core'
 import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Credits from './pages/Credits'
@@ -18,6 +19,7 @@ function App() {
         } />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/credits" element={<Credits />} />
       </Routes>
     </Router>

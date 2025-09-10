@@ -36,7 +36,7 @@ import {
     IconCheck,
     IconDeviceFloppy
   } from '@tabler/icons-react'
-  import { useState } from 'react'
+  import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
   const DashboardComp = ()=>{
@@ -625,6 +625,9 @@ import {
 
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
+    const [volunteers, setVolunteers] = useState([])
+    const [inboxVolunteers, setInboxVolunteers] = useState([])
+    const [loading, setLoading] = useState(true)
     
     // Volunteer Schedule State
     const [volunteerSchedule, setVolunteerSchedule] = useState([
@@ -668,6 +671,136 @@ import {
 
     const [isEditing, setIsEditing] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState([]);
+
+    // API Base URL - corrected to match server port
+    const API_BASE_URL = 'http://localhost:3000';
+
+    // Fetch volunteers from backend
+    const fetchVolunteers = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/volunteer/get`);
+        const allVolunteers = response.data;
+        
+        // Separate verified and unverified volunteers
+        const verifiedVolunteers = allVolunteers.filter(vol => vol.verified === true || vol.verified === "True");
+        const unverifiedVolunteers = allVolunteers.filter(vol => vol.verified === false || vol.verified === "False");
+        
+        setVolunteers(verifiedVolunteers);
+        setInboxVolunteers(unverifiedVolunteers);
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to fetch volunteers',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Handle volunteer verification (accept)
+    const handleAcceptVolunteer = async (volunteerId) => {
+      try {
+        const volunteer = inboxVolunteers.find(v => v._id === volunteerId);
+        if (!volunteer) return;
+
+        const updateData = {
+          ...volunteer,
+          verified: true
+        };
+
+        await axios.put(`${API_BASE_URL}/volunteer/update/${volunteerId}`, updateData);
+        
+        // Refresh the volunteer lists
+        await fetchVolunteers();
+        
+        notifications.show({
+          title: 'Volunteer Accepted!',
+          message: `${volunteer.first_name} ${volunteer.last_name} has been verified`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+        });
+      } catch (error) {
+        console.error('Error accepting volunteer:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to accept volunteer',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      }
+    };
+
+    // Handle volunteer rejection (decline)
+    const handleDeclineVolunteer = async (volunteerId) => {
+      try {
+        const volunteer = inboxVolunteers.find(v => v._id === volunteerId);
+        if (!volunteer) return;
+
+        await axios.delete(`${API_BASE_URL}/volunteer/delete/${volunteerId}`);
+        
+        // Refresh the volunteer lists
+        await fetchVolunteers();
+        
+        notifications.show({
+          title: 'Volunteer Declined',
+          message: `${volunteer.first_name} ${volunteer.last_name} has been removed`,
+          color: 'orange',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      } catch (error) {
+        console.error('Error declining volunteer:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to decline volunteer',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      }
+    };
+
+    // Delete verified volunteer
+    const handleDeleteVolunteer = async (volunteerId) => {
+      try {
+        const volunteer = volunteers.find(v => v._id === volunteerId);
+        if (!volunteer) return;
+
+        await axios.delete(`${API_BASE_URL}/volunteer/delete/${volunteerId}`);
+        
+        // Refresh the volunteer lists
+        await fetchVolunteers();
+        
+        notifications.show({
+          title: 'Volunteer Deleted',
+          message: `${volunteer.first_name} ${volunteer.last_name} has been removed`,
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      } catch (error) {
+        console.error('Error deleting volunteer:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to delete volunteer',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+      }
+    };
+
+    // Fetch volunteers on component mount
+    useEffect(() => {
+      fetchVolunteers();
+    }, []);
 
     const handleEdit = () => {
       setEditingSchedule(JSON.parse(JSON.stringify(volunteerSchedule)));
@@ -737,120 +870,107 @@ import {
           <Grid.Col span={6}>
             <Paper mt={'xl'} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Title order={3}>Volunteers</Title>
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Email</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {[{
-                      name: "Big M", 
-                      email: "BigM@gmail.com", 
-                      phone: "9083315271", 
-                      zip:"08502",
-                      dob:"3/11/2011", 
-                      town: "Belle Mead", 
-                      state: "NJ", 
-                      shift:"Mornings", 
-                      role:"Server",
-                      emergencyName: "Mike", 
-                      emergencyPhone:"9179683021"
-                  }].map((volunteer, idx)=> {
-                  return(
+              {loading ? (
+                <Center p="xl">
+                  <Loader size="md" />
+                  <Text ml="md">Loading volunteers...</Text>
+                </Center>
+              ) : (
+                <Table>
+                  <Table.Thead>
                     <Table.Tr>
+                      <Table.Th>Name</Table.Th>
+                      <Table.Th>Email</Table.Th>
+                      <Table.Th>Actions</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {volunteers.length === 0 ? (
+                      <Table.Tr>
+                        <Table.Td colSpan={3}>
+                          <Center p="md">
+                            <Text color="dimmed">No verified volunteers found</Text>
+                          </Center>
+                        </Table.Td>
+                      </Table.Tr>
+                    ) : (
+                      volunteers.map((volunteer, idx)=> (
+                    <Table.Tr key={volunteer._id}>
                     <Modal p={0} opened={volunteerInfo} onClose={()=> setVolunteerInfo(false)} centered size="lg" radius="md" padding="lg">
                       
                         <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
                           <Group align="center" mb="md" spacing="lg">
-                            <Avatar size={64} radius="xl" color="blue">JD</Avatar>
+                            <Avatar size={64} radius="xl" color="blue">
+                              {volunteer.first_name?.[0]}{volunteer.last_name?.[0]}
+                            </Avatar>
                             <div>
-                              <Title order={3} mb={2}>{volunteer.name}</Title>
+                              <Title order={3} mb={2}>{volunteer.first_name} {volunteer.last_name}</Title>
                               <Text size="sm" color="dimmed">{volunteer.email}</Text>
                             </div>
                           </Group>
                           <Grid gutter="md" mb="md">
                             <Grid.Col span={6}>
-                              <Text size="sm" fw={500}><b>Phone:</b> {volunteer.phone}</Text>
-                              <Text size="sm" fw={500}><b>Town:</b> {volunteer.town}</Text>
-                              <Text size="sm" fw={500}><b>State:</b> {volunteer.state}</Text>
-                              <Text size="sm" fw={500}><b>Zip:</b> {volunteer.zip}</Text>
+                              <Text size="sm" fw={500}><b>Phone:</b> {volunteer.phone_number}</Text>
+                              <Text size="sm" fw={500}><b>Zip:</b> {volunteer.zipcode}</Text>
+                              <Text size="sm" fw={500}><b>Date of Birth:</b> {volunteer.date_of_birth}</Text>
                             </Grid.Col>
                             <Grid.Col span={6}>
-                              <Text size="sm" fw={500}><b>Shift:</b> {volunteer.shift}</Text>
-                              <Text size="sm" fw={500}><b>Date of Birth:</b> {volunteer.dob}</Text>
-                              <Text size="sm" fw={500}><b>Preferred Role:</b> {volunteer.role}</Text>
+                              <Text size="sm" fw={500}><b>Availability:</b> {volunteer.availability}</Text>
+                              <Text size="sm" fw={500}><b>Roles:</b> {volunteer.roles}</Text>
+                              <Text size="sm" fw={500}><b>Verified:</b> {volunteer.verified ? 'Yes' : 'No'}</Text>
                             </Grid.Col>
                             
                           </Grid>
                           <Paper p="sm" radius="md" withBorder bg="gray.0">
                             <Title order={5} mb={4} color="blue">Emergency Contact</Title>
-                            <Text size="sm" fw={500}><b>Name:</b> {volunteer.emergencyName}</Text>
-                            <Text size="sm" fw={500}><b>Phone:</b> {volunteer.emergencyPhone}</Text>
+                            <Text size="sm" fw={500}><b>Name:</b> {volunteer.emergency_name}</Text>
+                            <Text size="sm" fw={500}><b>Phone:</b> {volunteer.emergency_number}</Text>
                           </Paper>
-                          <Button color='blue' m={'2rem'} onClick={(e) => window.location.href = `mailto:${volunteer.email}`}>Email</Button>
-                          <Button color='red' m={'2rem'}>DELETE</Button>
+                          <Group mt="md">
+                            <Button color='blue' onClick={(e) => window.location.href = `mailto:${volunteer.email}`}>Email</Button>
+                            <Button color='red' onClick={() => handleDeleteVolunteer(volunteer._id)}>DELETE</Button>
+                          </Group>
                         </Paper>
                     </Modal>
-                    <Table.Td>{volunteer.name}</Table.Td>
+                    <Table.Td>{volunteer.first_name} {volunteer.last_name}</Table.Td>
                     <Table.Td>{volunteer.email}</Table.Td>
                     <Table.Td><Button variant="light" color="gray" radius="xl" onClick={()=> setVolunteerInfo(true)}><IconInfoCircle size={20} /></Button></Table.Td>
                   </Table.Tr>
-                  )})}
-                  
-                </Table.Tbody>
-              </Table>
+                  ))
+                  )}
+                  </Table.Tbody>
+                </Table>
+              )}
             </Paper>
             
             {/* Inbox Section under Volunteers List */}
             <Paper mt={'xl'} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Title order={3} mb="md">Inbox</Title>
-              <Button variant="gradient" gradient={{ from: 'teal', to: 'green' }} radius="xl" onClick={()=> setInboxInfo(true)}>Open Inbox<Badge p={5} m={5} color="red">3</Badge></Button>
+              <Button variant="gradient" gradient={{ from: 'teal', to: 'green' }} radius="xl" onClick={()=> setInboxInfo(true)}>
+                Open Inbox
+                {inboxVolunteers.length > 0 && <Badge p={5} m={5} color="red">{inboxVolunteers.length}</Badge>}
+              </Button>
               <Modal p={0} opened={inboxInfo} onClose={()=> setInboxInfo(false)} centered size="lg" radius="md" padding="lg">
                 <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
                   <Title order={3}>Inbox</Title>
-                  <Table>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>Name</Table.Th>
-                        <Table.Th>Email</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                      {[
-                        {
-                          name: "John Doe",
-                          email: "john.doe@example.com",
-                          phone: "123-456-7890",
-                          town: "Belle Mead",
-                          state: "NJ",
-                          zip: "08502",
-                          shift: "Mornings and Tuesdays",
-                          dob: "01/01/1990",
-                          role: "Server",
-                          emergency: { name: "Jane Doe", phone: "123-456-7890" },
-                          bio: "I want to volunteer because I want to help people and I want to make a difference."
-                        },
-                        {
-                          name: "Jane Doe",
-                          email: "jane.doe@example.com",
-                          phone: "987-654-3210",
-                          town: "Princeton",
-                          state: "NJ",
-                          zip: "08540",
-                          shift: "Afternoons and Weekends",
-                          dob: "02/02/1992",
-                          role: "Cook",
-                          emergency: { name: "John Doe", phone: "987-654-3210" },
-                          bio: "I want to volunteer because I want to help people and I want to make a difference."
-                        }
-                      ].map((applicant, idx) => {
-                        const [expanded, setExpanded] = useState(false);
-                        // To allow per-row expansion, use a component per row
-                        function ApplicantRow() {
-                          const [expanded, setExpanded] = useState(false);
-                          return (
+                  {inboxVolunteers.length === 0 ? (
+                    <Center p="xl">
+                      <Text color="dimmed">No pending volunteer applications</Text>
+                    </Center>
+                  ) : (
+                    <Table>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Name</Table.Th>
+                          <Table.Th>Email</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>
+                        {inboxVolunteers.map((applicant, idx) => {
+                          // Create a component for each row to manage its own state
+                          function ApplicantRow() {
+                            const [expanded, setExpanded] = useState(false);
+                            return (
                             <>
                               <Table.Tr style={{ cursor: "pointer" }} onClick={() => setExpanded((e) => !e)}>
                                 <Table.Td>
@@ -862,7 +982,7 @@ import {
                                   >
                                     {expanded ? "▼" : "▶"}
                                   </Button>
-                                  {applicant.name}
+                                  {applicant.first_name} {applicant.last_name}
                                 </Table.Td>
                                 <Table.Td>{applicant.email}</Table.Td>
                               </Table.Tr>
@@ -885,34 +1005,33 @@ import {
                                     <Paper p="md" radius="md"  style={{ margin: 0, background: "#f8fafc" }}>
                                       <Grid gutter="md" mb="md">
                                         <Grid.Col span={6}>
-                                          <Text size="sm" fw={500}><b>Phone:</b> {applicant.phone}</Text>
-                                          <Text size="sm" fw={500}><b>Town:</b> {applicant.town}</Text>
-                                          <Text size="sm" fw={500}><b>State:</b> {applicant.state}</Text>
-                                          <Text size="sm" fw={500}><b>Zip:</b> {applicant.zip}</Text>
+                                          <Text size="sm" fw={500}><b>Phone:</b> {applicant.phone_number}</Text>
+                                          <Text size="sm" fw={500}><b>Zip:</b> {applicant.zipcode}</Text>
+                                          <Text size="sm" fw={500}><b>Date of Birth:</b> {applicant.date_of_birth}</Text>
                                         </Grid.Col>
                                         <Grid.Col span={6}>
-                                          <Text size="sm" fw={500}><b>Availability:</b> {applicant.shift}</Text>
-                                          <Text size="sm" fw={500}><b>Date of Birth:</b> {applicant.dob}</Text>
-                                          <Text size="sm" fw={500}><b>Role:</b> {applicant.role}</Text>
-                                          <Text size="sm" fw={500}><b>Bio:</b> {applicant.bio}</Text>
+                                          <Text size="sm" fw={500}><b>Availability:</b> {applicant.availability}</Text>
+                                          <Text size="sm" fw={500}><b>Roles:</b> {applicant.roles}</Text>
+                                          <Text size="sm" fw={500}><b>Emergency Contact:</b> {applicant.emergency_name} - {applicant.emergency_number}</Text>
                                         </Grid.Col>
                                       </Grid>
                 
                                       <Group mt="md">
-                                        <Button color="green" variant="light" radius="xl">Accept</Button>
-                                        <Button color="red" variant="light" radius="xl">Decline</Button>
+                                        <Button color="green" variant="light" radius="xl" onClick={() => handleAcceptVolunteer(applicant._id)}>Accept</Button>
+                                        <Button color="red" variant="light" radius="xl" onClick={() => handleDeclineVolunteer(applicant._id)}>Decline</Button>
                                       </Group>
                                     </Paper>
                                   </div>
                                 </td>
                               </tr>
                             </>
-                          );
-                        }
-                        return <ApplicantRow key={applicant.email} />;
-                      })}
-                    </Table.Tbody>
-                  </Table>
+                            );
+                          }
+                          return <ApplicantRow key={applicant._id} />;
+                        })}
+                      </Table.Tbody>
+                    </Table>
+                  )}
                 </Paper>
               </Modal>
             </Paper>
@@ -931,12 +1050,18 @@ import {
                          <div key={volIndex} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                            {isEditing ? (
                              <>
-                               <TextInput
+                               <Select
                                  size="xs"
-                                 placeholder="Name"
+                                 placeholder="Select volunteer"
                                  value={volunteer.name}
-                                 onChange={(e) => updateVolunteer(shift.id, volIndex, 'name', e.target.value)}
+                                 onChange={(value) => updateVolunteer(shift.id, volIndex, 'name', value)}
                                  style={{ flex: 1 }}
+                                 data={volunteers.map(vol => ({
+                                   value: `${vol.first_name} ${vol.last_name}`,
+                                   label: `${vol.first_name} ${vol.last_name}`
+                                 }))}
+                                 searchable
+                                 clearable
                                />
                                <TextInput
                                  size="xs"
@@ -1029,10 +1154,83 @@ import {
  function Dashboard() {
     let [page, setPage] = useState("")
     let [settings, setSettings] = useState(false)
+    let [helpModal, setHelpModal] = useState(false)
     const [foodBankName, setFoodBankName] = useState("TASK Food Bank")
     const [foodBankAddress, setFoodBankAddress] = useState("123 Main St, Belle Mead, NJ 08502")
     const [foodBankPhone, setFoodBankPhone] = useState("(609) 123-4567")
     const [foodBankEmail, setFoodBankEmail] = useState("info@taskfoodbank.org")
+    const [settingsLoading, setSettingsLoading] = useState(false)
+    
+    // API Base URL
+    const API_BASE_URL = 'http://localhost:3000';
+    
+    // Save settings function
+    const handleSaveSettings = async () => {
+        try {
+            setSettingsLoading(true);
+            
+            // Get current user data
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const userId = userData._id;
+            
+            if (!userId) {
+                notifications.show({
+                    title: 'Error',
+                    message: 'User not found. Please sign in again.',
+                    color: 'red',
+                    icon: <IconInfoCircle size={16} />,
+                    autoClose: 3000,
+                });
+                return;
+            }
+            
+            // Update pantry information
+            const pantryData = {
+                name: foodBankName,
+                address: foodBankAddress,
+                phone_number: foodBankPhone,
+                email: foodBankEmail
+            };
+            
+            // For now, we'll store settings in localStorage since we don't have a pantry update endpoint
+            // In a real app, you'd call an API to update pantry settings
+            localStorage.setItem('pantry_settings', JSON.stringify(pantryData));
+            
+            notifications.show({
+                title: 'Settings Saved!',
+                message: 'Your food bank settings have been updated successfully.',
+                color: 'green',
+                icon: <IconCheck size={16} />,
+                autoClose: 3000,
+            });
+            
+            setSettings(false);
+            
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            notifications.show({
+                title: 'Error',
+                message: 'Failed to save settings. Please try again.',
+                color: 'red',
+                icon: <IconInfoCircle size={16} />,
+                autoClose: 3000,
+            });
+        } finally {
+            setSettingsLoading(false);
+        }
+    };
+    
+    // Load settings on component mount
+    useEffect(() => {
+        const savedSettings = localStorage.getItem('pantry_settings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            setFoodBankName(settings.name || "TASK Food Bank");
+            setFoodBankAddress(settings.address || "123 Main St, Belle Mead, NJ 08502");
+            setFoodBankPhone(settings.phone_number || "(609) 123-4567");
+            setFoodBankEmail(settings.email || "info@taskfoodbank.org");
+        }
+    }, []);
     
     return (
       <AppShell
@@ -1091,27 +1289,94 @@ import {
                 onChange={(e) => setFoodBankEmail(e.target.value)}
               />
               <Group justify="flex-end" mt="md">
-                <Button variant="light" onClick={() => setSettings(false)}>
+                <Button variant="light" onClick={() => setSettings(false)} disabled={settingsLoading}>
                   Cancel
                 </Button>
-                <Button onClick={() => {
-                  // Here you would typically save the settings
-                  console.log('Saving settings:', { foodBankName, foodBankAddress, foodBankPhone, foodBankEmail });
-                  setSettings(false);
-                }}>
-                  Save Changes
+                <Button onClick={handleSaveSettings} loading={settingsLoading} disabled={settingsLoading}>
+                  {settingsLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Group>
             </Stack>
           </Paper>
         </Modal>
-  
+
+        {/* Help Modal */}
+        <Modal opened={helpModal} onClose={() => setHelpModal(false)} centered size="lg" radius="md" padding="lg">
+          <Paper m={0} p="md" radius="md" withBorder style={{ backgroundColor: "#f8fafc" }}>
+            <Title order={3} mb="lg">Dashboard Help</Title>
+            <Stack spacing="md">
+              <div>
+                <Text fw={600} size="md" mb="xs">Welcome to PantryLink Dashboard!</Text>
+                <Text size="sm" color="dimmed">
+                  This dashboard helps you manage your food bank operations efficiently. Here's how to use each section:
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">📊 Dashboard Overview</Text>
+                <Text size="sm" color="dimmed">
+                  View key metrics like total volunteers, stock levels, and upcoming events. 
+                  The schedule shows today's volunteer shifts and important reminders.
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">📦 Inventory Management</Text>
+                <Text size="sm" color="dimmed">
+                  Track your food inventory by category (Fruits, Vegetables, Proteins, Nonperishable). 
+                  Edit quantities, add new items, and filter by type. Items turn red when stock is low.
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">👥 Volunteer Management</Text>
+                <Text size="sm" color="dimmed">
+                  <strong>Volunteers List:</strong> View all verified volunteers with their contact information.<br/>
+                  <strong>Inbox:</strong> Review and approve new volunteer applications. Accept to verify them or decline to remove them.<br/>
+                  <strong>Schedule:</strong> Assign verified volunteers to different shifts throughout the day.
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">📢 Stream Posts</Text>
+                <Text size="sm" color="dimmed">
+                  Share announcements and updates with your community. Post about special events, 
+                  new arrivals, or important notices.
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">⚙️ Settings</Text>
+                <Text size="sm" color="dimmed">
+                  Update your food bank's contact information, name, and address. 
+                  Changes are saved automatically and will be used throughout the system.
+                </Text>
+              </div>
+              
+              <div>
+                <Text fw={600} size="sm" mb="xs">💡 Tips</Text>
+                <Text size="sm" color="dimmed">
+                  • Use the navigation menu on the left to switch between sections<br/>
+                  • Click the info button next to volunteers to see full details<br/>
+                  • Edit mode in inventory and schedule allows bulk changes<br/>
+                  • Notifications will appear for successful actions and errors
+                </Text>
+              </div>
+              
+              <Group justify="center" mt="md">
+                <Button onClick={() => setHelpModal(false)} color="blue">
+                  Got it!
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        </Modal>
 
         <AppShell.Header px="md" style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
           <Group h="100%" position="apart">
             <Text fw={700} size="lg">Dashboard</Text>
             <Group>
-              <Button variant="light" color="gray">
+              <Button variant="light" color="gray" onClick={() => setHelpModal(true)}>
                 Help
               </Button>
               <Menu>

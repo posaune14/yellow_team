@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, current_app, request
 from flask_bcrypt import Bcrypt
 from app.models.volunteer import volunteer_model
+from app.models.user import UserModel
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
