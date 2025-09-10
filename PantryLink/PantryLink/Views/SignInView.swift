@@ -16,6 +16,8 @@ struct SignInView: View {
     //unfinished
     @State var empty_field  = false
     //@StateObject var viewModel = SignInViewModel()
+    @Binding var path: NavigationPath
+    
     var body: some View {
         VStack {
             Text("Sign In")
@@ -59,6 +61,10 @@ struct SignInView: View {
                         let user = User(username: username, password: password, alert_message: alert_message, show_alert: show_alert)
                         
                     register_user(user: user)
+                Section(header:Button(action: {
+                    path.append("Home")
+                }){
+                    Text("Sign In")
                 }
                     
                     .frame(width: 350, height: 80)
@@ -96,8 +102,10 @@ struct SignInView: View {
                 
                     
                 
-                Section(header:Button("Create One Today"){
-                    print("Create One Today")
+                Section(header:Button(action: {
+                    path.append("SignUp")
+                }){
+                    Text("Create One Today")
                 }
                     
                     .frame(width: 250, height: 50)
@@ -169,6 +177,7 @@ struct SignInView: View {
 
                 
    
-#Preview {
+/*#Preview {
     SignInView()
 }
+*/
