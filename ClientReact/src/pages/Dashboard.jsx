@@ -272,6 +272,56 @@ import {
       { name: 'Lentils', current: 23, full: 50, type: 'Nonperishable' }
     ])
 
+    const [inventoryLoading, setInventoryLoading] = useState(false)
+    const [inventoryError, setInventoryError] = useState(null)
+    const API_BASE_URL = 'http://localhost:3000'
+
+    const resolvePantryId = () => {
+      const explicit = localStorage.getItem('pantry_id')
+      if (explicit) return explicit
+      try {
+        const userData = JSON.parse(localStorage.getItem('user_data') || '{}')
+        if (userData && userData.pantry_id) return userData.pantry_id
+      } catch {}
+      return null
+    }
+
+    const fetchInventory = async () => {
+      const pantryId = resolvePantryId()
+      if (!pantryId) return
+      try {
+        setInventoryLoading(true)
+        setInventoryError(null)
+        const { data } = await axios.get(`${API_BASE_URL}/pantry/get/${pantryId}`)
+        const incoming = data && Object.prototype.hasOwnProperty.call(data, 'stock') ? data.stock : data
+        if (Array.isArray(incoming)) {
+          setItems(incoming)
+        } else if (incoming && typeof incoming === 'object') {
+          const mapped = Object.entries(incoming).map(([name, value]) => {
+            if (typeof value === 'object' && value !== null) {
+              return {
+                name,
+                current: Number(value.current ?? value.qty ?? value.quantity ?? 0),
+                full: Number(value.full ?? value.capacity ?? 0),
+                type: value.type ?? 'Nonperishable',
+              }
+            }
+            return { name, current: Number(value) || 0, full: 0, type: 'Nonperishable' }
+          })
+          setItems(mapped)
+        }
+      } catch (err) {
+        setInventoryError('Failed to load inventory')
+        console.error('Error loading inventory:', err)
+      } finally {
+        setInventoryLoading(false)
+      }
+    }
+
+    useEffect(() => {
+      fetchInventory()
+    }, [])
+
     const handleSaveItem = (itemName, current, full) => {
       setItems(prevItems => 
         prevItems.map(item => 
@@ -447,16 +497,28 @@ import {
           onChange={setSort}
           />
         </Center>
-        <Grid p={'xl'}>
-          {filteredItems.map((item, index) => (
-            <InvItems 
-              key={index} 
-              item={item} 
-              editing={editing} 
-              onSave={handleSaveItem}
-            />
-          ))}
-        </Grid>
+        {inventoryError && (
+          <Center p="sm">
+            <Text color="red">{inventoryError}</Text>
+          </Center>
+        )}
+        {inventoryLoading ? (
+          <Center p="xl">
+            <Loader size="md" />
+            <Text ml="md">Loading inventory...</Text>
+          </Center>
+        ) : (
+          <Grid p={'xl'}>
+            {filteredItems.map((item, index) => (
+              <InvItems 
+                key={index} 
+                item={item} 
+                editing={editing} 
+                onSave={handleSaveItem}
+              />
+            ))}
+          </Grid>
+        )}
 
         {/* Add New Item Modal */}
         <Modal 
