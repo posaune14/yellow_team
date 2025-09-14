@@ -15,11 +15,12 @@ class UserModel:
             "email": email, 
             "phone_number": phone_number, 
         }
+
+            
         #Sends the users data into the database
         result = self.collection.insert_one(user_data)
         #Returns the id of the document as a string
         return str(result.inserted_id)
-    
     def find_user_by_username(self, username):
         user = self.collection.find_one({"username": username})
         if user:
