@@ -48,6 +48,8 @@ def update_pantry(pantry_id):
         # Only include stock if it's provided
         if "stock" in data:
             update_data["stock"] = data["stock"]
+        if "stream" in data:
+            update_data["stream"] = data["stream"]
 
         new_pantry = pantry_model(current_app.mongo)
         response = new_pantry.update_pantry(ObjectId(pantry_id), update_data)   
