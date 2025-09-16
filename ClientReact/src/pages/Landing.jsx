@@ -6,13 +6,13 @@ import Mobile from '../components/Mobile'
 import { useRef } from 'react'
 import InventoryEx from '../components/InventoryEx'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import VolunteerEx from '../components/VolunteerEx'
 import JFCS from '../assets/JFCS.png'
 import Somerset from '../assets/Somerset.png'
 function Landing() {
     const MobileExRef = useRef(null);
-
+    const navigate = useNavigate();
     const scrollToMobileEx = () => {
         MobileExRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -245,6 +245,7 @@ function Landing() {
                           color="dark"
                           radius="xl"
                           fw={600}
+                          onClick={() => navigate('/signin')}
                         >
                           Get Started Today
                         </Button>
