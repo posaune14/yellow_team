@@ -87,7 +87,7 @@ import {
             </Grid>
   
             <Grid>
-              <Grid.Col span={8}>
+              <Grid.Col span={12}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
                   <Text size="sm" fw={900} mb="xs">Today's Schedule</Text>
                   {volunteerSchedule.length === 0 ? (
@@ -119,16 +119,6 @@ import {
                     ))
                   )}
                   <Text size="sm" color="dimmed" mt="sm">Update on the volunteer page</Text>
-                </Paper>
-              </Grid.Col>
-              <Grid.Col span={4}>
-                <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-                  <Text size="sm" fw={500} mb="xs">Reminders</Text>
-                  <Text>Meeting</Text>
-                  <Text size="xs" colo="dimmed">2:00 PM – 4:00 PM</Text>
-                  <Button mt="sm" fullWidth radius="xl" variant="gradient" gradient={{ from: 'teal', to: 'green' }}>
-                    Start Meeting
-                  </Button>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={12}>
