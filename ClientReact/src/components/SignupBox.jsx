@@ -1,4 +1,4 @@
-import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor, Stack } from '@mantine/core'
+import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor, Stack, Flex } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useState } from 'react'
@@ -102,12 +102,12 @@ function SignupBox() {
     
     return (
         <Center>
-            <Container style={{ borderRadius: '40px', backgroundColor: '#fff', height: '45rem', width: '30rem', margin: '1rem' }}>
+            <Container style={{ borderRadius: '40px', backgroundColor: '#fff', height: '50rem', width: '30rem', margin: '1rem' }}>
                 <Title order={1} style={{ padding: '2rem'}}>
                     Food Bank Sign Up
                 </Title>
                 <Center>
-                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"20rem", height: "25rem", margin: '2rem'}}>
+                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"22rem", height: "28rem", margin: '2rem'}}>
                         <Stack spacing="md">
                             <TextInput 
                                 label="Username" 
@@ -117,6 +117,7 @@ function SignupBox() {
                                 size="md" 
                                 required
                             />
+                            <Flex direction="row" justify="space-between" gap="md">
                             <TextInput 
                                 label="First Name" 
                                 placeholder="Enter your first name"  
@@ -133,6 +134,8 @@ function SignupBox() {
                                 size="md" 
                                 required
                             />
+                            </Flex>
+                            <Flex direction="row" justify="space-between" gap="md">
                             <TextInput 
                                 label="Email" 
                                 placeholder="Enter your email"  
@@ -150,6 +153,7 @@ function SignupBox() {
                                 size="md" 
                                 required
                             />
+                            </Flex>
                             <TextInput 
                                 label="Password" 
                                 placeholder="Enter your password"  
