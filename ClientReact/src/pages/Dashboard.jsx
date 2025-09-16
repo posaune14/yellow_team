@@ -39,32 +39,49 @@ import {
   import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
-  const DashboardComp = ()=>{
+  const DashboardComp = ({ volunteers = [], inventory = [], volunteerSchedule = [] })=>{
+    // Calculate real metrics
+    const totalVolunteers = volunteers.length;
+    
+    // Calculate stock percentage
+    const stockPercentage = inventory.length > 0 
+      ? Math.round((inventory.reduce((sum, item) => sum + (item.current / item.full), 0) / inventory.length) * 100)
+      : 0;
+    
+    // Calculate low stock items (less than 35% full)
+    const lowStockItems = inventory.filter(item => (item.current / item.full) < 0.35).length;
+    
+    // Calculate total scheduled volunteers for today (only count volunteers with actual names)
+    const totalScheduledVolunteers = volunteerSchedule.reduce((sum, shift) => {
+      const actualVolunteers = shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '');
+      return sum + actualVolunteers.length;
+    }, 0);
+
     return(
       <Stack spacing="md">
             <Grid>
               <Grid.Col span={3}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
                   <Text size="sm" color="dimmed">Total Volunteers</Text>
-                  <Text size="xl" fw={700}>8</Text>
+                  <Text size="xl" fw={700}>{totalVolunteers}</Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={3}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
                   <Text size="sm" color="dimmed">Stock(%)</Text>
-                  <Text size="xl" fw={700}>58</Text>
+                  <Text size="xl" fw={700}>{stockPercentage}%</Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={3}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-                  <Text size="sm" color="dimmed">X</Text>
-                  <Text size="xl" fw={700}>12</Text>
+                  <Text size="sm" color="dimmed">Low Stock Items</Text>
+                  <Text size="xl" fw={700} style={{ color: lowStockItems > 0 ? 'red' : 'green' }}>{lowStockItems}</Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={3}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-                  <Text size="sm" color="dimmed">X</Text>
-                  <Text size="xl" fw={700}>2</Text>
+                  <Text size="sm" color="dimmed">Scheduled Today</Text>
+                  <Text size="xl" fw={700}>{totalScheduledVolunteers}</Text>
                 </Paper>
               </Grid.Col>
             </Grid>
@@ -72,39 +89,36 @@ import {
             <Grid>
               <Grid.Col span={8}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-                  <Text size="sm" fw={900} mb="xs">Schedule</Text>
-                  <Paper p="md" radius="lg" shadow="xs" withBorder style={{ margin: '1rem', backgroundColor: '#fff' }}>
-                    <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                      <Text fw={900}>8:00 AM</Text>
-                      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                        <Text>Opening</Text>
-                      </div>
-                    </Flex>
-                  </Paper>
-                  <Paper p="md" radius="lg" shadow="xs" withBorder style={{ margin:'1rem', backgroundColor: '#fff' }}>
-                    <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                      <Text fw={900}>10:00 AM</Text>
-                      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                        <Text>2nd Volunteer shift starts</Text>
-                      </div>
-                    </Flex>
-                  </Paper>
-                  <Paper p="md" radius="lg" shadow="xs" withBorder style={{ margin:'1rem', backgroundColor: '#fff' }}>
-                    <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                      <Text fw={900}>1:00 PM</Text>
-                      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                        <Text>Last Volunteer shift starts</Text>
-                      </div>
-                    </Flex>
-                  </Paper>
-                  <Paper p="md" radius="lg" shadow="xs" withBorder style={{ margin:'1rem', backgroundColor: '#fff' }}>
-                    <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                      <Text fw={900}>4:00 PM</Text>
-                      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                        <Text>Closing</Text>
-                      </div>
-                    </Flex>
-                  </Paper>
+                  <Text size="sm" fw={900} mb="xs">Today's Schedule</Text>
+                  {volunteerSchedule.length === 0 ? (
+                    <Paper p="md" radius="lg" shadow="xs" withBorder style={{ margin: '1rem', backgroundColor: '#fff' }}>
+                      <Text color="dimmed" ta="center">No shifts scheduled for today</Text>
+                    </Paper>
+                  ) : (
+                    volunteerSchedule.map((shift) => (
+                      <Paper key={shift.id} p="md" radius="lg" shadow="xs" withBorder style={{ margin: '1rem', backgroundColor: '#fff' }}>
+                        <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
+                          <Text fw={900}>{shift.time}</Text>
+                          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                            <Text>{shift.shift}</Text>
+                          </div>
+                          <Text size="sm" color="dimmed">
+                            {shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '').length} volunteer{shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '').length !== 1 ? 's' : ''}
+                          </Text>
+                        </Flex>
+                        {shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '').length > 0 && (
+                          <Stack spacing="xs" mt="sm">
+                            {shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '').map((volunteer, index) => (
+                              <Text key={index} size="sm" color="dimmed" ml="md">
+                                • {volunteer.name} - {volunteer.role}
+                              </Text>
+                            ))}
+                          </Stack>
+                        )}
+                      </Paper>
+                    ))
+                  )}
+                  <Text size="sm" color="dimmed" mt="sm">Update on the volunteer page</Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={4}>
@@ -731,7 +745,7 @@ import {
       </>
     )
   }
-  const Volunteer = ()=> {
+  const Volunteer = ({ onScheduleUpdate })=> {
 
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
@@ -914,6 +928,10 @@ import {
     const handleSave = () => {
       setVolunteerSchedule(editingSchedule);
       setIsEditing(false);
+      // Update the main dashboard's volunteer schedule
+      if (onScheduleUpdate) {
+        onScheduleUpdate(editingSchedule);
+      }
     };
 
     const handleCancel = () => {
@@ -961,6 +979,31 @@ import {
             : shift
         )
       );
+    };
+
+    const updateShift = (shiftId, field, value) => {
+      setEditingSchedule(prev => 
+        prev.map(shift => 
+          shift.id === shiftId 
+            ? { ...shift, [field]: value }
+            : shift
+        )
+      );
+    };
+
+    const addNewShift = () => {
+      const newId = Math.max(...editingSchedule.map(s => s.id)) + 1;
+      const newShift = {
+        id: newId,
+        time: "New Shift Time",
+        shift: "New Shift Name",
+        volunteers: []
+      };
+      setEditingSchedule(prev => [...prev, newShift]);
+    };
+
+    const removeShift = (shiftId) => {
+      setEditingSchedule(prev => prev.filter(shift => shift.id !== shiftId));
     };
 
     //const volunteers = [{name: "Big M", email: "BigM@gmail.com", phone: "9083315271", zip:"08502", dob:"3/11/2011", town: "Belle Mead", state: "NJ", shift:"Mornings", role:"Server", emergencyName: "Mike", emergencyPhone:"9179683021"}]
@@ -1142,13 +1185,72 @@ import {
           </Grid.Col>
           <Grid.Col mt={'xl'} span={6}>
             <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-              <Title order={3} mb="md">Today's Volunteer Schedule</Title>
+              <Group position="apart" mb="md">
+                <Title order={3}>Today's Volunteer Schedule</Title>
+                {!isEditing ? (
+                  <Button variant="light" onClick={handleEdit} size="sm">
+                    Edit Schedule
+                  </Button>
+                ) : (
+                  <Group spacing="xs">
+                    <Button variant="light" onClick={handleSave} color="green" size="sm">
+                      Save
+                    </Button>
+                    <Button variant="light" onClick={handleCancel} color="gray" size="sm">
+                      Cancel
+                    </Button>
+                  </Group>
+                )}
+              </Group>
 
-                             <Stack spacing="md">
+              {isEditing && (
+                <Group mb="md">
+                  <Button 
+                    variant="light" 
+                    color="blue" 
+                    onClick={addNewShift}
+                    size="sm"
+                    leftSection={<IconCheck size={16} />}
+                  >
+                    Add New Shift
+                  </Button>
+                </Group>
+              )}
+
+              <Stack spacing="md">
                  {(isEditing ? editingSchedule : volunteerSchedule).map((shift) => (
                    <Paper key={shift.id} p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#fff' }}>
-                     <Text fw={700} size="lg" mb="xs">{shift.time}</Text>
-                     <Text size="sm" color="dimmed">{shift.shift}</Text>
+                     {isEditing ? (
+                       <Group mb="xs" spacing="xs">
+                         <TextInput
+                           size="sm"
+                           placeholder="Shift Time (e.g., 8:00 AM - 12:00 PM)"
+                           value={shift.time}
+                           onChange={(e) => updateShift(shift.id, 'time', e.target.value)}
+                           style={{ flex: 1 }}
+                         />
+                         <TextInput
+                           size="sm"
+                           placeholder="Shift Name"
+                           value={shift.shift}
+                           onChange={(e) => updateShift(shift.id, 'shift', e.target.value)}
+                           style={{ flex: 1 }}
+                         />
+                         <Button
+                           size="xs"
+                           color="red"
+                           variant="light"
+                           onClick={() => removeShift(shift.id)}
+                         >
+                           Remove Shift
+                         </Button>
+                       </Group>
+                     ) : (
+                       <>
+                         <Text fw={700} size="lg" mb="xs">{shift.time}</Text>
+                         <Text size="sm" color="dimmed">{shift.shift}</Text>
+                       </>
+                     )}
                      <Stack mt="sm" spacing="xs">
                        {shift.volunteers.map((volunteer, volIndex) => (
                          <div key={volIndex} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1201,23 +1303,6 @@ import {
                      </Stack>
                    </Paper>
                  ))}
-                 
-                 <Group>
-                   {isEditing ? (
-                     <>
-                       <Button variant="light" onClick={handleSave} color="green">
-                         Save
-                       </Button>
-                       <Button variant="light" onClick={handleCancel} color="gray">
-                         Cancel
-                       </Button>
-                     </>
-                   ) : (
-                     <Button variant="light" onClick={handleEdit}>
-                       Edit
-                     </Button>
-                   )}
-                 </Group>
                </Stack>
             </Paper>
           </Grid.Col>
@@ -1265,8 +1350,96 @@ import {
     const [foodBankEmail, setFoodBankEmail] = useState("info@taskfoodbank.org")
     const [settingsLoading, setSettingsLoading] = useState(false)
     
+    // Shared data state for dashboard
+    const [volunteers, setVolunteers] = useState([])
+    const [inventory, setInventory] = useState([])
+    const [volunteerSchedule, setVolunteerSchedule] = useState([])
+    
     // API Base URL
     const API_BASE_URL = 'http://localhost:3000';
+    
+    // Get pantry ID from user data
+    const getPantryId = () => {
+      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+      return userData._id;
+    };
+    
+    // Fetch volunteers from backend
+    const fetchVolunteers = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/volunteer/get`);
+        const allVolunteers = response.data;
+        
+        // Separate verified and unverified volunteers
+        const verifiedVolunteers = allVolunteers.filter(vol => vol.verified === true || vol.verified === "True");
+        setVolunteers(verifiedVolunteers);
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+      }
+    };
+    
+    // Fetch inventory from backend
+    const fetchInventory = async () => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) return;
+        
+        const response = await axios.get(`${API_BASE_URL}/pantry/${pantryId}/inventory`);
+        setInventory(response.data.inventory || []);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+        // Fallback to default data if API fails
+        setInventory([
+          { name: 'Tomatoes', current: 44, full: 50, type: 'Vegetables' },
+          { name: 'Broccoli', current: 5, full: 50, type: 'Nonperishable' },
+          { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
+          { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
+          { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' }
+        ]);
+      }
+    };
+    
+    // Load data on component mount
+    useEffect(() => {
+      fetchVolunteers();
+      fetchInventory();
+    }, []);
+    
+    // Initialize volunteer schedule with default structure
+    useEffect(() => {
+      const defaultSchedule = [
+        {
+          id: 1,
+          time: "8:00 AM - 12:00 PM",
+          shift: "Morning Shift",
+          volunteers: []
+        },
+        {
+          id: 2,
+          time: "12:00 PM - 4:00 PM",
+          shift: "Afternoon Shift",
+          volunteers: []
+        },
+        {
+          id: 3,
+          time: "4:00 PM - 8:00 PM",
+          shift: "Evening Shift",
+          volunteers: []
+        },
+        {
+          id: 4,
+          time: "On Call",
+          shift: "Backup Volunteers",
+          volunteers: []
+        }
+      ];
+      setVolunteerSchedule(defaultSchedule);
+    }, []);
+    
+    // Callback to update volunteer schedule from Volunteer component
+    const handleScheduleUpdate = (newSchedule) => {
+      setVolunteerSchedule(newSchedule);
+    };
     
     // Save settings function
     const handleSaveSettings = async () => {
@@ -1503,15 +1676,23 @@ import {
           {(() => {
             switch (page) {
               case 'dash':
-                return <DashboardComp />;
+                return <DashboardComp 
+                  volunteers={volunteers} 
+                  inventory={inventory} 
+                  volunteerSchedule={volunteerSchedule} 
+                />;
               case 'inv':
                 return <Inventory />;
               case 'vol':
-                return <Volunteer />;
+                return <Volunteer onScheduleUpdate={handleScheduleUpdate} />;
               case 'stream':
                 return <Stream />
               default:
-                return <DashboardComp />;
+                return <DashboardComp 
+                  volunteers={volunteers} 
+                  inventory={inventory} 
+                  volunteerSchedule={volunteerSchedule} 
+                />;
             }
           })()}
           
