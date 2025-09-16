@@ -94,3 +94,11 @@ class pantry_model:
             {"stock": 1, "_id": 0}
         )
         return pantry.get("stock", []) if pantry else []
+    
+    def get_pantry_info(self, pantry_id):
+        """Get pantry information (name, address, email, phone)"""
+        pantry = self.collection.find_one(
+            {"_id": pantry_id},
+            {"name": 1, "address": 1, "email": 1, "phone_number": 1, "username": 1, "_id": 0}
+        )
+        return pantry

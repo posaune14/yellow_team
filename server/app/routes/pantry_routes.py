@@ -43,8 +43,11 @@ def update_pantry(pantry_id):
             "email": data["email"],
             "phone_number": data["phone_number"],
             "password": data["password"],
-            "stock": data["stock"],
         }
+        
+        # Only include stock if it's provided
+        if "stock" in data:
+            update_data["stock"] = data["stock"]
 
         new_pantry = pantry_model(current_app.mongo)
         response = new_pantry.update_pantry(ObjectId(pantry_id), update_data)   
@@ -67,6 +70,22 @@ def get_stock(pantry_id):
     for item in stock:
         return jsonify(item), 200
     #to remove the stock list object being in a list from the aggregate method which returns a list
+
+@pantry_routes.route("/info/<string:pantry_id>", methods=["GET"])
+def get_pantry_info(pantry_id):
+    """Get pantry information (name, address, email, phone)"""
+    try:
+        pantry_id = ObjectId(pantry_id)
+        new_pantry = pantry_model(current_app.mongo)
+        pantry_info = new_pantry.get_pantry_info(pantry_id)
+        
+        if pantry_info:
+            return jsonify(pantry_info), 200
+        else:
+            return jsonify({"message": "Pantry not found"}), 404
+            
+    except Exception as e:
+        return jsonify({"message": "Error getting pantry info", "error": str(e)}), 400
 
 # Inventory management routes
 @pantry_routes.route("/<string:pantry_id>/inventory", methods=["GET"])

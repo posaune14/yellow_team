@@ -1399,6 +1399,34 @@ import {
       }
     };
     
+    // Fetch pantry data from backend
+    const fetchPantryData = async () => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) return;
+        
+        const response = await axios.get(`${API_BASE_URL}/pantry/info/${pantryId}`);
+        const pantryData = response.data;
+        
+        // Update the form fields with real data
+        setFoodBankName(pantryData.name || "TASK Food Bank");
+        setFoodBankAddress(pantryData.address || "123 Main St, Belle Mead, NJ 08502");
+        setFoodBankPhone(pantryData.phone_number || "(609) 123-4567");
+        setFoodBankEmail(pantryData.email || "info@taskfoodbank.org");
+      } catch (error) {
+        console.error('Error fetching pantry data:', error);
+        // Fallback to localStorage or default values
+        const savedSettings = localStorage.getItem('pantry_settings');
+        if (savedSettings) {
+          const settings = JSON.parse(savedSettings);
+          setFoodBankName(settings.name || "TASK Food Bank");
+          setFoodBankAddress(settings.address || "123 Main St, Belle Mead, NJ 08502");
+          setFoodBankPhone(settings.phone_number || "(609) 123-4567");
+          setFoodBankEmail(settings.email || "info@taskfoodbank.org");
+        }
+      }
+    };
+    
     // Load data on component mount
     useEffect(() => {
       fetchVolunteers();
@@ -1448,9 +1476,9 @@ import {
             
             // Get current user data
             const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-            const userId = userData._id;
+            const pantryId = userData._id;
             
-            if (!userId) {
+            if (!pantryId) {
                 notifications.show({
                     title: 'Error',
                     message: 'User not found. Please sign in again.',
@@ -1466,11 +1494,14 @@ import {
                 name: foodBankName,
                 address: foodBankAddress,
                 phone_number: foodBankPhone,
-                email: foodBankEmail
+                email: foodBankEmail,
+                password: "existing_password" // We need to include password for the update endpoint
             };
             
-            // For now, we'll store settings in localStorage since we don't have a pantry update endpoint
-            // In a real app, you'd call an API to update pantry settings
+            // Call the pantry update API
+            await axios.put(`${API_BASE_URL}/pantry/update/${pantryId}`, pantryData);
+            
+            // Also store in localStorage as backup
             localStorage.setItem('pantry_settings', JSON.stringify(pantryData));
             
             notifications.show({
@@ -1497,16 +1528,9 @@ import {
         }
     };
     
-    // Load settings on component mount
+    // Load pantry data on component mount
     useEffect(() => {
-        const savedSettings = localStorage.getItem('pantry_settings');
-        if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
-            setFoodBankName(settings.name || "TASK Food Bank");
-            setFoodBankAddress(settings.address || "123 Main St, Belle Mead, NJ 08502");
-            setFoodBankPhone(settings.phone_number || "(609) 123-4567");
-            setFoodBankEmail(settings.email || "info@taskfoodbank.org");
-        }
+        fetchPantryData();
     }, []);
     
     return (
@@ -1526,7 +1550,8 @@ import {
             <NavLink label="Volunteers" icon={<IconChartBar size={20} />} onClick={()=> setPage("vol")}/>
             <NavLink label="Stream" icon={<IconUser size={20} />} onClick={()=> setPage("stream")}/>
             <Box mt="lg">
-              <NavLink label="Settings" icon={<IconSettings size={20} />} onClick={()=> {
+              <NavLink label="Settings" icon={<IconSettings size={20} />} onClick={async ()=> {
+                await fetchPantryData();
                 setSettings(true)
               }}/>
               <NavLink label="Logout" color='red' onClick={()=> {
