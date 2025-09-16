@@ -1,4 +1,5 @@
 from flask_pymongo import PyMongo
+from bson import ObjectId
 
 class volunteer_model:
     def __init__(self, mongo: PyMongo):
@@ -39,22 +40,16 @@ class volunteer_model:
         )
     
     def get_volunteers(self):
-        return (
-            self.collection.aggregate(
-                [
-                    {
-                        "$project": {
-                            "_id": 0,
-                        }
-                    }
-                ]
-            )
-        )
+        volunteers = list(self.collection.find())
+        # Convert ObjectId to string for JSON serialization
+        for volunteer in volunteers:
+            volunteer['_id'] = str(volunteer['_id'])
+        return volunteers
     
     def update_volunteer(self, volunteer_id, update_data):
-        result = self.collection.update_one({"_id": volunteer_id}, {"$set": update_data})
+        result = self.collection.update_one({"_id": ObjectId(volunteer_id)}, {"$set": update_data})
         return result
 
     def delete_volunteer(self, volunteer_id):
-        result = self.collection.delete_one({"_id": volunteer_id})
+        result = self.collection.delete_one({"_id": ObjectId(volunteer_id)})
         return result 

@@ -21,7 +21,7 @@ def log_in():
 
         pantry = pantry_model(current_app.mongo) #is this correct??? whole section needs to be checked to distinguish between employees and users
         pantry_database = pantry.find_user_by_username(username)
-        if not user_database:
+        if not pantry_database:
             return jsonify({"error": "Error incorrect username"}), 401
         
         bcrypt = Bcrypt(current_app)
@@ -36,7 +36,7 @@ def log_in():
             refresh_token = create_refresh_token(identity=username)
             return jsonify(
                 {
-                    "user_database":user_database,
+                    "pantry_database":pantry_database,
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 }

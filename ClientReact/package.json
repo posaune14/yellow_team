@@ -20,6 +20,7 @@
     "@mantine/modals": "^8.0.2",
     "@mantine/notifications": "^8.0.2",
     "@tabler/icons-react": "^3.34.0",
+    "axios": "^1.11.0",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.12",
