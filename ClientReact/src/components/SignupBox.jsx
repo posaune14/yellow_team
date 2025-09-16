@@ -30,8 +30,7 @@ function SignupBox() {
     
     const handleSignUp = async() => {
         // Validation
-        if (!formData.username.trim() || !formData.password.trim() || !formData.first_name.trim() || 
-            !formData.last_name.trim() || !formData.email.trim() || !formData.phone_number.trim()) {
+        if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim() || !formData.email.trim() || !formData.phone_number.trim()) {
             notifications.show({
                 title: 'Error',
                 message: 'Please fill in all required fields',
@@ -66,11 +65,10 @@ function SignupBox() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`${API_BASE_URL}/user/create`, {
+            const response = await axios.post(`${API_BASE_URL}/pantry/create`, {
                 username: formData.username,
                 password: formData.password,
-                first_name: formData.first_name,
-                last_name: formData.last_name,
+                name: formData.name,
                 email: formData.email,
                 phone_number: formData.phone_number
             });
@@ -117,24 +115,14 @@ function SignupBox() {
                                 size="md" 
                                 required
                             />
-                            <Flex direction="row" justify="space-between" gap="md">
                             <TextInput 
-                                label="First Name" 
+                                label="Name" 
                                 placeholder="Enter your first name"  
-                                value={formData.first_name} 
-                                onChange={(e) => handleInputChange('first_name', e.target.value)} 
+                                value={formData.name} 
+                                onChange={(e) => handleInputChange('name', e.target.value)} 
                                 size="md" 
                                 required
                             />
-                            <TextInput 
-                                label="Last Name" 
-                                placeholder="Enter your last name"  
-                                value={formData.last_name} 
-                                onChange={(e) => handleInputChange('last_name', e.target.value)} 
-                                size="md" 
-                                required
-                            />
-                            </Flex>
                             <Flex direction="row" justify="space-between" gap="md">
                             <TextInput 
                                 label="Email" 
