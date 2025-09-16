@@ -238,108 +238,123 @@ import {
     const [editing, setEditing] = useState(false)
     const [confirmSave, setConfirmSave] = useState(false)
     const [addNewModal, setAddNewModal] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [newItem, setNewItem] = useState({
       name: '',
       current: 0,
       full: 0,
       type: 'Vegetables'
     })
-    const [items, setItems] = useState([
-      { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
-      { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
-      { name: 'Tomatoe', current: 44, full: 50, type: 'Fruits' },
-      { name: 'Tomatoe', current: 15, full: 50, type: 'Proteins' },
-      { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
-      { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
-      { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
-      { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' },
-      { name: 'Chicken Breast', current: 22, full: 50, type: 'Proteins' },
-      { name: 'Bananas', current: 18, full: 50, type: 'Fruits' },
-      { name: 'Spinach', current: 35, full: 50, type: 'Vegetables' },
-      { name: 'Beans (Dry)', current: 44, full: 50, type: 'Nonperishable' },
-      { name: 'Eggs', current: 10, full: 30, type: 'Proteins' },
-      { name: 'Oranges', current: 27, full: 50, type: 'Fruits' },
-      { name: 'Canned Corn', current: 8, full: 50, type: 'Nonperishable' },
-      { name: 'Beef Patties', current: 20, full: 50, type: 'Proteins' },
-      { name: 'Zucchini', current: 12, full: 50, type: 'Vegetables' },
-      { name: 'Canned Soup', current: 41, full: 50, type: 'Nonperishable' },
-      { name: 'Grapes', current: 29, full: 50, type: 'Fruits' },
-      { name: 'Canned Beans', current: 45, full: 50, type: 'Nonperishable' },
-      { name: 'Turkey Slices', current: 9, full: 50, type: 'Proteins' },
-      { name: 'Peppers', current: 40, full: 50, type: 'Vegetables' },
-      { name: 'Strawberries', current: 33, full: 50, type: 'Fruits' },
-      { name: 'Rice', current: 36, full: 50, type: 'Nonperishable' },
-      { name: 'Lentils', current: 23, full: 50, type: 'Nonperishable' }
-    ])
-
-    const [inventoryLoading, setInventoryLoading] = useState(false)
-    const [inventoryError, setInventoryError] = useState(null)
-    const API_BASE_URL = 'http://localhost:3000'
-
-    const resolvePantryId = () => {
-      const explicit = localStorage.getItem('pantry_id')
-      if (explicit) return explicit
-      try {
-        const userData = JSON.parse(localStorage.getItem('user_data') || '{}')
-        if (userData && userData.pantry_id) return userData.pantry_id
-      } catch {}
-      return null
-    }
-
+    const [items, setItems] = useState([])
+    
+    // API Base URL
+    const API_BASE_URL = 'http://localhost:3000';
+    
+    // Get pantry ID from user data
+    const getPantryId = () => {
+      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+      return userData._id;
+    };
+    
+    // Fetch inventory from API
     const fetchInventory = async () => {
-      const pantryId = resolvePantryId()
-      if (!pantryId) return
       try {
-        setInventoryLoading(true)
-        setInventoryError(null)
-        const { data } = await axios.get(`${API_BASE_URL}/pantry/get/${pantryId}`)
-        const incoming = data && Object.prototype.hasOwnProperty.call(data, 'stock') ? data.stock : data
-        if (Array.isArray(incoming)) {
-          setItems(incoming)
-        } else if (incoming && typeof incoming === 'object') {
-          const mapped = Object.entries(incoming).map(([name, value]) => {
-            if (typeof value === 'object' && value !== null) {
-              return {
-                name,
-                current: Number(value.current ?? value.qty ?? value.quantity ?? 0),
-                full: Number(value.full ?? value.capacity ?? 0),
-                type: value.type ?? 'Nonperishable',
-              }
-            }
-            return { name, current: Number(value) || 0, full: 0, type: 'Nonperishable' }
-          })
-          setItems(mapped)
+        setLoading(true);
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          notifications.show({
+            title: 'Error',
+            message: 'Pantry ID not found. Please sign in again.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
         }
-      } catch (err) {
-        setInventoryError('Failed to load inventory')
-        console.error('Error loading inventory:', err)
+        
+        const response = await axios.get(`${API_BASE_URL}/pantry/${pantryId}/inventory`);
+        setItems(response.data.inventory || []);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to fetch inventory. Using default data.',
+          color: 'orange',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+        });
+        // Fallback to default data if API fails
+        setItems([
+          { name: 'Tomatoe', current: 44, full: 50, type: 'Vegetables' },
+          { name: 'Brocoli', current: 5, full: 50, type: 'Nonperishable' },
+          { name: 'Carrots', current: 30, full: 50, type: 'Vegetables' },
+          { name: 'Apples', current: 50, full: 50, type: 'Fruits' },
+          { name: 'Tuna Can', current: 12, full: 40, type: 'Nonperishable' },
+          { name: 'Chicken Breast', current: 22, full: 50, type: 'Proteins' },
+          { name: 'Bananas', current: 18, full: 50, type: 'Fruits' },
+          { name: 'Spinach', current: 35, full: 50, type: 'Vegetables' },
+          { name: 'Beans (Dry)', current: 44, full: 50, type: 'Nonperishable' },
+          { name: 'Eggs', current: 10, full: 30, type: 'Proteins' }
+        ]);
       } finally {
-        setInventoryLoading(false)
+        setLoading(false);
       }
-    }
-
+    };
+    
+    // Fetch inventory on component mount
     useEffect(() => {
-      fetchInventory()
-    }, [])
+      fetchInventory();
+    }, []);
 
-    const handleSaveItem = (itemName, current, full) => {
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.name === itemName 
-            ? { ...item, current, full }
-            : item
+    const handleSaveItem = async (itemName, current, full) => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          notifications.show({
+            title: 'Error',
+            message: 'Pantry ID not found. Please sign in again.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+        
+        // Update via API
+        await axios.put(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(itemName)}`, {
+          current,
+          full
+        });
+        
+        // Update local state
+        setItems(prevItems => 
+          prevItems.map(item => 
+            item.name === itemName 
+              ? { ...item, current, full }
+              : item
+          )
         )
-      )
-      
-      // Show success notification
-      notifications.show({
-        title: 'Inventory Updated!',
-        message: `${itemName} quantity has been updated to ${current}/${full}`,
-        color: 'green',
-        icon: <IconCheck size={16} />,
-        autoClose: 3000,
-        withCloseButton: true,
-      })
+        
+        // Show success notification
+        notifications.show({
+          title: 'Inventory Updated!',
+          message: `${itemName} quantity has been updated to ${current}/${full}`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        })
+      } catch (error) {
+        console.error('Error updating inventory item:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to update inventory item. Please try again.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      }
     }
 
     const handleSaveAll = () => {
@@ -357,7 +372,7 @@ import {
       })
     }
 
-    const handleAddNewItem = () => {
+    const handleAddNewItem = async () => {
       if (!newItem.name.trim()) {
         notifications.show({
           title: 'Error!',
@@ -396,27 +411,56 @@ import {
         return
       }
 
-      setItems(prevItems => [...prevItems, { ...newItem, name: newItem.name.trim() }])
-      
-      // Reset form
-      setNewItem({
-        name: '',
-        current: 0,
-        full: 0,
-        type: 'Vegetables'
-      })
-      
-      setAddNewModal(false)
-      
-      // Show success notification
-      notifications.show({
-        title: 'Item Added!',
-        message: `${newItem.name.trim()} has been added to your inventory.`,
-        color: 'green',
-        icon: <IconCheck size={16} />,
-        autoClose: 3000,
-        withCloseButton: true,
-      })
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          notifications.show({
+            title: 'Error',
+            message: 'Pantry ID not found. Please sign in again.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        // Add via API
+        const itemToAdd = { ...newItem, name: newItem.name.trim() };
+        await axios.post(`${API_BASE_URL}/pantry/${pantryId}/inventory`, itemToAdd);
+        
+        // Update local state
+        setItems(prevItems => [...prevItems, itemToAdd])
+        
+        // Reset form
+        setNewItem({
+          name: '',
+          current: 0,
+          full: 0,
+          type: 'Vegetables'
+        })
+        
+        setAddNewModal(false)
+        
+        // Show success notification
+        notifications.show({
+          title: 'Item Added!',
+          message: `${itemToAdd.name} has been added to your inventory.`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        })
+      } catch (error) {
+        console.error('Error adding inventory item:', error);
+        notifications.show({
+          title: 'Error!',
+          message: 'Failed to add inventory item. Please try again.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      }
     }
 
     const handleCancelAdd = () => {
@@ -497,26 +541,30 @@ import {
           onChange={setSort}
           />
         </Center>
-        {inventoryError && (
-          <Center p="sm">
-            <Text color="red">{inventoryError}</Text>
-          </Center>
-        )}
-        {inventoryLoading ? (
+        
+        {loading ? (
           <Center p="xl">
             <Loader size="md" />
             <Text ml="md">Loading inventory...</Text>
           </Center>
         ) : (
           <Grid p={'xl'}>
-            {filteredItems.map((item, index) => (
-              <InvItems 
-                key={index} 
-                item={item} 
-                editing={editing} 
-                onSave={handleSaveItem}
-              />
-            ))}
+            {filteredItems.length === 0 ? (
+              <Grid.Col span={12}>
+                <Center p="xl">
+                  <Text color="dimmed">No inventory items found. Add some items to get started!</Text>
+                </Center>
+              </Grid.Col>
+            ) : (
+              filteredItems.map((item, index) => (
+                <InvItems 
+                  key={`${item.name}-${index}`} 
+                  item={item} 
+                  editing={editing} 
+                  onSave={handleSaveItem}
+                />
+              ))
+            )}
           </Grid>
         )}
 
@@ -698,8 +746,7 @@ import {
         time: "8:00 AM - 12:00 PM",
         shift: "Morning Shift",
         volunteers: [
-          { name: "John Doe", role: "Server" },
-          { name: "Sarah Johnson", role: "Cook" }
+          { name: " ", role: " " }
         ]
       },
       {
@@ -707,9 +754,7 @@ import {
         time: "12:00 PM - 4:00 PM",
         shift: "Afternoon Shift",
         volunteers: [
-          { name: "Mike Chen", role: "Server" },
-          { name: "Emily Rodriguez", role: "Cook" },
-          { name: "David Thompson", role: "Server" }
+          { name: " ", role: " " }
         ]
       },
       {
@@ -717,8 +762,7 @@ import {
         time: "4:00 PM - 8:00 PM",
         shift: "Evening Shift",
         volunteers: [
-          { name: "Lisa Wang", role: "Server" },
-          { name: "Robert Martinez", role: "Cook" }
+          { name: " ", role: " " }
         ]
       },
       {
@@ -726,7 +770,7 @@ import {
         time: "On Call",
         shift: "Backup Volunteers",
         volunteers: [
-          { name: "Jennifer Lee", role: "Server" }
+          { name: " ", role: " " }
         ]
       }
     ]);
@@ -764,7 +808,6 @@ import {
       }
     };
 
-    // Handle volunteer verification (accept)
     const handleAcceptVolunteer = async (volunteerId) => {
       try {
         const volunteer = inboxVolunteers.find(v => v._id === volunteerId);
@@ -829,15 +872,14 @@ import {
       }
     };
 
-    // Delete verified volunteer
+
     const handleDeleteVolunteer = async (volunteerId) => {
       try {
         const volunteer = volunteers.find(v => v._id === volunteerId);
         if (!volunteer) return;
 
         await axios.delete(`${API_BASE_URL}/volunteer/delete/${volunteerId}`);
-        
-        // Refresh the volunteer lists
+ 
         await fetchVolunteers();
         
         notifications.show({

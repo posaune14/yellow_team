@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, current_app, request
 from app.models.pantry import pantry_model
 from bson import ObjectId
+from flask_bcrypt import Bcrypt
 
 pantry_routes = Blueprint("pantry_routes", __name__)
 
@@ -13,9 +14,14 @@ def create_pantry():
         email = data["email"]
         phone_number = data["phone_number"]
         password = data["password"]
+        username = data.get("username", email)  # Use email as username if not provided
+
+        # Hash the password
+        bcrypt = Bcrypt(current_app)
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         new_pantry = pantry_model(current_app.mongo)
-        response = new_pantry.create_pantry(name, address, email, phone_number, password)
+        response = new_pantry.create_pantry(name, address, email, phone_number, hashed_password, username)
 
     except Exception as e:
         return jsonify({"message": "Error creating pantry", "error": str(e)}), 400
@@ -61,3 +67,79 @@ def get_stock(pantry_id):
     for item in stock:
         return jsonify(item), 200
     #to remove the stock list object being in a list from the aggregate method which returns a list
+
+# Inventory management routes
+@pantry_routes.route("/<string:pantry_id>/inventory", methods=["GET"])
+def get_inventory(pantry_id):
+    """Get all inventory items for a pantry"""
+    try:
+        pantry_id = ObjectId(pantry_id)
+        new_pantry = pantry_model(current_app.mongo)
+        inventory = new_pantry.get_all_inventory(pantry_id)
+        
+        return jsonify({"inventory": inventory}), 200
+        
+    except Exception as e:
+        return jsonify({"message": "Error getting inventory", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/inventory", methods=["POST"])
+def add_inventory_item(pantry_id):
+    """Add a new inventory item to the pantry"""
+    try:
+        data = request.get_json()
+        pantry_id = ObjectId(pantry_id)
+        
+        # Validate required fields
+        required_fields = ["name", "current", "full", "type"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"message": f"Missing required field: {field}"}), 400
+        
+        new_pantry = pantry_model(current_app.mongo)
+        success = new_pantry.add_inventory_item(pantry_id, data)
+        
+        if success:
+            return jsonify({"message": "Item added successfully"}), 201
+        else:
+            return jsonify({"message": "Failed to add item"}), 400
+            
+    except Exception as e:
+        return jsonify({"message": "Error adding inventory item", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/inventory/<string:item_name>", methods=["PUT"])
+def update_inventory_item(pantry_id, item_name):
+    """Update an inventory item's quantities"""
+    try:
+        data = request.get_json()
+        pantry_id = ObjectId(pantry_id)
+        
+        # Validate required fields
+        if "current" not in data or "full" not in data:
+            return jsonify({"message": "Missing current or full quantity"}), 400
+        
+        new_pantry = pantry_model(current_app.mongo)
+        success = new_pantry.update_inventory_item(pantry_id, item_name, data)
+        
+        if success:
+            return jsonify({"message": "Item updated successfully"}), 200
+        else:
+            return jsonify({"message": "Item not found or failed to update"}), 404
+            
+    except Exception as e:
+        return jsonify({"message": "Error updating inventory item", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/inventory/<string:item_name>", methods=["DELETE"])
+def delete_inventory_item(pantry_id, item_name):
+    """Remove an inventory item from the pantry"""
+    try:
+        pantry_id = ObjectId(pantry_id)
+        new_pantry = pantry_model(current_app.mongo)
+        success = new_pantry.delete_inventory_item(pantry_id, item_name)
+        
+        if success:
+            return jsonify({"message": "Item deleted successfully"}), 200
+        else:
+            return jsonify({"message": "Item not found or failed to delete"}), 404
+            
+    except Exception as e:
+        return jsonify({"message": "Error deleting inventory item", "error": str(e)}), 400
