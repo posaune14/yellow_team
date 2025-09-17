@@ -11,6 +11,7 @@ struct SignInView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @Binding var path: NavigationPath
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         VStack {
@@ -39,7 +40,9 @@ struct SignInView: View {
                 }
                 
                 Section(header:Button(action: {
+                    isLoggedIn = true
                     path.append("Home")
+                    
                 }){
                     Text("Sign In")
                 }
