@@ -33,6 +33,7 @@ struct Colors {
 
 struct ContentView: View {
     @State private var path = NavigationPath()
+    //creating class object
     
     var body: some View {
         //if logged in or not, show login view path or home path

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct SignUpView: View {
     //navigation
@@ -24,6 +25,7 @@ struct SignUpView: View {
     //alert
     @State var alert_message = ""
     @State var show_alert = false
+    let notificationCenter = UNUserNotificationCenter.current()
     
     var body: some View {
         VStack{
@@ -75,6 +77,13 @@ struct SignUpView: View {
                         signUpUser(with: userData)
                         
                         // Navigate after successful signup
+                        Task {
+                            do {
+                                try await notificationCenter.requestAuthorization(options: [.alert, .badge, .sound]) }
+                            catch {
+                                print("Request authorization error")
+                            }
+                        }
                         path.append("Home")
                     }) {
                         Text("Sign Up")
@@ -89,10 +98,10 @@ struct SignUpView: View {
                 Section(header: Text("Already have an account?")
                     .foregroundStyle(.black) // Changed from .flexibleBlack
                     .fontWeight(.bold)) {
-                    Button("Sign In") {
-                        print("Sign in button pressed")
-                        path.removeLast() // Go back to sign in view
-                    }
+                        Button("Sign In") {
+                            print("Sign in button pressed")
+                            path.removeLast()
+                        }// Go back to sign in view
                     .buttonStyle(.plain)
                     .foregroundStyle(.blue) // Changed from .flexibleBlue
                     .fontWeight(.bold)
@@ -116,6 +125,6 @@ struct SignUpView: View {
     }
 }
 
-#Preview {
+/*#Preview {
     SignUpView(path: .constant(NavigationPath()))
-}
+}*/
