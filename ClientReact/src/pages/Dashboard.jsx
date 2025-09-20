@@ -64,6 +64,29 @@ import {
       return sum + actualVolunteers.length;
     }, 0);
 
+    // Latest stream post state
+    const [latestPost, setLatestPost] = useState(null);
+    const [latestLoading, setLatestLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchLatestStream = async () => {
+        try {
+          setLatestLoading(true);
+          const pantryId = getPantryId();
+          if (!pantryId) return;
+          const response = await axios.get(`${API_BASE_URL}/pantry/info/${pantryId}`);
+          const stream = response.data.stream || [];
+          const last = stream.length > 0 ? stream[stream.length - 1] : null;
+          setLatestPost(last);
+        } catch (e) {
+          setLatestPost(null);
+        } finally {
+          setLatestLoading(false);
+        }
+      };
+      fetchLatestStream();
+    }, []);
+
     return(
       <Stack spacing="md">
             <Grid>
@@ -131,11 +154,30 @@ import {
               <Grid.Col span={12}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5', marginTop: '1rem' }}>
                   <Text fw={700} size="md" mb="xs">Current Stream Post</Text>
-                  <Blockquote color="blue" p="md" rightSection={<Text>12.24.2025 12:00 PM</Text>}>
-                    <Text>
-                      Latest Stream Post goes here
-                    </Text>
-                  </Blockquote>
+                  {latestLoading ? (
+                    <>
+                      <Loader size="sm" />
+                      <Text size="sm" color="dimmed">Loading latest post...</Text>
+                    </>
+                  ) : latestPost ? (
+                    <Blockquote color="blue" p="md">
+                      <Flex align="center" style={{ width: '100%' }}>
+                        <Text size="xs" color="dimmed" style={{ minWidth: 140 }}>
+                          {typeof latestPost === 'string' ? '' : latestPost.date}
+                        </Text>
+                        <Flex justify="center" align="center" style={{ flex: 1 }}>
+                          {typeof latestPost === 'string' ? (
+                            <Text ta="center">{latestPost}</Text>
+                          ) : (
+                            <Text ta="center">{latestPost.message}</Text>
+                          )}
+                        </Flex>
+                        <div style={{ minWidth: 140 }} />
+                      </Flex>
+                    </Blockquote>
+                  ) : (
+                    <Text size="sm" color="dimmed">No stream posts yet</Text>
+                  )}
                 </Paper>
               </Grid.Col>
             </Grid>
@@ -1366,26 +1408,28 @@ import {
                               <Text ta="center">{item.message}</Text>
                             )}
                           </Flex>
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            aria-label="Delete message"
-                            onClick={async () => {
-                              try {
-                                setLoading(true)
-                                const pantryId = getPantryId();
-                                if (!pantryId) return;
-                                const res = await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/stream/${i}`);
-                                setStream(res.data.stream || [])
-                              } catch (e) {
-                                console.error('Error deleting message:', e)
-                              } finally {
-                                setLoading(false)
-                              }
-                            }}
-                          >
-                            <IconTrash size={16} />
-                          </ActionIcon>
+                          <div style={{ minWidth: 140, display: 'flex', justifyContent: 'flex-end' }}>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              aria-label="Delete message"
+                              onClick={async () => {
+                                try {
+                                  setLoading(true)
+                                  const pantryId = getPantryId();
+                                  if (!pantryId) return;
+                                  const res = await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/stream/${i}`);
+                                  setStream(res.data.stream || [])
+                                } catch (e) {
+                                  console.error('Error deleting message:', e)
+                                } finally {
+                                  setLoading(false)
+                                }
+                              }}
+                            >
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </div>
                         </Flex>
                       </Blockquote>
                     ))}
