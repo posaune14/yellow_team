@@ -1,4 +1,5 @@
 from flask_pymongo import PyMongo
+from datetime import datetime
 
 class pantry_model: 
     def __init__(self, mongo: PyMongo):
@@ -103,3 +104,28 @@ class pantry_model:
             {"name": 1, "address": 1, "email": 1, "phone_number": 1, "username": 1, "stream": 1, "_id": 0}
         )
         return pantry
+
+    def post_stream_message(self, pantry_id, message: str):
+        """Post a message to the pantry's stream and return the updated stream."""
+        now = datetime.now().strftime("%m/%d/%Y %I:%M %p")
+        result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$push": {"stream": {"date": now, "message": message}}}
+        )
+        if result.matched_count == 0:
+            return None
+        pantry = self.collection.find_one({"_id": pantry_id}, {"stream": 1, "_id": 0})
+        return pantry.get("stream", [])
+
+    def delete_stream_item(self, pantry_id, index: int):
+        """Delete a stream item by index and return the updated stream."""
+        # First unset the array element at index, then pull nulls
+        unset_result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$unset": {f"stream.{index}": 1}}
+        )
+        if unset_result.matched_count == 0:
+            return None
+        self.collection.update_one({"_id": pantry_id}, {"$pull": {"stream": None}})
+        pantry = self.collection.find_one({"_id": pantry_id}, {"stream": 1, "_id": 0})
+        return pantry.get("stream", [])
