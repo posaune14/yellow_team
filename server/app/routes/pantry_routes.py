@@ -48,6 +48,8 @@ def update_pantry(pantry_id):
         # Only include stock if it's provided
         if "stock" in data:
             update_data["stock"] = data["stock"]
+        if "stream" in data:
+            update_data["stream"] = data["stream"]
 
         new_pantry = pantry_model(current_app.mongo)
         response = new_pantry.update_pantry(ObjectId(pantry_id), update_data)   
@@ -86,6 +88,34 @@ def get_pantry_info(pantry_id):
             
     except Exception as e:
         return jsonify({"message": "Error getting pantry info", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/stream", methods=["POST"])
+def post_stream(pantry_id):
+    try:
+        pantry_id = ObjectId(pantry_id)
+        data = request.get_json()
+        message = data.get("message")
+        if not message or not isinstance(message, str):
+            return jsonify({"message": "Missing or invalid message"}), 400
+        new_pantry = pantry_model(current_app.mongo)
+        updated_stream = new_pantry.post_stream_message(pantry_id, message)
+        if updated_stream is None:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"stream": updated_stream}), 200
+    except Exception as e:
+        return jsonify({"message": "Error appending stream", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/stream/<int:index>", methods=["DELETE"])
+def delete_stream_item(pantry_id, index):
+    try:
+        pantry_id = ObjectId(pantry_id)
+        new_pantry = pantry_model(current_app.mongo)
+        updated_stream = new_pantry.delete_stream_item(pantry_id, index)
+        if updated_stream is None:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"stream": updated_stream}), 200
+    except Exception as e:
+        return jsonify({"message": "Error deleting stream item", "error": str(e)}), 400
 
 # Inventory management routes
 @pantry_routes.route("/<string:pantry_id>/inventory", methods=["GET"])

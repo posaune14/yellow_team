@@ -24,6 +24,7 @@ import {
     Table,
     Modal
   } from '@mantine/core'
+  import { ActionIcon } from '@mantine/core'
   import {
     IconSettings,
     IconGauge,
@@ -34,11 +35,17 @@ import {
     IconSend,
     IconInfoCircle,
     IconCheck,
-    IconDeviceFloppy
+    IconDeviceFloppy,
+    IconTrash
   } from '@tabler/icons-react'
   import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
+  const API_BASE_URL = 'http://localhost:3000';
+  const getPantryId = () => {
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    return userData._id;
+  };
   const DashboardComp = ({ volunteers = [], inventory = [], volunteerSchedule = [] })=>{
     // Calculate real metrics
     const totalVolunteers = volunteers.length;
@@ -56,6 +63,29 @@ import {
       const actualVolunteers = shift.volunteers.filter(vol => vol.name && vol.name.trim() !== '');
       return sum + actualVolunteers.length;
     }, 0);
+
+    // Latest stream post state
+    const [latestPost, setLatestPost] = useState(null);
+    const [latestLoading, setLatestLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchLatestStream = async () => {
+        try {
+          setLatestLoading(true);
+          const pantryId = getPantryId();
+          if (!pantryId) return;
+          const response = await axios.get(`${API_BASE_URL}/pantry/info/${pantryId}`);
+          const stream = response.data.stream || [];
+          const last = stream.length > 0 ? stream[stream.length - 1] : null;
+          setLatestPost(last);
+        } catch (e) {
+          setLatestPost(null);
+        } finally {
+          setLatestLoading(false);
+        }
+      };
+      fetchLatestStream();
+    }, []);
 
     return(
       <Stack spacing="md">
@@ -124,11 +154,30 @@ import {
               <Grid.Col span={12}>
                 <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5', marginTop: '1rem' }}>
                   <Text fw={700} size="md" mb="xs">Current Stream Post</Text>
-                  <Blockquote color="blue" p="md" rightSection={<Text>12.24.2025 12:00 PM</Text>}>
-                    <Text>
-                      Latest Stream Post goes here
-                    </Text>
-                  </Blockquote>
+                  {latestLoading ? (
+                    <>
+                      <Loader size="sm" />
+                      <Text size="sm" color="dimmed">Loading latest post...</Text>
+                    </>
+                  ) : latestPost ? (
+                    <Blockquote color="blue" p="md">
+                      <Flex align="center" style={{ width: '100%' }}>
+                        <Text size="xs" color="dimmed" style={{ minWidth: 140 }}>
+                          {typeof latestPost === 'string' ? '' : latestPost.date}
+                        </Text>
+                        <Flex justify="center" align="center" style={{ flex: 1 }}>
+                          {typeof latestPost === 'string' ? (
+                            <Text ta="center">{latestPost}</Text>
+                          ) : (
+                            <Text ta="center">{latestPost.message}</Text>
+                          )}
+                        </Flex>
+                        <div style={{ minWidth: 140 }} />
+                      </Flex>
+                    </Blockquote>
+                  ) : (
+                    <Text size="sm" color="dimmed">No stream posts yet</Text>
+                  )}
                 </Paper>
               </Grid.Col>
             </Grid>
@@ -250,15 +299,6 @@ import {
       type: 'Vegetables'
     })
     const [items, setItems] = useState([])
-    
-    // API Base URL
-    const API_BASE_URL = 'http://localhost:3000';
-    
-    // Get pantry ID from user data
-    const getPantryId = () => {
-      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-      return userData._id;
-    };
     
     // Fetch inventory from API
     const fetchInventory = async () => {
@@ -782,8 +822,7 @@ import {
     const [isEditing, setIsEditing] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState([]);
 
-    // API Base URL - corrected to match server port
-    const API_BASE_URL = 'http://localhost:3000';
+    
 
     // Fetch volunteers from backend
     const fetchVolunteers = async () => {
@@ -1301,29 +1340,121 @@ import {
     )
   }
   const Stream = ()=> {
+    const [stream, setStream] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [foodBankName, setFoodBankName] = useState("");
+    useEffect(()=> {
+      const fetchStream = async () => {
+        try {
+          setLoading(true)
+          const pantryId = getPantryId();
+          if (!pantryId) return;
+          const response = await axios.get(`${API_BASE_URL}/pantry/info/${pantryId}`);
+          setFoodBankName(response.data.name || "Food Pantry");
+          setStream(response.data.stream || []);
+        } catch (e) {
+          setStream([])
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchStream();
+    }, []);
+    const [message, setMessage] = useState("");
+    const handleSendMessage = async () => {
+      try {
+        setLoading(true)
+        const pantryId = getPantryId();
+        if (!pantryId) return;
+        const response = await axios.post(`${API_BASE_URL}/pantry/${pantryId}/stream`, { message });
+        setStream(response.data.stream || []);
+        setMessage("")
+      } catch (e) {
+        console.error('Error sending message:', e);
+      } finally {
+        setLoading(false)
+      }
+    }
     return(
       <>
         <Stack spacing="md">
-          <Title order={1}>TASK's Stream</Title>
+          <Title order={1}>{foodBankName}'s Stream</Title>
           <Grid>
               <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5', width: '100%' }}>
-                <Loader />
-                <Text size="sm" color="dimmed">Stream Loading...</Text>
+                {loading ? (
+                  <>
+                    <Loader />
+                    <Text size="sm" color="dimmed">Stream Loading...</Text>
+                  </>
+                ) : (
+                  stream.length === 0 ? (
+                    <>
+                      <Text size="sm" color="dimmed">No stream posts yet</Text>
+                    </>
+                  ) : null
+                )}
                 <ScrollArea style={{ height: '30rem' }}>
                 <Stack spacing="xs" mt="md">
-                    {Array.from({ length: 10 }, (_, i) => (
+                    {stream.map((item, i) => (
                       <Blockquote key={i} p={'sm'} color='blue'>
-                        <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-                          <Text fw={900}>12.21.2024</Text>
-                          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                            <Text>Tamales and horchata available for a limited time only!</Text>
+                        <Flex align="center" style={{ width: '100%' }}>
+                          <Text size="xs" color="dimmed" style={{ minWidth: 140 }}>
+                            {typeof item === 'string' ? '' : item.date}
+                          </Text>
+                          <Flex justify="center" align="center" style={{ flex: 1 }}>
+                            {typeof item === 'string' ? (
+                              <Text ta="center">{item}</Text>
+                            ) : (
+                              <Text ta="center">{item.message}</Text>
+                            )}
+                          </Flex>
+                          <div style={{ minWidth: 140, display: 'flex', justifyContent: 'flex-end' }}>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              aria-label="Delete message"
+                              onClick={async () => {
+                                try {
+                                  setLoading(true)
+                                  const pantryId = getPantryId();
+                                  if (!pantryId) return;
+                                  const res = await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/stream/${i}`);
+                                  setStream(res.data.stream || [])
+                                } catch (e) {
+                                  console.error('Error deleting message:', e)
+                                } finally {
+                                  setLoading(false)
+                                }
+                              }}
+                            >
+                              <IconTrash size={16} />
+                            </ActionIcon>
                           </div>
                         </Flex>
                       </Blockquote>
                     ))}
                     </Stack>
                     </ScrollArea>
-                    <TextInput p={'sm'} radius={'xl'} placeholder="Type your message..." leftSection={<IconMessage size={16} />} rightSection={<Button p={0} variant="light" size="xs" radius="xl"><IconSend /></Button>} />
+                    <TextInput 
+                      p={'sm'} 
+                      radius={'xl'} 
+                      placeholder="Type your message..." 
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      leftSection={<IconMessage size={16} />}
+                      rightSection={
+                        <Button 
+                          p={0} 
+                          variant="light" 
+                          size="xs" 
+                          radius="xl" 
+                          onClick={() => handleSendMessage()}
+                          disabled={loading || !message.trim()}
+                        >
+                          <IconSend />
+                        </Button>
+                      }
+                    />
               </Paper>
           </Grid>
         </Stack>
@@ -1334,7 +1465,7 @@ import {
     let [page, setPage] = useState("")
     let [settings, setSettings] = useState(false)
     let [helpModal, setHelpModal] = useState(false)
-    const [foodBankName, setFoodBankName] = useState("TASK Food Bank")
+    const [foodBankName, setFoodBankName] = useState("Food Pantry")
     const [foodBankAddress, setFoodBankAddress] = useState("123 Main St, Belle Mead, NJ 08502")
     const [foodBankPhone, setFoodBankPhone] = useState("(609) 123-4567")
     const [foodBankEmail, setFoodBankEmail] = useState("info@taskfoodbank.org")
@@ -1344,15 +1475,6 @@ import {
     const [volunteers, setVolunteers] = useState([])
     const [inventory, setInventory] = useState([])
     const [volunteerSchedule, setVolunteerSchedule] = useState([])
-    
-    // API Base URL
-    const API_BASE_URL = 'http://localhost:3000';
-    
-    // Get pantry ID from user data
-    const getPantryId = () => {
-      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-      return userData._id;
-    };
     
     // Fetch volunteers from backend
     const fetchVolunteers = async () => {
@@ -1399,7 +1521,7 @@ import {
         const pantryData = response.data;
         
         // Update the form fields with real data
-        setFoodBankName(pantryData.name || "TASK Food Bank");
+        setFoodBankName(pantryData.name || "Food Pantry");
         setFoodBankAddress(pantryData.address || "123 Main St, Belle Mead, NJ 08502");
         setFoodBankPhone(pantryData.phone_number || "(609) 123-4567");
         setFoodBankEmail(pantryData.email || "info@taskfoodbank.org");
@@ -1409,7 +1531,7 @@ import {
         const savedSettings = localStorage.getItem('pantry_settings');
         if (savedSettings) {
           const settings = JSON.parse(savedSettings);
-          setFoodBankName(settings.name || "TASK Food Bank");
+          setFoodBankName(settings.name || "Food Pantry");
           setFoodBankAddress(settings.address || "123 Main St, Belle Mead, NJ 08502");
           setFoodBankPhone(settings.phone_number || "(609) 123-4567");
           setFoodBankEmail(settings.email || "info@taskfoodbank.org");

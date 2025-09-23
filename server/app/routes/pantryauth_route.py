@@ -14,7 +14,7 @@ pantryauth_route = Blueprint("pantryauth_route", __name__)
 #is current_app correct? 
 @pantryauth_route.route("/log_in/", methods=["POST"])
 def log_in():
-    try:
+    try: 
         data=request.get_json()
         username = data["username"]
         password = data["password"]
