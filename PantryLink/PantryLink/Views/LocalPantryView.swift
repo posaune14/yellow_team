@@ -25,7 +25,8 @@ struct LocalPantryView: View {
                     .foregroundColor(.white)
                     .font(.title)
                 TabView{
-                    ForEach(0..<slides.count, id: \.self) { index in
+                    Image("H_FoodBank").resizable().scaledToFit()
+                    ForEach(1..<slides.count, id: \.self) { index in
                         RoundedRectangle(cornerRadius: 25)
                             .fill(slides[index])
                             .frame(height:200)
