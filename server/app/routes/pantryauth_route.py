@@ -30,12 +30,18 @@ def log_in():
 
         is_valid = bcrypt.check_password_hash(hashed_password, password)
         if is_valid and pantry_database["username"] == username:
-            pantry_database.pop("password", None)
+            # Build a safe, JSON-serializable user payload
+            user_payload = {
+                "_id": str(pantry_database.get("_id")),
+                "username": pantry_database.get("username"),
+            }
             #Generate a token
             access_token = create_access_token(identity=username)
             refresh_token = create_refresh_token(identity=username)
             return jsonify(
                 {
+
+                  
                     "pantry_database":pantry_database,
                     "access_token": access_token,
                     "refresh_token": refresh_token,

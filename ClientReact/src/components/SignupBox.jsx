@@ -10,8 +10,9 @@ function SignupBox() {
         username: "",
         password: "",
         confirmPassword: "",
-        first_name: "",
-        last_name: "",
+        name: "",
+        address: "",
+
         email: "",
         phone_number: ""
     })
@@ -30,7 +31,8 @@ function SignupBox() {
     
     const handleSignUp = async() => {
         // Validation
-        if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim() || !formData.email.trim() || !formData.phone_number.trim()) {
+        if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim() || !formData.address.trim() || !formData.email.trim() || !formData.phone_number.trim()) {
+
             notifications.show({
                 title: 'Error',
                 message: 'Please fill in all required fields',
@@ -69,6 +71,8 @@ function SignupBox() {
                 username: formData.username,
                 password: formData.password,
                 name: formData.name,
+                address: formData.address,
+
                 email: formData.email,
                 phone_number: formData.phone_number
             });
@@ -105,7 +109,8 @@ function SignupBox() {
                     Food Bank Sign Up
                 </Title>
                 <Center>
-                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"22rem", height: "28rem", margin: '2rem'}}>
+                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"22rem", height: "29rem", margin: '2rem'}}>
+
                         <Stack spacing="md">
                             <TextInput 
                                 label="Username" 
@@ -117,9 +122,18 @@ function SignupBox() {
                             />
                             <TextInput 
                                 label="Name" 
-                                placeholder="Enter your first name"  
+                                placeholder="Enter your pantry name"  
+
                                 value={formData.name} 
                                 onChange={(e) => handleInputChange('name', e.target.value)} 
+                                size="md" 
+                                required
+                            />
+                            <TextInput 
+                                label="Address" 
+                                placeholder="Enter your address"  
+                                value={formData.address} 
+                                onChange={(e) => handleInputChange('address', e.target.value)} 
                                 size="md" 
                                 required
                             />

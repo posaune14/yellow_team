@@ -43,14 +43,10 @@ class pantry_model:
             )
         )
     def find_user_by_username(self, username):
+        # Use a simple projection; convert ObjectId to string at the route level
         return self.collection.find_one(
             {"username": username},
-            {
-                "_id": {"$toString": "$_id"},
-                "username": 1,
-                "password": 1,
-                
-            },
+            {"username": 1, "password": 1, "_id": 1},
         )
     
     def add_inventory_item(self, pantry_id, item):
