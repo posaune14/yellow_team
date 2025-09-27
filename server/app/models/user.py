@@ -11,7 +11,7 @@ class UserModel:
             "password": password, 
             "username": username,
             "first_name": first_name, 
-            "last_name": last_name, 
+            "last_name": last_name,
             "email": email, 
             "phone_number": phone_number, 
         }
@@ -22,12 +22,8 @@ class UserModel:
         #Returns the id of the document as a string
         return str(result.inserted_id)
     def find_user_by_username(self, username):
-        return self.collection.find_one(
-            {"username": username},
-            {
-                "_id": {"$toString": "$_id"},
-                "username": 1,
-                "password": 1,
-            },
-        )
+        user = self.collection.find_one({"username": username})
+        if user:
+            user['_id'] = str(user['_id'])
+        return user
     

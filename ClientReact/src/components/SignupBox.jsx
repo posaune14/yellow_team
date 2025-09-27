@@ -12,6 +12,7 @@ function SignupBox() {
         confirmPassword: "",
         name: "",
         address: "",
+
         email: "",
         phone_number: ""
     })
@@ -31,6 +32,7 @@ function SignupBox() {
     const handleSignUp = async() => {
         // Validation
         if (!formData.username.trim() || !formData.password.trim() || !formData.name.trim() || !formData.address.trim() || !formData.email.trim() || !formData.phone_number.trim()) {
+
             notifications.show({
                 title: 'Error',
                 message: 'Please fill in all required fields',
@@ -70,6 +72,7 @@ function SignupBox() {
                 password: formData.password,
                 name: formData.name,
                 address: formData.address,
+
                 email: formData.email,
                 phone_number: formData.phone_number
             });
@@ -107,6 +110,7 @@ function SignupBox() {
                 </Title>
                 <Center>
                     <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"22rem", height: "29rem", margin: '2rem'}}>
+
                         <Stack spacing="md">
                             <TextInput 
                                 label="Username" 
@@ -119,6 +123,7 @@ function SignupBox() {
                             <TextInput 
                                 label="Name" 
                                 placeholder="Enter your pantry name"  
+
                                 value={formData.name} 
                                 onChange={(e) => handleInputChange('name', e.target.value)} 
                                 size="md" 

@@ -14,14 +14,14 @@ pantryauth_route = Blueprint("pantryauth_route", __name__)
 #is current_app correct? 
 @pantryauth_route.route("/log_in/", methods=["POST"])
 def log_in():
-    try:
+    try: 
         data=request.get_json()
         username = data["username"]
         password = data["password"]
 
         pantry = pantry_model(current_app.mongo) #is this correct??? whole section needs to be checked to distinguish between employees and users
         pantry_database = pantry.find_user_by_username(username)
-        if not user_database:
+        if not pantry_database:
             return jsonify({"error": "Error incorrect username"}), 401
         
         bcrypt = Bcrypt(current_app)
@@ -40,11 +40,9 @@ def log_in():
             refresh_token = create_refresh_token(identity=username)
             return jsonify(
                 {
-<<<<<<< Updated upstream
-                    "user_database":user_database,
-=======
-                    "pantry_database": user_payload,
->>>>>>> Stashed changes
+
+                  
+                    "pantry_database":pantry_database,
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 }
