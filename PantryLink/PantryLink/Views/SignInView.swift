@@ -66,18 +66,7 @@ struct SignInView: View {
                             .padding()
                     }
                     
-                    Button(action: {
-                        print("Sign In With Google")
-                        // Implement Google Sign In here
-                    }) {
-                        Text("Sign In With Google")
-                            .frame(width: 300, height: 60)
-                            .font(.system(size: 25, weight: .bold))
-                            .background(Color(red: 248/255, green: 248/255, blue: 248/255))
-                            .foregroundColor(.black)
-                            .cornerRadius(15)
-                            .padding()
-                    }
+                    
                 }
                 
                 // Sign Up Prompt Section
