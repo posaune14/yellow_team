@@ -34,6 +34,9 @@ struct Colors {
 struct ContentView: View {
     @State private var path = NavigationPath()
     
+    //Location Authentication 
+    @StateObject private var locationManager = LocationManager()
+    
     var body: some View {
         //if logged in or not, show login view path or home path
         NavigationStack(path: $path){
