@@ -40,7 +40,9 @@ struct ContentView: View {
     var body: some View {
         //if logged in or not, show login view path or home path
         NavigationStack(path: $path){
-            SignInView(path: $path)
+            SignInView(path: $path).onAppear(perform: {
+                locationManager.checkLocationAuthorization()
+            })
             .navigationDestination(for: String.self){value in
                 if value == "Home" {
                     HomeView(path: $path)
