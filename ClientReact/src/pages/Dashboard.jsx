@@ -1765,7 +1765,6 @@ import {
                 address: foodBankAddress,
                 phone_number: foodBankPhone,
                 email: foodBankEmail,
-                password: "existing_password" // We need to include password for the update endpoint
             };
             
             // Call the pantry update API

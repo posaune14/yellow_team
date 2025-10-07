@@ -32,18 +32,47 @@ def create_pantry():
         }
     ),201
 
+@pantry_routes.route("/reset_password_by_username", methods=["POST"])
+def reset_password_by_username():
+    try:
+        data = request.get_json()
+        username = data.get("username")
+        new_password = data.get("new_password")
+        if not username or not new_password:
+            return jsonify({"message": "username and new_password required"}), 400
+
+        bcrypt = Bcrypt(current_app)
+        hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+        # Update by username
+        model = pantry_model(current_app.mongo)
+        # Direct update on collection since model doesn't have a dedicated method
+        result = model.collection.update_one({"username": username}, {"$set": {"password": hashed}})
+        if result.matched_count == 0:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Password reset"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error resetting password", "error": str(e)}), 400
+
 @pantry_routes.route("/update/<string:pantry_id>", methods=["PUT"])
 def update_pantry(pantry_id):
     try:
         data = request.get_json()
+        bcrypt = Bcrypt(current_app)
 
         update_data = {
             "name": data["name"],
             "address": data["address"], 
             "email": data["email"],
             "phone_number": data["phone_number"],
-            "password": data["password"],
         }
+        # Update password only if provided and non-empty; ensure it stays hashed
+        new_password = data.get("password")
+        if new_password:
+            # If it's not already a bcrypt hash, hash it
+            if not (isinstance(new_password, str) and new_password.startswith(("$2a$", "$2b$", "$2y$"))):
+                new_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            update_data["password"] = new_password
         
         # Only include stock if it's provided
         if "stock" in data:

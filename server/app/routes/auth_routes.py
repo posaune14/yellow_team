@@ -35,7 +35,7 @@ def log_in():
         if is_valid and user_database["username"]==username:
             user_database.pop("password", None) 
             #Generate a token
-            access_token = create_access_token(identify=username)
+            access_token = create_access_token(identity=username)
             refresh_token = create_refresh_token(identity=username)
             return jsonify(
                 {
@@ -66,7 +66,7 @@ def refresh():
 
         return jsonify({"access_token": new_access_token}), 200
     except Exception as error:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(error)}), 400
 
         
         
