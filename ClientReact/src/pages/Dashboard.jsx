@@ -25,6 +25,7 @@ import {
     Modal
   } from '@mantine/core'
   import { ActionIcon } from '@mantine/core'
+  import emailjs from '@emailjs/browser'
   import {
     IconSettings,
     IconGauge,
@@ -776,6 +777,11 @@ import {
     )
   }
   const Volunteer = ({ onScheduleUpdate })=> {
+    // EmailJS configuration
+    const EMAILJS_SERVICE_ID = 'service_75uj6cx';
+    const EMAILJS_TEMPLATE_ID = import.meta.env?.VITE_EMAILJS_TEMPLATE_ID || 'template_schedule_update';
+    const EMAILJS_PUBLIC_KEY = import.meta.env?.VITE_EMAILJS_PUBLIC_KEY || undefined;
+
 
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
@@ -821,8 +827,58 @@ import {
 
     const [isEditing, setIsEditing] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+    const [scheduleByDate, setScheduleByDate] = useState({});
 
-    
+    const getDefaultSchedule = () => ([
+      {
+        id: 1,
+        time: "8:00 AM - 12:00 PM",
+        shift: "Morning Shift",
+        volunteers: []
+      },
+      {
+        id: 2,
+        time: "12:00 PM - 4:00 PM",
+        shift: "Afternoon Shift",
+        volunteers: []
+      },
+      {
+        id: 3,
+        time: "4:00 PM - 8:00 PM",
+        shift: "Evening Shift",
+        volunteers: []
+      },
+      {
+        id: 4,
+        time: "On Call",
+        shift: "Backup Volunteers",
+        volunteers: []
+      }
+    ]);
+
+    const todayKey = new Date().toISOString().slice(0, 10);
+
+    // Load schedules from localStorage on mount
+    useEffect(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem('volunteer_schedules') || '{}');
+        setScheduleByDate(stored);
+        const current = stored[selectedDate] || getDefaultSchedule();
+        setVolunteerSchedule(current);
+      } catch (e) {
+        setScheduleByDate({});
+        setVolunteerSchedule(getDefaultSchedule());
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // When date changes, load that day's schedule (or defaults)
+    useEffect(() => {
+      const current = scheduleByDate[selectedDate] || getDefaultSchedule();
+      setVolunteerSchedule(current);
+      setIsEditing(false);
+    }, [selectedDate]);
 
     // Fetch volunteers from backend
     const fetchVolunteers = async () => {
@@ -955,11 +1011,103 @@ import {
     };
 
     const handleSave = () => {
+      const updatedSchedules = { ...(scheduleByDate || {}) };
+      updatedSchedules[selectedDate] = editingSchedule;
+      setScheduleByDate(updatedSchedules);
+      localStorage.setItem('volunteer_schedules', JSON.stringify(updatedSchedules));
+
       setVolunteerSchedule(editingSchedule);
       setIsEditing(false);
-      // Update the main dashboard's volunteer schedule
-      if (onScheduleUpdate) {
+      // Update the main dashboard's volunteer schedule if editing today
+      if (onScheduleUpdate && selectedDate === todayKey) {
         onScheduleUpdate(editingSchedule);
+      }
+
+      // Email the full schedule to all involved recipients
+      try {
+        // Build a text representation of the schedule
+        const scheduleText = editingSchedule.map((shift) => {
+          const vols = (shift.volunteers || []).filter(v => (v.name || '').trim() !== '')
+            .map(v => `- ${v.name}${v.role ? ` (${v.role})` : ''}`)
+            .join('\n');
+          return `${shift.time} — ${shift.shift}\n${vols || '- No volunteers assigned'}`;
+        }).join('\n\n');
+
+        // Resolve recipient emails from assigned volunteer names
+        const nameToEmail = new Map();
+        for (const v of volunteers) {
+          const full = `${v.first_name} ${v.last_name}`.trim();
+          if (full) nameToEmail.set(full, v.email);
+        }
+        const recipients = new Set();
+        for (const shift of editingSchedule) {
+          for (const v of shift.volunteers || []) {
+            const nm = (v.name || '').trim();
+            const email = nameToEmail.get(nm);
+            if (email) recipients.add(email);
+          }
+        }
+
+        // No recipients -> skip sending
+        if (recipients.size === 0) {
+          notifications.show({
+            title: 'Schedule Saved',
+            message: 'No emails found for assigned volunteers; skipped email sending.',
+            color: 'orange',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        const dateLabel = new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+
+        const sends = Array.from(recipients).map((toEmail) => {
+          const params = {
+            to_email: toEmail,
+            date: dateLabel,
+            schedule_text: scheduleText,
+            subject: `Volunteer Schedule — ${dateLabel}`,
+          };
+          return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY);
+        });
+
+        Promise.allSettled(sends).then((results) => {
+          const failed = results.filter(r => r.status === 'rejected').length;
+          if (failed === 0) {
+            notifications.show({
+              title: 'Schedule Emails Sent',
+              message: `Emailed the schedule to ${recipients.size} recipient(s).`,
+              color: 'green',
+              icon: <IconCheck size={16} />,
+              autoClose: 3000,
+            });
+          } else {
+            notifications.show({
+              title: 'Some Emails Failed',
+              message: `Sent ${recipients.size - failed}, failed ${failed}. Check EmailJS config.`,
+              color: 'orange',
+              icon: <IconInfoCircle size={16} />,
+              autoClose: 4000,
+            });
+          }
+        }).catch(() => {
+          notifications.show({
+            title: 'Email Error',
+            message: 'Failed to send schedule emails. Verify EmailJS keys/template.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 4000,
+          });
+        });
+      } catch (e) {
+        notifications.show({
+          title: 'Email Error',
+          message: 'Unexpected error building or sending schedule emails.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 4000,
+        });
       }
     };
 
@@ -1215,7 +1363,7 @@ import {
           <Grid.Col mt={'xl'} span={6}>
             <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Group position="apart" mb="md">
-                <Title order={3}>Today's Volunteer Schedule</Title>
+                <Title order={3}>Volunteer Schedule</Title>
                 {!isEditing ? (
                   <Button variant="light" onClick={handleEdit} size="sm">
                     Edit Schedule
@@ -1230,6 +1378,30 @@ import {
                     </Button>
                   </Group>
                 )}
+              </Group>
+
+              {/* Date selector: today + next 7 days */}
+              <Group mb="md">
+                {(() => {
+                  const options = Array.from({ length: 8 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const key = d.toISOString().slice(0, 10);
+                    const label = i === 0 ? 'Today' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+                    return { value: key, label };
+                  });
+                  return (
+                    <Select
+                      size="sm"
+                      label="Select day"
+                      value={selectedDate}
+                      onChange={(val) => val && setSelectedDate(val)}
+                      data={options}
+                      leftSection={<IconCalendar size={16} />}
+                      style={{ maxWidth: 240 }}
+                    />
+                  );
+                })()}
               </Group>
 
               {isEditing && (
@@ -1545,35 +1717,21 @@ import {
       fetchInventory();
     }, []);
     
-    // Initialize volunteer schedule with default structure
+    // Initialize dashboard's view of today's schedule from localStorage (fallback to defaults)
     useEffect(() => {
       const defaultSchedule = [
-        {
-          id: 1,
-          time: "8:00 AM - 12:00 PM",
-          shift: "Morning Shift",
-          volunteers: []
-        },
-        {
-          id: 2,
-          time: "12:00 PM - 4:00 PM",
-          shift: "Afternoon Shift",
-          volunteers: []
-        },
-        {
-          id: 3,
-          time: "4:00 PM - 8:00 PM",
-          shift: "Evening Shift",
-          volunteers: []
-        },
-        {
-          id: 4,
-          time: "On Call",
-          shift: "Backup Volunteers",
-          volunteers: []
-        }
+        { id: 1, time: "8:00 AM - 12:00 PM", shift: "Morning Shift", volunteers: [] },
+        { id: 2, time: "12:00 PM - 4:00 PM", shift: "Afternoon Shift", volunteers: [] },
+        { id: 3, time: "4:00 PM - 8:00 PM", shift: "Evening Shift", volunteers: [] },
+        { id: 4, time: "On Call", shift: "Backup Volunteers", volunteers: [] }
       ];
-      setVolunteerSchedule(defaultSchedule);
+      try {
+        const stored = JSON.parse(localStorage.getItem('volunteer_schedules') || '{}');
+        const todayKey = new Date().toISOString().slice(0, 10);
+        setVolunteerSchedule(stored[todayKey] || defaultSchedule);
+      } catch (e) {
+        setVolunteerSchedule(defaultSchedule);
+      }
     }, []);
     
     // Callback to update volunteer schedule from Volunteer component
