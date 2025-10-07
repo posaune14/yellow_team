@@ -33,6 +33,7 @@ struct Colors {
 
 struct ContentView: View {
     @State private var path = NavigationPath()
+    //creating class object
     
     //Location Authentication 
     @StateObject private var locationManager = LocationManager()
