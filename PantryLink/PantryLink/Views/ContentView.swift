@@ -34,11 +34,15 @@ struct Colors {
 struct ContentView: View {
     @State private var path = NavigationPath()
     //creating class object
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    //gives access to appdelegate here
     
     var body: some View {
         //if logged in or not, show login view path or home path
         NavigationStack(path: $path){
-            SignInView(path: $path)
+            SignInView(path: $path).onAppear(perform: {
+                appDelegate.app = self
+            })
             .navigationDestination(for: String.self){value in
                 if value == "Home" {
                     HomeView(path: $path)
