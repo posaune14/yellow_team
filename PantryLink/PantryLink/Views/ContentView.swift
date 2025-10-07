@@ -34,6 +34,8 @@ struct Colors {
 struct ContentView: View {
     @State private var path = NavigationPath()
     //creating class object
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    //gives access to appdelegate here
     
     //Location Authentication 
     @StateObject private var locationManager = LocationManager()
@@ -43,6 +45,7 @@ struct ContentView: View {
         NavigationStack(path: $path){
             SignInView(path: $path).onAppear(perform: {
                 locationManager.checkLocationAuthorization()
+                appDelegate.app = self
             })
             .navigationDestination(for: String.self){value in
                 if value == "Home" {
