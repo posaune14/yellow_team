@@ -16,6 +16,7 @@ struct SignInView: View {
     @State var empty_field = false
     //@StateObject var viewModel = SignInViewModel()
     @Binding var path: NavigationPath
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         VStack {
@@ -55,6 +56,7 @@ struct SignInView: View {
                         authenticateUser(with: userData)
                         
                         // Navigate to home on successful sign in
+                        isLoggedIn = true
                         path.append("Home")
                     }) {
                         Text("Sign In")
