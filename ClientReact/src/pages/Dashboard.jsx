@@ -188,26 +188,51 @@ import {
 
  
 
-  function InvItems({ item, editing, onSave }){
+ function InvItems({ item, editing, onSave, onDelete }){
     const [currentValue, setCurrentValue] = useState(item.current)
     const [fullValue, setFullValue] = useState(item.full)
     const [isEditing, setIsEditing] = useState(false)
+    const [nameValue, setNameValue] = useState(item.name)
+    
+    useEffect(() => {
+      setNameValue(item.name)
+      setCurrentValue(item.current)
+      setFullValue(item.full)
+    }, [item.name, item.current, item.full])
     
     const handleSave = () => {
-      onSave(item.name, currentValue, fullValue)
+      onSave(item.name, nameValue, currentValue, fullValue, item.type)
       setIsEditing(false)
     }
     
     const handleCancel = () => {
       setCurrentValue(item.current)
       setFullValue(item.full)
+      setNameValue(item.name)
       setIsEditing(false)
     }
     
     return(
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
-          <Text size="lg" color="darks">{item.name}</Text>
+          {!isEditing ? (
+            <Text size="lg" color="darks">{nameValue}</Text>
+          ) : (
+            <TextInput
+              variant="filled"
+              size="xs"
+              placeholder={item.name}
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              styles={{
+                input: {
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  fontWeight: 600
+                }
+              }}
+            />
+          )}
           {!isEditing ? (
             <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>
               {item.current}/{item.full}
@@ -269,17 +294,26 @@ import {
             </Stack>
           )}
           {editing && !isEditing && (
-            <Button 
-              size="xs" 
-              variant="light" 
-              color="blue" 
-              onClick={() => setIsEditing(true)}
-              mt="xs"
-              radius="sm"
-              fullWidth
-            >
-              Edit
-            </Button>
+            <Group gap="xs" mt="xs">
+              <Button 
+                size="xs" 
+                variant="light" 
+                color="blue" 
+                onClick={() => setIsEditing(true)}
+                radius="sm"
+              >
+                Edit
+              </Button>
+              <Button 
+                size="xs" 
+                variant="light" 
+                color="red" 
+                onClick={() => onDelete(item.name)}
+                radius="sm"
+              >
+                Delete
+              </Button>
+            </Group>
           )}
         </Paper>
       </Grid.Col>
@@ -351,7 +385,7 @@ import {
       fetchInventory();
     }, []);
 
-    const handleSaveItem = async (itemName, current, full) => {
+    const handleSaveItem = async (originalName, newName, current, full, type) => {
       try {
         const pantryId = getPantryId();
         if (!pantryId) {
@@ -364,36 +398,141 @@ import {
           });
           return;
         }
-        
-        // Update via API
-        await axios.put(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(itemName)}`, {
-          current,
-          full
-        });
-        
-        // Update local state
-        setItems(prevItems => 
-          prevItems.map(item => 
-            item.name === itemName 
-              ? { ...item, current, full }
-              : item
+        const trimmedName = (newName || '').trim();
+        if (!trimmedName) {
+          notifications.show({
+            title: 'Error',
+            message: 'Item name cannot be empty.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        if (current > full) {
+          notifications.show({
+            title: 'Error',
+            message: 'Current quantity cannot be greater than full capacity.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        const isRenaming = originalName !== trimmedName;
+        if (isRenaming) {
+          const nameExists = items.some(i => i.name.toLowerCase() === trimmedName.toLowerCase() && i.name.toLowerCase() !== originalName.toLowerCase());
+          if (nameExists) {
+            notifications.show({
+              title: 'Error!',
+              message: 'An item with this name already exists.',
+              color: 'red',
+              icon: <IconInfoCircle size={16} />,
+              autoClose: 3000,
+              withCloseButton: true,
+            });
+            return;
+          }
+
+          // Create new item with new name
+          await axios.post(`${API_BASE_URL}/pantry/${pantryId}/inventory`, {
+            name: trimmedName,
+            current,
+            full,
+            type
+          });
+
+          // Delete old item
+          await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(originalName)}`);
+
+          // Update local state
+          setItems(prevItems => 
+            prevItems.map(item => 
+              item.name === originalName 
+                ? { ...item, name: trimmedName, current, full }
+                : item
+            )
           )
-        )
-        
-        // Show success notification
-        notifications.show({
-          title: 'Inventory Updated!',
-          message: `${itemName} quantity has been updated to ${current}/${full}`,
-          color: 'green',
-          icon: <IconCheck size={16} />,
-          autoClose: 3000,
-          withCloseButton: true,
-        })
+
+          notifications.show({
+            title: 'Item Renamed',
+            message: `Updated to ${trimmedName} — ${current}/${full}`,
+            color: 'green',
+            icon: <IconCheck size={16} />,
+            autoClose: 3000,
+            withCloseButton: true,
+          })
+        } else {
+          // Update quantities via API
+          await axios.put(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(originalName)}`, {
+            current,
+            full
+          });
+          
+          // Update local state
+          setItems(prevItems => 
+            prevItems.map(item => 
+              item.name === originalName 
+                ? { ...item, current, full }
+                : item
+            )
+          )
+          
+          notifications.show({
+            title: 'Inventory Updated!',
+            message: `${originalName} quantity has been updated to ${current}/${full}`,
+            color: 'green',
+            icon: <IconCheck size={16} />,
+            autoClose: 3000,
+            withCloseButton: true,
+          })
+        }
       } catch (error) {
         console.error('Error updating inventory item:', error);
         notifications.show({
           title: 'Error',
           message: 'Failed to update inventory item. Please try again.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      }
+    }
+
+    const handleDeleteItem = async (itemName) => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          notifications.show({
+            title: 'Error',
+            message: 'Pantry ID not found. Please sign in again.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(itemName)}`);
+
+        setItems(prev => prev.filter(i => i.name !== itemName));
+
+        notifications.show({
+          title: 'Item Deleted',
+          message: `${itemName} has been removed from your inventory`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      } catch (error) {
+        console.error('Error deleting inventory item:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to delete inventory item. Please try again.',
           color: 'red',
           icon: <IconInfoCircle size={16} />,
           autoClose: 3000,
@@ -532,6 +671,9 @@ import {
     case 'Nonperishable':
       filteredItems = items.filter((item) => item.type === 'Nonperishable');
       break;
+    case 'Carbs(perishable)':
+      filteredItems = items.filter((item) => item.type === 'Carbs(perishable)');
+      break;
     default:
       filteredItems = items; 
   }
@@ -578,7 +720,7 @@ import {
         <Select
           label="Filter"
           placeholder="Pick value"
-          data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+          data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable', 'Carbs(perishable)']}
           searchable
           clearable
           style={{width: '10rem'}}
@@ -607,6 +749,7 @@ import {
                   item={item} 
                   editing={editing} 
                   onSave={handleSaveItem}
+                  onDelete={handleDeleteItem}
                 />
               ))
             )}
@@ -655,7 +798,7 @@ import {
               <Select
                 label="Item Type"
                 placeholder="Select item type"
-                data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+                data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable', 'Carbs(perishable)']}
                 value={newItem.type}
                 onChange={(value) => setNewItem({...newItem, type: value})}
                 radius="md"
