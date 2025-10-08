@@ -29,7 +29,7 @@ struct SignUpView: View {
         VStack{
             Text("Create Account")
                 .multilineTextAlignment(.center)
-                .font(.system(size: 58, weight: .bold))
+                .font(.title)
                 .foregroundColor(.red) // Changed from .maroonWhite to standard color
                 .frame(maxWidth: .infinity, alignment: .center)
             
@@ -78,11 +78,11 @@ struct SignUpView: View {
                         path.append("Home")
                     }) {
                         Text("Sign Up")
-                            .frame(width: 350, height: 80)
-                            .font(.system(size: 30, weight: .bold))
+                            .frame(width: 350, height: 40)
+                            .font(.system(size: 27, weight: .bold))
                             .background(.orange) // Changed from .flexibleOrange
                             .foregroundColor(.white)
-                            .cornerRadius(15)
+                            .cornerRadius(10)
                     }
                 }
                 
