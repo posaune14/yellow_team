@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, current_app, request
 from flask_bcrypt import Bcrypt
-from app.models.volunteer import volunteer_model
+from app.models.pantry import pantry_model
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -14,29 +14,35 @@ pantryauth_route = Blueprint("pantryauth_route", __name__)
 #is current_app correct? 
 @pantryauth_route.route("/log_in/", methods=["POST"])
 def log_in():
-    try:
+    try: 
         data=request.get_json()
         username = data["username"]
         password = data["password"]
 
-        user = UserModel(current_app.mongo) #is this correct??? whole section needs to be checked to distinguish between employees and users
-        user_database = user.find_user_by_username(username)
-        if not user_database:
+        pantry = pantry_model(current_app.mongo) #is this correct??? whole section needs to be checked to distinguish between employees and users
+        pantry_database = pantry.find_user_by_username(username)
+        if not pantry_database:
             return jsonify({"error": "Error incorrect username"}), 401
         
         bcrypt = Bcrypt(current_app)
         #retrieve hashed password from the database
-        hashed_password = user_database["password"]
+        hashed_password = pantry_database["password"]
 
         is_valid = bcrypt.check_password_hash(hashed_password, password)
-        if is_valid and user_database["username"] == username:
-            user_database.pop("password", None)
+        if is_valid and pantry_database["username"] == username:
+            # Build a safe, JSON-serializable user payload
+            user_payload = {
+                "_id": str(pantry_database.get("_id")),
+                "username": pantry_database.get("username"),
+            }
             #Generate a token
             access_token = create_access_token(identity=username)
             refresh_token = create_refresh_token(identity=username)
             return jsonify(
                 {
-                    "user_database":user_database,
+
+                  
+                    "pantry_database":pantry_database,
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 }

@@ -18,12 +18,12 @@ struct Pantry {
     let items: [String]
 }
 let pantries = [
-    Pantry(name: "Princeton Mobile", stock: 78, items: ["Beans", "Soup", "Vegis"]),
+    Pantry(name: "Princeton Mobile", stock: 78, items: ["Beans", "Soup", "Vegetables"]),
     Pantry(name: "TASK", stock: 72, items: ["Rice", "Pasta", "Milk"]),
     Pantry(name: "Franklin", stock:66 , items: ["Eggs", "Cereal", "Juice"]),
-    Pantry(name: "idk man", stock: 50, items: ["Beans", "Soup", "Vegis"]),
-    Pantry(name: "idk", stock: 42, items: ["Rice", "Pasta", "Milk"]),
-    Pantry(name: "anotha one", stock:22 , items: ["Eggs", "Cereal", "Juice"])
+    Pantry(name: "Flemington", stock: 50, items: ["Beans", "Soup", "Vegetables"]),
+    Pantry(name: "Hillsborough", stock: 42, items: ["Rice", "Pasta", "Milk"]),
+    Pantry(name: "JFCS", stock:22 , items: ["Eggs", "Cereal", "Juice"])
 ]
 //https://www.programiz.com/swift-programming/classes-objects
 //https://developer.apple.com/documentation/swiftui/foreach

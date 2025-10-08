@@ -10,7 +10,6 @@ A comprehensive food bank management platform that streamlines operations, track
 [![Swift](https://img.shields.io/badge/Swift-5.0-orange?logo=swift)](https://swift.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.1-000000?logo=flask)](https://flask.palletsprojects.com/)
 [![Mantine](https://img.shields.io/badge/Mantine-8.0.2-339AF0?logo=mantine)](https://mantine.dev/)
-[![Redux](https://img.shields.io/badge/Redux-4.2.1-764ABC?logo=redux)](https://redux.js.org/)
 
 ---
 
