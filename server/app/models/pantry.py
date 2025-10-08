@@ -151,3 +151,18 @@ class pantry_model:
             {"$unset": {f"schedules.{date_key}": ""}}
         )
         return result.matched_count > 0
+
+    def cleanup_past_schedules(self, pantry_id, today_key: str) -> int:
+        """Unset any schedules with a key older than today_key (YYYY-MM-DD). Returns number removed."""
+        pantry = self.collection.find_one({"_id": pantry_id}, {"schedules": 1})
+        if not pantry:
+            return 0
+        schedules = pantry.get("schedules")
+        if not isinstance(schedules, dict):
+            return 0
+        to_remove = [k for k in schedules.keys() if isinstance(k, str) and k < today_key]
+        if not to_remove:
+            return 0
+        unset_spec = {f"schedules.{k}": "" for k in to_remove}
+        self.collection.update_one({"_id": pantry_id}, {"$unset": unset_spec})
+        return len(to_remove)

@@ -232,6 +232,12 @@ def get_schedule_for_date(pantry_id):
             return jsonify({"message": "Missing 'date' query parameter (YYYY-MM-DD)"}), 400
         pantry_id = ObjectId(pantry_id)
         model = pantry_model(current_app.mongo)
+        # Lazy cleanup of past schedules
+        today_key = datetime.utcnow().strftime("%Y-%m-%d")
+        try:
+            model.cleanup_past_schedules(pantry_id, today_key)
+        except Exception:
+            pass
         schedule = model.get_schedule_for_date(pantry_id, date_key)
         return jsonify({"date": date_key, "schedule": schedule}), 200
     except Exception as e:
@@ -247,6 +253,12 @@ def put_schedule_for_date(pantry_id, date_key):
             return jsonify({"message": "'schedule' must be an array"}), 400
         pantry_id = ObjectId(pantry_id)
         model = pantry_model(current_app.mongo)
+        # Lazy cleanup of past schedules prior to save
+        today_key = datetime.utcnow().strftime("%Y-%m-%d")
+        try:
+            model.cleanup_past_schedules(pantry_id, today_key)
+        except Exception:
+            pass
         ok = model.save_schedule_for_date(pantry_id, date_key, schedule)
         if not ok:
             return jsonify({"message": "Pantry not found"}), 404
