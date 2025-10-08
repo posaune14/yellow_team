@@ -221,3 +221,48 @@ def delete_inventory_item(pantry_id, item_name):
             
     except Exception as e:
         return jsonify({"message": "Error deleting inventory item", "error": str(e)}), 400
+
+# --- Volunteer Schedule Routes ---
+@pantry_routes.route("/<string:pantry_id>/schedule", methods=["GET"])
+def get_schedule_for_date(pantry_id):
+    """Get volunteer schedule for a specific date key (YYYY-MM-DD) via query param 'date'"""
+    try:
+        date_key = request.args.get("date")
+        if not date_key:
+            return jsonify({"message": "Missing 'date' query parameter (YYYY-MM-DD)"}), 400
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        schedule = model.get_schedule_for_date(pantry_id, date_key)
+        return jsonify({"date": date_key, "schedule": schedule}), 200
+    except Exception as e:
+        return jsonify({"message": "Error getting schedule", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/schedule/<string:date_key>", methods=["PUT"])
+def put_schedule_for_date(pantry_id, date_key):
+    """Replace volunteer schedule for date_key (YYYY-MM-DD). Body: { schedule: [...] }"""
+    try:
+        data = request.get_json() or {}
+        schedule = data.get("schedule", [])
+        if not isinstance(schedule, list):
+            return jsonify({"message": "'schedule' must be an array"}), 400
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        ok = model.save_schedule_for_date(pantry_id, date_key, schedule)
+        if not ok:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Schedule saved"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error saving schedule", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/schedule/<string:date_key>", methods=["DELETE"])
+def delete_schedule_for_date(pantry_id, date_key):
+    """Delete volunteer schedule for date_key (YYYY-MM-DD)."""
+    try:
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        ok = model.delete_schedule_for_date(pantry_id, date_key)
+        if not ok:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Schedule deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error deleting schedule", "error": str(e)}), 400

@@ -1002,25 +1002,40 @@ import {
 
     const todayKey = new Date().toISOString().slice(0, 10);
 
-    // Load schedules from localStorage on mount
+    // Load schedules cache from localStorage on mount (used as fallback)
     useEffect(() => {
       try {
         const stored = JSON.parse(localStorage.getItem('volunteer_schedules') || '{}');
         setScheduleByDate(stored);
-        const current = stored[selectedDate] || getDefaultSchedule();
-        setVolunteerSchedule(current);
       } catch (e) {
         setScheduleByDate({});
-        setVolunteerSchedule(getDefaultSchedule());
       }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // When date changes, load that day's schedule (or defaults)
+    // Backend: fetch schedule for a date
+    const fetchScheduleForDate = async (dateKey) => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          setVolunteerSchedule(getDefaultSchedule());
+          return;
+        }
+        const res = await axios.get(`${API_BASE_URL}/pantry/${pantryId}/schedule`, { params: { date: dateKey } });
+        const schedule = Array.isArray(res.data?.schedule) ? res.data.schedule : getDefaultSchedule();
+        setVolunteerSchedule(schedule);
+      } catch (e) {
+        // Fallback to local cache or defaults
+        const fallback = scheduleByDate[dateKey] || getDefaultSchedule();
+        setVolunteerSchedule(fallback);
+      } finally {
+        setIsEditing(false);
+      }
+    };
+
+    // When date changes, load that day's schedule from backend (fallback to cache/default)
     useEffect(() => {
-      const current = scheduleByDate[selectedDate] || getDefaultSchedule();
-      setVolunteerSchedule(current);
-      setIsEditing(false);
+      fetchScheduleForDate(selectedDate);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate]);
 
     // Fetch volunteers from backend
@@ -1153,37 +1168,68 @@ import {
       setIsEditing(true);
     };
 
-    const handleSave = () => {
-      const updatedSchedules = { ...(scheduleByDate || {}) };
-      updatedSchedules[selectedDate] = editingSchedule;
-      setScheduleByDate(updatedSchedules);
-      localStorage.setItem('volunteer_schedules', JSON.stringify(updatedSchedules));
-
-      setVolunteerSchedule(editingSchedule);
-      setIsEditing(false);
-      // Update the main dashboard's volunteer schedule if editing today
-      if (onScheduleUpdate && selectedDate === todayKey) {
-        onScheduleUpdate(editingSchedule);
-      }
-
-      // Email the full schedule to all involved recipients
+    const handleSave = async () => {
       try {
+        // Enrich schedule with emails before saving
+        const enriched = (editingSchedule || []).map(shift => ({
+          id: shift.id,
+          time: shift.time,
+          shift: shift.shift,
+          volunteers: (shift.volunteers || []).map(v => {
+            if ((v.email || '').trim()) return v;
+            const match = volunteers.find(m => `${m.first_name} ${m.last_name}` === (v.name || ''));
+            return { name: v.name || '', role: v.role || '', email: match?.email || '' };
+          })
+        }));
+
+        const pantryId = getPantryId();
+        if (pantryId) {
+          await axios.put(`${API_BASE_URL}/pantry/${pantryId}/schedule/${selectedDate}`, { schedule: enriched });
+        }
+
+        // Persist a local cache copy as well
+        const updatedSchedules = { ...(scheduleByDate || {}) };
+        updatedSchedules[selectedDate] = enriched;
+        setScheduleByDate(updatedSchedules);
+        localStorage.setItem('volunteer_schedules', JSON.stringify(updatedSchedules));
+
+        setVolunteerSchedule(enriched);
+        setIsEditing(false);
+        if (onScheduleUpdate && selectedDate === todayKey) {
+          onScheduleUpdate(enriched);
+        }
+
+        notifications.show({
+          title: 'Schedule Saved',
+          message: `Saved schedule for ${new Date(selectedDate).toLocaleDateString()}`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+        });
+
+        // Email the full schedule to all involved recipients
         // Build a text representation of the schedule
-        const scheduleText = editingSchedule.map((shift) => {
+        const scheduleText = enriched.map((shift) => {
           const vols = (shift.volunteers || []).filter(v => (v.name || '').trim() !== '')
             .map(v => `- ${v.name}${v.role ? ` (${v.role})` : ''}`)
             .join('\n');
           return `${shift.time} — ${shift.shift}\n${vols || '- No volunteers assigned'}`;
         }).join('\n\n');
 
-        // Resolve recipient emails from assigned volunteer names
+        // Resolve recipient emails from enriched schedule entries first; fallback to volunteers list
         const nameToEmail = new Map();
+        for (const sh of enriched) {
+          for (const v of sh.volunteers || []) {
+            const nm = (v.name || '').trim();
+            if (nm && (v.email || '').trim()) nameToEmail.set(nm, v.email);
+          }
+        }
         for (const v of volunteers) {
           const full = `${v.first_name} ${v.last_name}`.trim();
-          if (full) nameToEmail.set(full, v.email);
+          if (full && v.email && !nameToEmail.has(full)) nameToEmail.set(full, v.email);
         }
         const recipients = new Set();
-        for (const shift of editingSchedule) {
+        for (const shift of enriched) {
           for (const v of shift.volunteers || []) {
             const nm = (v.name || '').trim();
             const email = nameToEmail.get(nm);
@@ -1264,11 +1310,15 @@ import {
           shift.id === shiftId 
             ? {
                 ...shift,
-                volunteers: shift.volunteers.map((vol, idx) => 
-                  idx === volunteerIndex 
-                    ? { ...vol, [field]: value }
-                    : vol
-                )
+                volunteers: shift.volunteers.map((vol, idx) => {
+                  if (idx !== volunteerIndex) return vol;
+                  if (field === 'name') {
+                    const match = volunteers.find(v => `${v.first_name} ${v.last_name}` === value);
+                    const email = match?.email || '';
+                    return { ...vol, name: value, email };
+                  }
+                  return { ...vol, [field]: value };
+                })
               }
             : shift
         )
