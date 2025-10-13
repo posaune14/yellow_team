@@ -46,7 +46,7 @@ class pantry_model:
         # Use a simple projection; convert ObjectId to string at the route level
         return self.collection.find_one(
             {"username": username},
-            {"username": 1, "password": 1, "_id": 1},
+            {"username": 1, "password": 1, "_id": {"$toString": "$_id"}},
         )
     
     def add_inventory_item(self, pantry_id, item):
