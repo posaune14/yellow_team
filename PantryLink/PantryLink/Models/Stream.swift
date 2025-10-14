@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct GetResponseData: Decodable {
+    let message: String
+    let pantries: [Pantry]
+}
