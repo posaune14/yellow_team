@@ -192,3 +192,15 @@ def delete_inventory_item(pantry_id, item_name):
             
     except Exception as e:
         return jsonify({"message": "Error deleting inventory item", "error": str(e)}), 400
+
+@pantry_routes.route("/", methods=["GET"])
+def get_pantries_with_stream():
+    try:
+        pantry = pantry_model(current_app.mongo)
+        pantries = pantry.get_pantries_with_streams()
+        if pantries:
+           return jsonify({"pantries": pantries, "message":"Streams found and sent"}), 200
+        else:
+            return jsonify({"pantries":pantries,"message": "Failed to find pantries with streams"}), 404
+    except Exception as e:
+        return jsonify({"pantries":[],"message": "Error grabbing streams", "error": str(e)}), 400

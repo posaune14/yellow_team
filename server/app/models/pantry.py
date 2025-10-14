@@ -125,3 +125,26 @@ class pantry_model:
         self.collection.update_one({"_id": pantry_id}, {"$pull": {"stream": None}})
         pantry = self.collection.find_one({"_id": pantry_id}, {"stream": 1, "_id": 0})
         return pantry.get("stream", [])
+    
+    def get_pantries_with_streams(self):
+        """Swift stream view functionality"""
+        return list(
+            self.collection.aggregate([
+                {
+                    "$match": {
+                        "$expr": {"$gt":[{"$size": "$stream"},0]} #grab pantries with 1 or more stream announcements
+                    }
+                },
+                {
+                    "$project":{
+                        "_id": {"$toString": "$_id"},
+                        "name":1,
+                        "address":1,
+                        "email":1,
+                        "phone_number":1,
+                        "stock":1,
+                        "stream":1
+                    }
+                }
+            ])
+        )
