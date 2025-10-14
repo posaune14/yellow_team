@@ -8,11 +8,28 @@
 import SwiftUI
 
 struct PantryAlertView: View {
+    let pantryName: String
+    let message: String
+    let date: String
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        RoundedRectangle(cornerRadius: 10)
+            .fill(.white)
+            .frame(width:300, height:150)
+            .overlay(
+                VStack {
+                    Text(pantryName)
+                        .bold()
+                        .font(.title2)
+                        .padding();
+                    Text(message)
+                        .font(.body)
+                    Text("Time: \(date)")
+                        .font(.body)
+                }
+            )
     }
 }
 
-#Preview {
-    PantryAlertView()
-}
+//#Preview {
+//    PantryAlertView()
+//}
