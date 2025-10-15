@@ -16,11 +16,13 @@ struct Pantry: Codable, Identifiable {
     var id: String {_id}
 }
 
-struct PantryItem: Codable{
+struct PantryItem: Codable, Identifiable{
     let name: String
     let current: Int
     let full: Int
     let type: String
+    let ratio: Double
+    var id: String{name}
 }
 
 struct StreamAlert: Codable, Identifiable{
