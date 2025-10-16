@@ -108,6 +108,3 @@ struct SignInView: View {
     }
 }
 
-//#Preview {
-//    SignInView(path: .constant(NavigationPath()))
-//}
