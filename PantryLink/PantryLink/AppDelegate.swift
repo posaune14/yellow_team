@@ -30,6 +30,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         let stringifiedToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("stringifiedToken:", stringifiedToken)
     }
+    
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
