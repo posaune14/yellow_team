@@ -12,25 +12,30 @@ struct PantryAlertView: View {
     let message: String
     let date: String
     var body: some View {
-        VStack{
-            //message header with name of pantry
-            Text(pantryName)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
             
             
             //message of pantry aligned to the left
-            Text(message)
-                .font(.title2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+            
                 
-            ZStack{
+        ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(Color.gray.opacity(0.067))
+                
+                VStack {
+                    //message header with name of pantry
+                    Text(pantryName)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                    Text(message)
+                        .font(.title)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
                 
                 
                 
+                }
             }
                 
             
@@ -49,7 +54,7 @@ struct PantryAlertView: View {
             //                        .font(.body)
             //                }
             //            )
-        }
+        
     }
 }
 
