@@ -21,21 +21,29 @@ struct PantryAlertView: View {
                 RoundedRectangle(cornerRadius: 25)
                     .fill(Color.gray.opacity(0.067))
                 
-                VStack {
+            VStack(spacing:8) {
                     //message header with name of pantry
                     Text(pantryName)
-                        .font(.largeTitle)
+                        .font(.title2)
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                    Text(message)
-                        .font(.title)
+                    Text(date)
+                        .font(.title3)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
+                
+                HStack{
+                    
+                        Text("Announcement: ")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            
+                        Text(message)
+                            .font(.title3)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+                }.frame(maxWidth:.infinity,alignment: .leading)
                 
                 
-                
-                }
+                }.padding()
             }
                 
             

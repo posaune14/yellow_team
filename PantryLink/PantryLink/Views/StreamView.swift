@@ -57,7 +57,7 @@ struct StreamView: View {
     StreamView(streamViewViewModel: StreamViewViewModel(), pantries: [
         Pantry(_id:"68ed1581783104e82a2790e9",name: "Princeton Mobile", stock: [], address:"1234 main street", stream:[
             StreamAlert(date: "10/25/2023", message: "Hi world")
-        ])
+        ]), Pantry(_id: "id", name: "Hillsborough CAN", stock: [], address: "273 Kelvin street", stream:[StreamAlert(date: "10/24/23", message: "food information")])
     ])
 }
 
