@@ -1,0 +1,9 @@
+{
+    "Simulator Target Bundle": "com.tcsm.pantrylink",
+    "aps": {
+        "alert": {
+            "title": "test notification title",
+            "body": "test notification body"
+        }
+    }
+}
