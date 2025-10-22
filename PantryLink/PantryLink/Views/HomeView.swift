@@ -9,6 +9,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var searchText = ""
     @Binding var path: NavigationPath
+    @StateObject var delegate = AppDelegate()
     
     var body: some View {
         ZStack{
@@ -17,7 +18,18 @@ struct HomeView: View {
                 .ignoresSafeArea()
             ScrollView{
                 VStack{
-                    
+                    //for notification testing
+                    Button(action: {
+                        // Request permission and schedule the notification
+                        delegate.testNotification()
+                    }) {
+                        Text("Send Test Notification")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                
                     NavView(path: $path)
                     LocalPantryView()
                         .padding()

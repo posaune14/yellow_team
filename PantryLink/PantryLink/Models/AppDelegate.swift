@@ -12,6 +12,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     //lets us access contentview methods here
     var app: ContentView?
     
+    //testing only, no back end connection
+    func testNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Test Notification"
+        content.body = "This is a test notification."
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        let request = UNNotificationRequest(identifier: "testNotification", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error adding notification: \(error)")
+            }
+        }
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         // register device to receive push notifications
         application.registerForRemoteNotifications()
@@ -44,7 +61,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print("Got notification title: ", response.notification.request.content.title)
     }
     
-    //function allows us to view notifications in the app even with it in the foreground
+    //allow us to see notifications when app is open
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         // options that will be used when displaying a notification with the app in the foreground
         return [.badge, .banner, .list, .sound]
