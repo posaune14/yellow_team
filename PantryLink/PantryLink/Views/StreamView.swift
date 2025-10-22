@@ -8,6 +8,14 @@
 import SwiftUI
 
 struct StreamView: View {
+//    private let pantries : [Pantry] = [
+//        Pantry(_id:"68ed1581783104e82a2790e9",name: "Princeton Mobile", stock: [], address:"1234 main street", stream:[StreamAlert(date:"23 March", message:"New Food available!"), StreamAlert(date:"23 March", message:"New Food available!")]),
+//        Pantry(_id:"68ed1581783104e82a2790e9",name: "Princeton Mobile", stock: [], address:"1234 main street", stream:[]),
+//    ]
+    
+    @StateObject var streamViewViewModel = StreamViewViewModel()
+    @State var pantries: [Pantry]?
+    
     var body: some View {
         ZStack {
             //new colors I created for stock are in dark mode branch, so make sure I (or you) add them
@@ -21,34 +29,35 @@ struct StreamView: View {
                         .bold()
                         .foregroundColor(.black)
                         .font(.title)
-                    ForEach(1...10, id: \.self) {i in
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.white)
-                            .frame(width:300, height:150)
-                            .overlay(
-                                VStack {
-                                    Text("Food Bank Alert")
-                                        .bold()
-                                        .font(.title2)
-                                        .padding();
-                                    Text("More info on alert")
-                                        .font(.body)
-                                }
-                            )
-                    }
                     
+                    if pantries != nil {
+                        ForEach(pantries ?? []) {pantry in
+                            ForEach(pantry.stream ?? []){alert in
+                                PantryAlertView(pantryName:pantry.name, message:alert.message, date: alert.date)
+                            }
+                            
+                        }
+                    }else {
+                        Text("No alerts at the moment. Please come back at a later time!")
+                    }
                 }
                 .padding()
                 .frame(width:325)
             }
             .frame(width:325, height: 675)
+        }.task{
+            // If request succeeds we get pantries otherwise we get nil and error is ignored
+            pantries = try? await streamViewViewModel.getStreams().pantries
         }
-        
     }
     
 }
 
-/*#Preview {
-    StreamView()
+#Preview {
+    StreamView(streamViewViewModel: StreamViewViewModel(), pantries: [
+        Pantry(_id:"68ed1581783104e82a2790e9",name: "Princeton Mobile", stock: [], address:"1234 main street", stream:[
+            StreamAlert(date: "10/25/2023", message: "Hi world")
+        ])
+    ])
 }
-*/
+
