@@ -111,5 +111,5 @@ private func authenticateUser(with userData: [String: String]) {
 
 
 #Preview {
-    SignInView2(path: .constant(NavigationPath()))
+    SignInView(path: .constant(NavigationPath()))
 }

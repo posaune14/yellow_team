@@ -152,5 +152,5 @@ struct SignUpView: View {
 
 
 #Preview {
-    SignUpView2(path: .constant(NavigationPath()))
+    SignUpView(path: .constant(NavigationPath()))
 }
