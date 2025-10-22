@@ -1,14 +1,13 @@
 //
-//  SignUpView.swift
+//  SignUpView2.swift
 //  PantryLink
 //
-//  Created by Naisha Singh on 6/7/25.
+//  Created by Naisha Singh on 10/4/25.
 //
 
 import SwiftUI
 
 struct SignUpView: View {
-    //navigation
     @Binding var path: NavigationPath
     
     //user
@@ -24,98 +23,134 @@ struct SignUpView: View {
     //alert
     @State var alert_message = ""
     @State var show_alert = false
-    
     var body: some View {
-        VStack{
-            Text("Create Account")
-                .multilineTextAlignment(.center)
+        VStack(alignment: .leading){
+            Text("Create Your Account")
                 .font(.title)
-                .foregroundColor(.red) // Changed from .maroonWhite to standard color
-                .frame(maxWidth: .infinity, alignment: .center)
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity,alignment: .leading)
+                .fontWeight(.bold)
+            Spacer()
+                .frame(height: 5)
+            Text("Please enter your details to Sign Up")
+                .foregroundColor(.gray)
+            Spacer()
+                .frame(height:25)
+            Text("Sign Up")
+                .font(.title)
+                .foregroundColor(.orange)
+                .fontWeight(.bold)
+            Spacer()
+                .frame(height: 27)
+            TextField("Username", text: $username)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height: 15)
+            SecureField("Password", text: $password)
+                .textContentType(.password)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height: 15)
+            TextField("First Name", text: $first_name)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height: 15)
+            TextField("Last Name", text: $last_name)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height: 15)
+            TextField("Email", text: $email)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height: 15)
+            TextField("Phone Number (Optional)", text: $phone_number)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                        )
+            Spacer()
+                .frame(height:60)
             
-            Form{
-                Section(header: Text("Login Details")
-                    .foregroundStyle(.black) // Changed from .flexibleBlack
-                    .fontWeight(.bold)) {
-                    TextField("Username", text: $username)
-                    SecureField("Password", text: $password)
-                        .textContentType(.password)
+            Button(action: {
+                guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
+                    empty_field = true
+                    alert_message = "Please fill in all required fields"
+                    show_alert = true
+                    return
                 }
                 
-                Section(header: Text("Account Information")
-                    .foregroundStyle(.black) // Changed from .flexibleBlack
-                    .fontWeight(.bold)) {
-                    TextField("First Name", text: $first_name)
-                    TextField("Last Name", text: $last_name)
-                    TextField("Email", text: $email)
-                    TextField("Phone Number (Optional)", text: $phone_number)
-                }
+                // Create user data dictionary instead of User object to avoid conflicts
+                let userData = [
+                    "firstname": first_name,
+                    "lastname": last_name,
+                    "email": email,
+                    "username": username,
+                    "password": password,
+                    "phonenumber": phone_number
+                ]
                 
-                // Fixed: Moved the button inside a proper Section
-                Section {
-                    Button(action: {
-                        guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
-                            empty_field = true
-                            alert_message = "Please fill in all required fields"
-                            show_alert = true
-                            return
-                        }
-                        
-                        // Create user data dictionary instead of User object to avoid conflicts
-                        let userData = [
-                            "firstname": first_name,
-                            "lastname": last_name,
-                            "email": email,
-                            "username": username,
-                            "password": password,
-                            "phonenumber": phone_number
-                        ]
-                        
-                        // Call your signup function
-                        signUpUser(with: userData)
-                        
-                        // Navigate after successful signup
-                        path.append("Home")
-                    }) {
-                        Text("Sign Up")
-                            .frame(width: 350, height: 40)
-                            .font(.system(size: 27, weight: .bold))
-                            .background(.orange) // Changed from .flexibleOrange
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
+                // Call your signup function
+                signUpUser(with: userData)
                 
-                Section(header: Text("Already have an account?")
-                    .foregroundStyle(.black) // Changed from .flexibleBlack
-                    .fontWeight(.bold)) {
-                    Button("Sign In") {
+                // Navigate after successful signup
+                path.append("Home")
+            }) {
+                Text("Sign Up")
+                    .frame(width: 350, height: 40)
+                    .font(.system(size: 27, weight: .bold))
+                    .background(.orange) // Changed from .flexibleOrange
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(20)
+        HStack(spacing: 0){
+            Text("Already have an account?")
+                .foregroundStyle(.black) // Changed from .flexibleBlack
+                .frame(maxWidth: .infinity,alignment: .leading)
+                .padding(.leading,30)
+                .fontWeight(.bold)
+            
+            Button("Sign In") {
                         print("Sign in button pressed")
                         path.removeLast() // Go back to sign in view
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.blue) // Changed from .flexibleBlue
+                    .foregroundStyle(.orange) // Changed from .flexibleBlue
                     .fontWeight(.bold)
+                    .padding(.trailing,36)
                 }
-            }
-        }
-        .alert(isPresented: $show_alert) {
-            Alert(
-                title: Text("Error"),
-                message: Text(alert_message),
-                dismissButton: .default(Text("OK"))
-            )
+            
         }
     }
-    
-    // Helper function for signup
     private func signUpUser(with userData: [String: String]) {
         // Implement your signup logic here
         // This replaces the problematic User object creation
         print("Signing up user: \(userData["username"] ?? "")")
     }
-}
+
 
 #Preview {
-    SignUpView(path: .constant(NavigationPath()))
+    SignUpView2(path: .constant(NavigationPath()))
 }
