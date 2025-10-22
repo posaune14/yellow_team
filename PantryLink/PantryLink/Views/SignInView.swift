@@ -16,6 +16,7 @@ struct SignInView: View {
     @State var empty_field = false
     //@StateObject var viewModel = SignInViewModel()
     @Binding var path: NavigationPath
+    @Binding var isLoggedIn: Bool
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -102,14 +103,6 @@ struct SignInView: View {
     }
 }
 
-private func authenticateUser(with userData: [String: String]) {
-    // Implement your authentication logic here
-    // This replaces the problematic User object creation
-    print("Authenticating user: \(userData["username"] ?? "")")
-}
-
-
-
-#Preview {
-    SignInView(path: .constant(NavigationPath()))
-}
+//#Preview {
+//    SignInView(path: .constant(NavigationPath()))
+//}
