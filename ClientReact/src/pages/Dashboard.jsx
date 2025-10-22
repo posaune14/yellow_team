@@ -25,7 +25,6 @@ import {
     Modal
   } from '@mantine/core'
   import { ActionIcon } from '@mantine/core'
-  import emailjs from '@emailjs/browser'
   import {
     IconSettings,
     IconGauge,
@@ -920,12 +919,7 @@ import {
     )
   }
   const Volunteer = ({ onScheduleUpdate })=> {
-    // EmailJS configuration
-    const EMAILJS_SERVICE_ID = 'service_75uj6cx';
-    const EMAILJS_TEMPLATE_ID = import.meta.env?.VITE_EMAILJS_TEMPLATE_ID || 'template_schedule_update';
-    const EMAILJS_PUBLIC_KEY = import.meta.env?.VITE_EMAILJS_PUBLIC_KEY || undefined;
-
-
+    
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
     const [volunteers, setVolunteers] = useState([])
@@ -1206,97 +1200,14 @@ import {
           icon: <IconCheck size={16} />,
           autoClose: 3000,
         });
-
-        // Email the full schedule to all involved recipients
-        // Build a text representation of the schedule
-        const scheduleText = enriched.map((shift) => {
-          const vols = (shift.volunteers || []).filter(v => (v.name || '').trim() !== '')
-            .map(v => `- ${v.name}${v.role ? ` (${v.role})` : ''}`)
-            .join('\n');
-          return `${shift.time} — ${shift.shift}\n${vols || '- No volunteers assigned'}`;
-        }).join('\n\n');
-
-        // Resolve recipient emails from enriched schedule entries first; fallback to volunteers list
-        const nameToEmail = new Map();
-        for (const sh of enriched) {
-          for (const v of sh.volunteers || []) {
-            const nm = (v.name || '').trim();
-            if (nm && (v.email || '').trim()) nameToEmail.set(nm, v.email);
-          }
-        }
-        for (const v of volunteers) {
-          const full = `${v.first_name} ${v.last_name}`.trim();
-          if (full && v.email && !nameToEmail.has(full)) nameToEmail.set(full, v.email);
-        }
-        const recipients = new Set();
-        for (const shift of enriched) {
-          for (const v of shift.volunteers || []) {
-            const nm = (v.name || '').trim();
-            const email = nameToEmail.get(nm);
-            if (email) recipients.add(email);
-          }
-        }
-
-        // No recipients -> skip sending
-        if (recipients.size === 0) {
-          notifications.show({
-            title: 'Schedule Saved',
-            message: 'No emails found for assigned volunteers; skipped email sending.',
-            color: 'orange',
-            icon: <IconInfoCircle size={16} />,
-            autoClose: 3000,
-          });
-          return;
-        }
-
-        const dateLabel = new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-
-        const sends = Array.from(recipients).map((toEmail) => {
-          const params = {
-            to_email: toEmail,
-            date: dateLabel,
-            schedule_text: scheduleText,
-            subject: `Volunteer Schedule — ${dateLabel}`,
-          };
-          return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY);
-        });
-
-        Promise.allSettled(sends).then((results) => {
-          const failed = results.filter(r => r.status === 'rejected').length;
-          if (failed === 0) {
-            notifications.show({
-              title: 'Schedule Emails Sent',
-              message: `Emailed the schedule to ${recipients.size} recipient(s).`,
-              color: 'green',
-              icon: <IconCheck size={16} />,
-              autoClose: 3000,
-            });
-          } else {
-            notifications.show({
-              title: 'Some Emails Failed',
-              message: `Sent ${recipients.size - failed}, failed ${failed}. Check EmailJS config.`,
-              color: 'orange',
-              icon: <IconInfoCircle size={16} />,
-              autoClose: 4000,
-            });
-          }
-        }).catch(() => {
-          notifications.show({
-            title: 'Email Error',
-            message: 'Failed to send schedule emails. Verify EmailJS keys/template.',
-            color: 'red',
-            icon: <IconInfoCircle size={16} />,
-            autoClose: 4000,
-          });
-        });
       } catch (e) {
-        notifications.show({
-          title: 'Email Error',
-          message: 'Unexpected error building or sending schedule emails.',
-          color: 'red',
-          icon: <IconInfoCircle size={16} />,
-          autoClose: 4000,
-        });
+      notifications.show({
+        title: 'Save Error',
+        message: 'Failed to save schedule. Please try again.',
+        color: 'red',
+        icon: <IconInfoCircle size={16} />,
+        autoClose: 4000,
+      });
       }
     };
 
