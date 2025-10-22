@@ -19,7 +19,7 @@ struct HomeView: View {
             ScrollView{
                 VStack{
                     //for notification testing
-                    Button(action: {
+                    /*Button(action: {
                         // Request permission and schedule the notification
                         delegate.testNotification()
                     }) {
@@ -28,7 +28,7 @@ struct HomeView: View {
                             .background(Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(10)
-                    }
+                    }*/
                 
                     NavView(path: $path)
                     LocalPantryView()
