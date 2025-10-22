@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct SignUpView: View {
     @Binding var path: NavigationPath
@@ -23,6 +24,8 @@ struct SignUpView: View {
     //alert
     @State var alert_message = ""
     @State var show_alert = false
+    let notificationCenter = UNUserNotificationCenter.current()
+    
     var body: some View {
         VStack(alignment: .leading){
             Text("Create Your Account")
@@ -151,6 +154,6 @@ struct SignUpView: View {
     }
 
 
-#Preview {
+/*#Preview {
     SignUpView(path: .constant(NavigationPath()))
-}
+}*/
