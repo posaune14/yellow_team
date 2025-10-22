@@ -16,6 +16,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         // register device to receive push notifications
         application.registerForRemoteNotifications()
         
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]){permission, error in
+            if permission {
+                print("Notification permission granted.")
+            } else {}
+        }
         // setting the notification delegate
         UNUserNotificationCenter.current().delegate = self
         
