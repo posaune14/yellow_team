@@ -59,7 +59,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     func findPantries(){
         //defining map and query
         let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = "food bank"
+        request.naturalLanguageQuery = "food bank, food pantry"
         request.region = MKCoordinateRegion(center: lastKnownLocation ?? CLLocationCoordinate2D(latitude: 40.4578517, longitude: -74.6598009), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         
         //search
@@ -70,15 +70,26 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                 return
         }
             let mapItems = response.mapItems
-            self.pantries = mapItems
+            
+            //trying to remove convenience stores and other food related places
+            let filteredPantries = mapItems.filter { item in
+                if let category = item.pointOfInterestCategory {
+                    if category == .restaurant || category == .foodMarket {
+                        return false
+                    }
+                }
+                return true
+            }
+
+            self.pantries = filteredPantries
             print(self.pantries)
             print(self.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 40, longitude: -74))
             
             //display name, image, and hours
-            /*self.pantries.sort(by: {
+            self.pantries.sort(by: {
                 $0.placemark.location?.distance(from: CLLocation(latitude: self.lastKnownLocation?.latitude ?? 40.4578517, longitude: self.lastKnownLocation?.longitude ?? -74.6598009)) ?? 1000
                 < $1.placemark.location?.distance(from: CLLocation(latitude: self.lastKnownLocation?.latitude ?? 40.4578517, longitude: self.lastKnownLocation?.longitude ?? -74.6598009)) ?? 1000
-            })*/
+            })
             /*var distancePantries = pantries.map{pantryLocation -> (pantryLocation: pantry, distance: CLLocationDistance) in
                 let pantryLocation = CLLocation(latitude: pantry.latitude, longitude: pantry.longitude)
                 let distance = lastKnownLocation.distance(from: pantryLocation)
@@ -88,7 +99,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
         }
     }
     
-    func generateSnapshot(for coordinate: CLLocationCoordinate2D, size: CGSize = CGSize(width: 300, height: 200), completion: @escaping (UIImage?) -> Void) {
+    func generateSnapshot(for coordinate: CLLocationCoordinate2D, size: CGSize = CGSize(width: 200, height: 200), completion: @escaping (UIImage?) -> Void) {
         let options = MKMapSnapshotter.Options()
         options.region = MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         options.size = size
@@ -101,7 +112,30 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                 completion(nil)
                 return
             }
-            completion(snapshot.image)
+            //code to get pin on the snapshot
+            let image = snapshot.image
+            let point = snapshot.point(for: coordinate)
+
+            let format = UIGraphicsImageRendererFormat.default()
+            format.scale = image.scale
+
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+
+            let finalImage = renderer.image { context in
+                image.draw(at: .zero)
+                let marker = MKMarkerAnnotationView(annotation: nil, reuseIdentifier: nil)
+                marker.markerTintColor = .red
+                marker.glyphImage = UIImage()
+                marker.bounds = CGRect(x: 0, y: 0, width: 12, height: 12)
+                let markerRenderer = UIGraphicsImageRenderer(size: marker.bounds.size)
+                let markerImage = markerRenderer.image { _ in
+                    marker.drawHierarchy(in: marker.bounds, afterScreenUpdates: true)
+                }
+                
+                markerImage.draw(at: point)
+            }
+
+            completion(finalImage)
         }
     }
 }

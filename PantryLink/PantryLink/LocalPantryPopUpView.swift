@@ -18,7 +18,7 @@ struct LocalPantryPopUpView: View{
             Text(pantryAddress)
             Text(pantryNumber)
             if let pantryURL{
-                Link("Website: ", destination: pantryURL)
+                Link("Website Link", destination: pantryURL)
             } else {
                 Text("No link available")
             }

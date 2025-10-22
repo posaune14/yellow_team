@@ -28,21 +28,22 @@ struct LocalPantryView: View {
                     .bold()
                     .foregroundColor(.white)
                     .font(.title)
+                    .padding(.bottom, 0)
                 TabView{
                     ForEach(location.pantries, id: \.self) { pantry in
-                        VStack{
+                        VStack(spacing: 20){
                             SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)
                                 .frame(width: 200, height: 200)
                                 .cornerRadius(10)
                             Button(action: {
                                 popUp = true
-                                print(pantry.address)
-                                   })
+                                })
                             {
-                                Text(pantry.name ?? "none")
-                            }
+                                Text(pantry.name ?? "none").frame(maxWidth: 300)
+                            }.padding(.bottom, 40)
+                             .frame(maxWidth: 300)
                         }.sheet(isPresented: $popUp){
-                            LocalPantryPopUpView(pantryAddress: pantry.address, pantryNumber: pantry.phoneNumber ?? "none", pantryURL: pantry.url)
+                            LocalPantryPopUpView(pantryAddress: ("\(pantry.placemark.subThoroughfare ?? "") \(pantry.placemark.thoroughfare ?? "") \(pantry.placemark.locality ?? "") \(pantry.placemark.administrativeArea ?? "") \(pantry.placemark.postalCode ?? "")"), pantryNumber: pantry.phoneNumber ?? "none", pantryURL: pantry.url).presentationDetents([.fraction(1/4)])
                         }
                     }
                 }
@@ -52,31 +53,6 @@ struct LocalPantryView: View {
         }.onAppear{
             location.checkLocationAuthorization()
             location.findPantries()
-        }
-    }
-}
-
-struct SnapshotImageView: View {
-    let coordinate: CLLocationCoordinate2D
-    @State private var snapshot: UIImage?
-    @StateObject var location: LocationManager
-
-    var body: some View {
-        Group {
-            if let image = snapshot {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                ProgressView()
-            }
-        }
-        .onAppear {
-            if snapshot == nil {
-                location.generateSnapshot(for: coordinate) { image in
-                    self.snapshot = image
-                }
-            }
         }
     }
 }
