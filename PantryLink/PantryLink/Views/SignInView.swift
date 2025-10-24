@@ -56,25 +56,32 @@ struct SignInView: View {
         Spacer()
             .frame(height: 100)
         Button(action: {
-            print("Sign In")
-            guard !username.isEmpty, !password.isEmpty else {
-                empty_field = true
-                alert_message = "Please fill in all fields"
-                show_alert = true
-                return
+            Task{
+                print("Sign In")
+                guard !username.isEmpty, !password.isEmpty else {
+                    empty_field = true
+                    alert_message = "Please fill in all fields"
+                    show_alert = true
+                    print("Fill in all fields")
+                    return
+                }
+                
+                // Create user object for authentication
+                let authData = AuthData(
+                    username: username,
+                    password: password
+                )
+                
+                // Call your authentication function here
+                let loggedIn = await login_user(authData: authData)
+                
+                if loggedIn == true{
+                    // Navigate to home on successful sign in
+                    path.append("Home")
+                }
+                
             }
             
-            // Create user object for authentication
-            let userData = [
-                "username": username,
-                "password": password
-            ]
-            
-            // Call your authentication function here
-            authenticateUser(with: userData)
-            
-            // Navigate to home on successful sign in
-            path.append("Home")
         }) {
             Text("Sign In")
                 .frame(width: 350, height: 40)
@@ -93,7 +100,7 @@ struct SignInView: View {
                 //.fontWeight(.bold)
                     Button("Don't Have An Account? Create One Today") {
                         print("Sign up button pressed")
-                        path.removeLast() // Go back to sign in view
+                        path.append("SignUp") // Go back to sign in view
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.orange) // Changed from .flexibleBlue
