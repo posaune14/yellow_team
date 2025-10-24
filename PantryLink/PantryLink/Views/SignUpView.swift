@@ -96,28 +96,33 @@ struct SignUpView: View {
                 .frame(height:60)
             
             Button(action: {
-                guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
-                    empty_field = true
-                    alert_message = "Please fill in all required fields"
-                    show_alert = true
-                    return
+                Task{
+                    guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
+                        empty_field = true
+                        alert_message = "Please fill in all required fields"
+                        show_alert = true
+                        return
+                    }
+                    
+                    // Create user data dictionary instead of User object to avoid conflicts
+                    let userData = User(
+                        username: username,
+                        password: password,
+                        first_name: first_name,
+                        last_name: last_name,
+                        email: email,
+                        phone_number: phone_number
+                    )
+                    
+                    // Call your signup function
+                    let loggedIn = await signUp(user: userData)
+                    
+                    if (loggedIn == true){
+                        // Navigate after successful signup
+                        path.append("Home")
+                    }
                 }
                 
-                // Create user data dictionary instead of User object to avoid conflicts
-                let userData = [
-                    "firstname": first_name,
-                    "lastname": last_name,
-                    "email": email,
-                    "username": username,
-                    "password": password,
-                    "phonenumber": phone_number
-                ]
-                
-                // Call your signup function
-                signUpUser(with: userData)
-                
-                // Navigate after successful signup
-                path.append("Home")
             }) {
                 Text("Sign Up")
                     .frame(width: 350, height: 40)
@@ -146,11 +151,6 @@ struct SignUpView: View {
                 }
             
         }
-    }
-    private func signUpUser(with userData: [String: String]) {
-        // Implement your signup logic here
-        // This replaces the problematic User object creation
-        print("Signing up user: \(userData["username"] ?? "")")
     }
 
 
