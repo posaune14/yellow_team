@@ -15,11 +15,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     //testing only, no back end connection
     func testNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "Test Notification"
-        content.body = "This is a test notification."
+        content.title = "Flemington Area Food Pantry Alert"
+        content.body = "Items have been restocked"
         content.sound = .default
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "testNotification", content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { error in

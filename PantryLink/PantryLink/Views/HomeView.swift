@@ -18,23 +18,24 @@ struct HomeView: View {
                 .ignoresSafeArea()
             ScrollView{
                 VStack{
-                    //for notification testing
-                    /*Button(action: {
-                        // Request permission and schedule the notification
-                        delegate.testNotification()
-                    }) {
-                        Text("Send Test Notification")
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }*/
                 
                     NavView(path: $path)
                     LocalPantryView()
                         .padding()
                     StreamView()
                         .padding()
+                    //for notification testing
+                    Button(action: {
+                        // Request permission and schedule the notification
+                        delegate.testNotification()
+                        print("test")
+                    }) {
+                        Text("Send Test Notification")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
             }
             .padding(1.0)
