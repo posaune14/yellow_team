@@ -15,7 +15,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     //testing only, no back end connection
     func testNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "New Alert from Flemington Area Food Pantry"
+        content.title = "Flemington Area Food Pantry Alert"
         content.body = "Items have been restocked"
         content.sound = .default
 
