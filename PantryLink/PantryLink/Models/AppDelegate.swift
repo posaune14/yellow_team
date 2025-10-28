@@ -15,8 +15,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     //testing only, no back end connection
     func testNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "Test Notification"
-        content.body = "This is a test notification."
+        content.title = "New Alert from Flemington Area Food Pantry"
+        content.body = "Items have been restocked"
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
