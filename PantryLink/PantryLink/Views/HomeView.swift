@@ -28,6 +28,7 @@ struct HomeView: View {
                     Button(action: {
                         // Request permission and schedule the notification
                         delegate.testNotification()
+                        print("test")
                     }) {
                         Text("Send Test Notification")
                             .padding()

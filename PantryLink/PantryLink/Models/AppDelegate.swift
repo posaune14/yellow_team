@@ -19,7 +19,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         content.body = "Items have been restocked"
         content.sound = .default
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "testNotification", content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { error in
