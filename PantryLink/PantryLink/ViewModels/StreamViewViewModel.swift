@@ -11,7 +11,7 @@ import Foundation
 class StreamViewViewModel: ObservableObject{
     // GetResponseData comes from StreamViewViewModel.swift file
     func getStreams() async throws -> GetResponseData {
-        guard let url = URL(string: "http://127.0.0.1:3000/pantry") else{
+        guard let url = URL(string: "https://yellow-team.onrender.com/pantry") else{
             fatalError("Invalid URL")
         }
         
