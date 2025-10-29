@@ -31,18 +31,18 @@ struct PantryAlertView: View {
                         .font(.title3)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 
-                HStack{
+                VStack{
                     
                         Text("Announcement: ")
                             .font(.title2)
                             .fontWeight(.bold)
                             
                         
-                        VStack{
+                       
                             Text(message)
                                 .font(.title3)
     //                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
                 }.frame(maxWidth:.infinity,alignment: .leading)
                 
                 
