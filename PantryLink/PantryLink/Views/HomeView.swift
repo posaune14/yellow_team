@@ -14,7 +14,7 @@ struct HomeView: View {
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.stockLightTan)
+                .fill(Color.white)
                 .ignoresSafeArea()
             ScrollView{
                 VStack{
