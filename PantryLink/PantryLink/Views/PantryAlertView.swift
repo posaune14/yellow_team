@@ -19,28 +19,28 @@ struct PantryAlertView: View {
                 
         ZStack(alignment: .top) {
                 RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.gray.opacity(0.067))
+                .fill(Color.white.opacity(0.85))
                 
             VStack(spacing:8) {
                     //message header with name of pantry
                     Text(pantryName)
-                        .font(.title2)
+                        .font(.title)
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(date)
-                        .font(.title3)
+                        .font(.caption)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 
-                HStack{
-                    
-                        Text("Announcement: ")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.white)
+                    .frame(width: 250, height: 70)
+                    .overlay(
                         Text(message)
-                            .font(.title3)
+                            .padding(1)
+                        .font(.headline)
 //                            .frame(maxWidth: .infinity, alignment: .leading)
-                }.frame(maxWidth:.infinity,alignment: .leading)
+                        )
+                
                 
                 
                 }.padding()

@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C00793C32E8DDDEE00F4F692 /* Exceptions for "PantryLink" folder in "PantryLink" target */ = {
+		576A0A992EB2B59000DB7E10 /* Exceptions for "PantryLink" folder in "PantryLink" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		27E68EEE2DE672D000D96EE2 /* PantryLink */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C00793C32E8DDDEE00F4F692 /* Exceptions for "PantryLink" folder in "PantryLink" target */,
+				576A0A992EB2B59000DB7E10 /* Exceptions for "PantryLink" folder in "PantryLink" target */,
 			);
 			path = PantryLink;
 			sourceTree = "<group>";
@@ -269,7 +269,6 @@
 				DEVELOPMENT_TEAM = 4LR6TS2F59;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PantryLink/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -308,7 +307,6 @@
 				DEVELOPMENT_TEAM = 4LR6TS2F59;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PantryLink/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

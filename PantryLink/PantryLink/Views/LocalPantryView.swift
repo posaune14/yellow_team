@@ -17,7 +17,7 @@ struct LocalPantryView: View {
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.stockLightTan)
+                .fill(.white)
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 25)
                 .fill(.stockDarkTan)

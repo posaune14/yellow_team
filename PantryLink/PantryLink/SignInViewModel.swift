@@ -11,7 +11,7 @@ extension SignInView {
     //allows you to edit the properties of another view/class in a different structure, lets us edit aler_message in this context
     
     func login_user(authData: AuthData) async -> Bool{
-        guard let url = URL(string: "http://127.0.0.1:3000/auth/log_in") else //change url
+        guard let url = URL(string: "https://yellow-team.onrender.com/auth/log_in") else //change url
         { return false }
         
         //request: takes inputed data, changes it to json, and sends it to the database
