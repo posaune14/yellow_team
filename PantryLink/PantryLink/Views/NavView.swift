@@ -5,7 +5,7 @@ struct NavView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 1.0, green: 0.92, blue: 0.88) // light peach background
+            Color(red: 1.0, green: 1, blue: 1) // light peach background
                 .ignoresSafeArea()
             
             HStack(spacing: 14) {
