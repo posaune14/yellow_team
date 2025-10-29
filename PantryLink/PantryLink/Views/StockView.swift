@@ -24,7 +24,7 @@ struct StockView: View{
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.stockLightTan)
+                .fill(.white)
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 15)
                 .fill(.stockDarkTan)
@@ -32,9 +32,9 @@ struct StockView: View{
                 .shadow(radius: 10)
             VStack{
                 Text("Stock")
-                    .foregroundColor(.stockRed)
+                    .foregroundColor(.white)
                     .bold()
-                    .font(.title)
+                    .font(.largeTitle)
                 ScrollView{
                     // Use this spacing for space between stock items
                     VStack(spacing:24){
@@ -54,9 +54,8 @@ struct StockView: View{
     }
 }
                                             
-/*#Preview {
+#Preview {
     StockView()
 }
-*/
 
                             

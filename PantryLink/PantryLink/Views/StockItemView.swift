@@ -18,12 +18,13 @@ struct StockItemView:View {
         ZStack{
             RoundedRectangle(cornerRadius: 30)
                 .fill(Color(red: 0.9, green: 0.9, blue: 0.9, opacity: 1.0))
-                .frame(width: 360, height: 210)
+                .frame(width: 310, height: 160)
+                
             VStack{
                 HStack{
                     Text(pantryName)
                         .fontWeight(.bold)
-                        .font(.title3)
+                        .font(.title)
                         .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3, opacity: 1.0))
                     Spacer()
                     Button(action: {
@@ -31,7 +32,7 @@ struct StockItemView:View {
                     }) {
                         HStack(spacing: 4) {
                                Text("Directions")
-                                   .font(.caption)
+                                .font(.callout)
                                Image(systemName: "arrow.triangle.turn.up.right.diamond")
                                    .font(.caption)
                            }
@@ -44,34 +45,42 @@ struct StockItemView:View {
                     HStack{
                         Text("\(ratio, format:.percent) Capacity")
                             .font(Font.title3)
-                            .foregroundColor(Color(red: 0.8, green: 0.3, blue: 0.3, opacity: 1.0))
+                            .foregroundColor(ratio < 0.5 ? .red : .green)
                         Spacer()
                     }
                     Text("Top Items:")
                     HStack{
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                            .frame(width: 120, height: 30)
-                            .overlay(
-                                Text(itemName)
-                                    .font(.caption2)
-                                
+                        Text(itemName)
+                            .font(.caption2)
+                            .lineLimit(1)               // ensures single line
+                            .fixedSize(horizontal: true, vertical: false) // avoids truncation
+                            .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
+                            .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
                             )
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                            .frame(width: 115, height: 30)
-                            .overlay(
-                                Text("Frozen Vegis")
-                                    .font(.caption)
-                                
-                            )
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                            .frame(width: 85, height: 30)
-                            .overlay(
-                                Text("Potatoes")
-                                    .font(.caption)
-                                
+
+                        
+                            Text("Tomato Soup")
+                                .font(.caption2)
+                                .lineLimit(1)               // ensures single line
+                                .fixedSize(horizontal: true, vertical: false) // avoids truncation
+                                .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
+                                .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
+                                )
+                        Text("Pasta")
+                            .font(.caption2)
+                            .lineLimit(1)               // ensures single line
+                            .fixedSize(horizontal: true, vertical: false) // avoids truncation
+                            .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
+                            .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
                             )
                     }
                     //                Text(itemName)
@@ -80,10 +89,14 @@ struct StockItemView:View {
                     //                Text("\(type)")
                     //                Text("\(ratio, format:.percent)")
                 }
+            .padding()
                 .frame(width: 310)
+                .shadow(radius: 10) 
                 
             }
+        
         }
+        
     }
 
 #Preview {
