@@ -12,24 +12,60 @@ struct PantryAlertView: View {
     let message: String
     let date: String
     var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(.white)
-            .frame(width:300, height:150)
-            .overlay(
-                VStack {
+            
+            
+            //message of pantry aligned to the left
+            
+                
+        ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(Color.gray.opacity(0.067))
+                
+            VStack(spacing:8) {
+                    //message header with name of pantry
                     Text(pantryName)
-                        .bold()
                         .font(.title2)
-                        .padding();
-                    Text(message)
-                        .font(.body)
-                    Text("Time: \(date)")
-                        .font(.body)
-                }
-            )
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(date)
+                        .font(.title3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                
+                HStack{
+                    
+                        Text("Announcement: ")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            
+                        Text(message)
+                            .font(.title3)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+                }.frame(maxWidth:.infinity,alignment: .leading)
+                
+                
+                }.padding()
+            }
+                
+            
+            //        RoundedRectangle(cornerRadius: 10)
+            //            .fill(.white)
+            //            .frame(width:300, height:150)
+            //            .overlay(
+            //                VStack {
+            //                    Text(pantryName)
+            //                        .bold()
+            //                        .font(.title2)
+            //                        .padding();
+            //                    Text(message)
+            //                        .font(.body)
+            //                    Text("Time: \(date)")
+            //                        .font(.body)
+            //                }
+            //            )
+        
     }
 }
 
-//#Preview {
-//    PantryAlertView()
-//}
+#Preview {
+    PantryAlertView(pantryName: "Pantry 1", message: "hello ", date: "10/14/25")
+}
