@@ -19,7 +19,7 @@ struct StreamView: View {
     var body: some View {
         ZStack {
             //new colors I created for stock are in dark mode branch, so make sure I (or you) add them
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 25)
                 .fill(.stockDarkTan)
                 .frame(width: 350, height: 700)
                 .shadow(radius: 10)
@@ -27,7 +27,7 @@ struct StreamView: View {
                 VStack(spacing: 10){
                     Text("Stream")
                         .bold()
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                         .font(.title)
                     
                     if pantries != nil {
