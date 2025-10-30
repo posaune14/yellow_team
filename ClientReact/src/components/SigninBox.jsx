@@ -11,8 +11,8 @@ function SigninBox() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     
-    // API Base URL - corrected to match server port
-    const API_BASE_URL = 'http://localhost:3000';
+    // API Base URL - point to Render deployment
+    const API_BASE_URL = 'https://yellow-team.onrender.com';
     
     const handleSignIn = async() => {
         if (!username.trim() || !password.trim()) {
