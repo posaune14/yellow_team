@@ -37,13 +37,15 @@ function SigninBox() {
                 // Store the access token
                 localStorage.setItem('token', response.data.access_token);
                 localStorage.setItem('refresh_token', response.data.refresh_token);
-                // Handle both user_database and pantry_database responses
-                const userData = response.data.user_database || response.data.pantry_database;
-                localStorage.setItem('user_data', JSON.stringify(userData));
+                // Handle possible response shapes
+                const userData = response.data.user || response.data.user_database || response.data.pantry_database;
+                if (userData) {
+                    localStorage.setItem('user_data', JSON.stringify(userData));
+                }
                 
                 notifications.show({
                     title: 'Welcome!',
-                    message: `Welcome back, ${userData.username}!`,
+                    message: `Welcome back, ${(userData && userData.username) || username}!`,
                     color: 'green',
                     icon: <IconCheck size={16} />,
                     autoClose: 3000,
