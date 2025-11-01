@@ -9,10 +9,12 @@ import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 
 createRoot(document.getElementById('root')).render(
-  <MantineProvider>
-    <Notifications />
-    <StrictMode>
-      <App />
-    </StrictMode>
-  </MantineProvider>
+  <>                      
+    <MantineProvider>
+      <Notifications />
+      <StrictMode>
+        <App />
+      </StrictMode>
+    </MantineProvider>  
+  </>
 )

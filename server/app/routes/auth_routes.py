@@ -62,7 +62,7 @@ def refresh():
 
         return jsonify({"access_token": new_access_token}), 200
     except Exception as error:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(error)}), 400
 
         
         

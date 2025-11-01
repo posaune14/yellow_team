@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, current_app, request
 from app.models.pantry import pantry_model
 from bson import ObjectId
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 pantry_routes = Blueprint("pantry_routes", __name__)
 
@@ -32,18 +33,47 @@ def create_pantry():
         }
     ),201
 
+@pantry_routes.route("/reset_password_by_username", methods=["POST"])
+def reset_password_by_username():
+    try:
+        data = request.get_json()
+        username = data.get("username")
+        new_password = data.get("new_password")
+        if not username or not new_password:
+            return jsonify({"message": "username and new_password required"}), 400
+
+        bcrypt = Bcrypt(current_app)
+        hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+        # Update by username
+        model = pantry_model(current_app.mongo)
+        # Direct update on collection since model doesn't have a dedicated method
+        result = model.collection.update_one({"username": username}, {"$set": {"password": hashed}})
+        if result.matched_count == 0:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Password reset"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error resetting password", "error": str(e)}), 400
+
 @pantry_routes.route("/update/<string:pantry_id>", methods=["PUT"])
 def update_pantry(pantry_id):
     try:
         data = request.get_json()
+        bcrypt = Bcrypt(current_app)
 
         update_data = {
             "name": data["name"],
             "address": data["address"], 
             "email": data["email"],
             "phone_number": data["phone_number"],
-            "password": data["password"],
         }
+        # Update password only if provided and non-empty; ensure it stays hashed
+        new_password = data.get("password")
+        if new_password:
+            # If it's not already a bcrypt hash, hash it
+            if not (isinstance(new_password, str) and new_password.startswith(("$2a$", "$2b$", "$2y$"))):
+                new_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            update_data["password"] = new_password
         
         # Only include stock if it's provided
         if "stock" in data:
@@ -193,6 +223,62 @@ def delete_inventory_item(pantry_id, item_name):
     except Exception as e:
         return jsonify({"message": "Error deleting inventory item", "error": str(e)}), 400
 
+# --- Volunteer Schedule Routes ---
+@pantry_routes.route("/<string:pantry_id>/schedule", methods=["GET"])
+def get_schedule_for_date(pantry_id):
+    """Get volunteer schedule for a specific date key (YYYY-MM-DD) via query param 'date'"""
+    try:
+        date_key = request.args.get("date")
+        if not date_key:
+            return jsonify({"message": "Missing 'date' query parameter (YYYY-MM-DD)"}), 400
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        # Lazy cleanup of past schedules
+        today_key = datetime.utcnow().strftime("%Y-%m-%d")
+        try:
+            model.cleanup_past_schedules(pantry_id, today_key)
+        except Exception:
+            pass
+        schedule = model.get_schedule_for_date(pantry_id, date_key)
+        return jsonify({"date": date_key, "schedule": schedule}), 200
+    except Exception as e:
+        return jsonify({"message": "Error getting schedule", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/schedule/<string:date_key>", methods=["PUT"])
+def put_schedule_for_date(pantry_id, date_key):
+    """Replace volunteer schedule for date_key (YYYY-MM-DD). Body: { schedule: [...] }"""
+    try:
+        data = request.get_json() or {}
+        schedule = data.get("schedule", [])
+        if not isinstance(schedule, list):
+            return jsonify({"message": "'schedule' must be an array"}), 400
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        # Lazy cleanup of past schedules prior to save
+        today_key = datetime.utcnow().strftime("%Y-%m-%d")
+        try:
+            model.cleanup_past_schedules(pantry_id, today_key)
+        except Exception:
+            pass
+        ok = model.save_schedule_for_date(pantry_id, date_key, schedule)
+        if not ok:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Schedule saved"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error saving schedule", "error": str(e)}), 400
+
+@pantry_routes.route("/<string:pantry_id>/schedule/<string:date_key>", methods=["DELETE"])
+def delete_schedule_for_date(pantry_id, date_key):
+    """Delete volunteer schedule for date_key (YYYY-MM-DD)."""
+    try:
+        pantry_id = ObjectId(pantry_id)
+        model = pantry_model(current_app.mongo)
+        ok = model.delete_schedule_for_date(pantry_id, date_key)
+        if not ok:
+            return jsonify({"message": "Pantry not found"}), 404
+        return jsonify({"message": "Schedule deleted"}), 200
+    except Exception as e:
+        return jsonify({"message": "Error deleting schedule", "error": str(e)}), 400
 @pantry_routes.route("/", methods=["GET"])
 def get_pantries():
     try:

@@ -125,6 +125,47 @@ class pantry_model:
         self.collection.update_one({"_id": pantry_id}, {"$pull": {"stream": None}})
         pantry = self.collection.find_one({"_id": pantry_id}, {"stream": 1, "_id": 0})
         return pantry.get("stream", [])
+
+    # --- Volunteer Schedules ---
+    def get_schedule_for_date(self, pantry_id, date_key: str):
+        """Return schedule array for a specific date key (YYYY-MM-DD)."""
+        pantry = self.collection.find_one(
+            {"_id": pantry_id},
+            {f"schedules.{date_key}": 1, "_id": 0}
+        )
+        schedules = pantry.get("schedules", {}) if pantry else {}
+        return schedules.get(date_key, [])
+
+    def save_schedule_for_date(self, pantry_id, date_key: str, schedule_array):
+        """Save schedule array for a specific date key (YYYY-MM-DD)."""
+        result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$set": {f"schedules.{date_key}": schedule_array}}
+        )
+        return result.matched_count > 0
+
+    def delete_schedule_for_date(self, pantry_id, date_key: str):
+        """Delete schedule for a specific date key (YYYY-MM-DD)."""
+        result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$unset": {f"schedules.{date_key}": ""}}
+        )
+        return result.matched_count > 0
+
+    def cleanup_past_schedules(self, pantry_id, today_key: str) -> int:
+        """Unset any schedules with a key older than today_key (YYYY-MM-DD). Returns number removed."""
+        pantry = self.collection.find_one({"_id": pantry_id}, {"schedules": 1})
+        if not pantry:
+            return 0
+        schedules = pantry.get("schedules")
+        if not isinstance(schedules, dict):
+            return 0
+        to_remove = [k for k in schedules.keys() if isinstance(k, str) and k < today_key]
+        if not to_remove:
+            return 0
+        unset_spec = {f"schedules.{k}": "" for k in to_remove}
+        self.collection.update_one({"_id": pantry_id}, {"$unset": unset_spec})
+        return len(to_remove)
     
     def get_pantries(self):
         """Swift stream view functionality"""
