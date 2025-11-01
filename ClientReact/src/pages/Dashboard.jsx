@@ -41,7 +41,7 @@ import {
   import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
-  const API_BASE_URL = 'http://localhost:3000';
+  const API_BASE_URL = 'https://yellow-team.onrender.com';
   const getPantryId = () => {
     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
     return userData._id;
@@ -318,7 +318,7 @@ import {
       </Grid.Col>
     )
   }
-  const Inventory = ()=> {
+  const Inventory = ({ foodBankName })=> {
     
     //maybe use a switch?
     const [sort, setSort] = useState("") 
@@ -685,7 +685,7 @@ import {
         align="center"
         direction="row"
         wrap="wrap">
-          <Text>TASK's Inventory</Text>
+          <Text>{`${foodBankName}'s Inventory`}</Text>
           <Group gap="md">
             <Button 
               variant="light" 
@@ -918,8 +918,8 @@ import {
       </>
     )
   }
-  const Volunteer = ({ onScheduleUpdate })=> {
-    
+  const Volunteer = ({ onScheduleUpdate, foodBankName })=> {
+
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
     const [volunteers, setVolunteers] = useState([])
@@ -1292,7 +1292,7 @@ import {
     return(
       <>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-          <Title order={1}>TASK's Volunteer Page</Title>
+          <Title order={1}>{`${foodBankName}'s Volunteer Page`}</Title>
         </Paper>
         <Grid>
           <Grid.Col span={6}>
@@ -2080,9 +2080,9 @@ import {
                   volunteerSchedule={volunteerSchedule} 
                 />;
               case 'inv':
-                return <Inventory />;
+                return <Inventory foodBankName={foodBankName} />;
               case 'vol':
-                return <Volunteer onScheduleUpdate={handleScheduleUpdate} />;
+                return <Volunteer onScheduleUpdate={handleScheduleUpdate} foodBankName={foodBankName} />;
               case 'stream':
                 return <Stream />
               default:
