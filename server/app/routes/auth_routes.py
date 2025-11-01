@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 
 auth_routes = Blueprint("auth_routes", __name__)
 
-@auth_routes.route("/log_in/", methods=["POST"])
+@auth_routes.route("/log_in", methods=["POST"])
 
 def log_in(): 
     try:
@@ -34,20 +34,16 @@ def log_in():
         is_valid = bcrypt.check_password_hash(hashed_password, password)
         if is_valid and user_database["username"]==username:
             user_database.pop("password", None) 
-            #Generate a token
-            access_token = create_access_token(identity=username)
-            refresh_token = create_refresh_token(identity=username)
+
             return jsonify(
                 {
                     "user_database": user_database,
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-
                 }
-            )
+            ), 200
         else:
             return jsonify({"error": "Error incorrect password or username"}), 401
     except Exception as error:
+        print(error)
         return jsonify({"error": str(error)}), 400
     
 @auth_routes.route("/log_out")

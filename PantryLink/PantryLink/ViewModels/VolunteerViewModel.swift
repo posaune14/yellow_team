@@ -10,7 +10,7 @@ extension VolunteerView {
     //allows you to edit the properties of another view/class in a different structure, so in here, lets us edit alert_message
     
     func register_volunteer(volunteer: Volunteer){
-        guard let url = URL(string: "http://127.0.0.1:5000/volunteer/create") else
+        guard let url = URL(string: "https://yellow-team.onrender.com/volunteer/create") else
         { return }
         
         //request: takes inputed data, changes it to json, and sends it to the database

@@ -279,3 +279,16 @@ def delete_schedule_for_date(pantry_id, date_key):
         return jsonify({"message": "Schedule deleted"}), 200
     except Exception as e:
         return jsonify({"message": "Error deleting schedule", "error": str(e)}), 400
+@pantry_routes.route("/", methods=["GET"])
+def get_pantries():
+    try:
+        pantry = pantry_model(current_app.mongo)
+        pantries = pantry.get_pantries()
+        if pantries:
+           return jsonify({"pantries": pantries, "message":"Pantries found and sent"}), 200
+        else:
+            return jsonify({"pantries":pantries,"message": "Failed to find pantries"}), 404
+    except Exception as e:
+        return jsonify({"pantries":[],"message": "Error grabbing pantries", "error": str(e)}), 400
+
+    

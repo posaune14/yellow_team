@@ -10,9 +10,22 @@
 		27E68EEC2DE672D000D96EE2 /* PantryLink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PantryLink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		576A0A992EB2B59000DB7E10 /* Exceptions for "PantryLink" folder in "PantryLink" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 27E68EEB2DE672D000D96EE2 /* PantryLink */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		27E68EEE2DE672D000D96EE2 /* PantryLink */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				576A0A992EB2B59000DB7E10 /* Exceptions for "PantryLink" folder in "PantryLink" target */,
+			);
 			path = PantryLink;
 			sourceTree = "<group>";
 		};

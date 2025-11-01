@@ -10,9 +10,9 @@ import Foundation
 extension SignInView {
     //allows you to edit the properties of another view/class in a different structure, lets us edit aler_message in this context
     
-    func register_user(user: User){
-        guard let url = URL(string: "http://127.0.0.1:5000/auth/log_in") else //change url
-        { return }
+    func login_user(authData: AuthData) async -> Bool{
+        guard let url = URL(string: "https://yellow-team.onrender.com/auth/log_in") else //change url
+        { return false }
         
         //request: takes inputed data, changes it to json, and sends it to the database
         var request = URLRequest(url: url)
@@ -20,32 +20,17 @@ extension SignInView {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         do {
-            let jsonData = try JSONEncoder().encode(user)
+            let jsonData = try JSONEncoder().encode(authData)
             request.httpBody = jsonData
             
-            URLSession.shared.dataTask(with: request) {
-                data, response, error in
-                if let error = error{
-                    DispatchQueue.main.async {
-                        self.alert_message = "Failed to send feedback: \(error.localizedDescription)" //alert_message not set up?
-                        self.show_alert = true
-                    }
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { //is 200 correct? might change
-                    DispatchQueue.main.async {
-                        self.alert_message = "Failed with status code: \((response as? HTTPURLResponse)?.statusCode ?? 500)"  //500 or -1?
-                        self.show_alert = true
-                    }
-                    return
-                }
-                
-            }.resume()
+            let (_, response) = try await URLSession.shared.data(for: request)
+                    guard let httpResponse = response as? HTTPURLResponse else { return false }
+                    return httpResponse.statusCode == 200
         }
         
         catch{
             print("error uploading user data")
+            return false
         }
     }
 }

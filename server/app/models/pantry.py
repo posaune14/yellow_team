@@ -46,7 +46,7 @@ class pantry_model:
         # Use a simple projection; convert ObjectId to string at the route level
         return self.collection.find_one(
             {"username": username},
-            {"username": 1, "password": 1, "_id": 1},
+            {"username": 1, "password": 1, "_id": {"$toString": "$_id"}},
         )
     
     def add_inventory_item(self, pantry_id, item):
@@ -166,3 +166,55 @@ class pantry_model:
         unset_spec = {f"schedules.{k}": "" for k in to_remove}
         self.collection.update_one({"_id": pantry_id}, {"$unset": unset_spec})
         return len(to_remove)
+    
+    def get_pantries(self):
+        """Swift stream view functionality"""
+        return list(
+            self.collection.aggregate([
+                {
+                    "$addFields":{ #Calculate ratios
+                        "stock":{ #replace old stock array with new stock array
+                            "$map":{ #lets you transform element in array
+                                "input":"$stock", #current stock array
+                                "as":"s", #s represents each item in stock array
+                                "in":{ #defines what each new element will look like
+                                    "name": "$$s.name",
+                                    "current":"$$s.current",
+                                    "full":"$$s.full",
+                                    "type":"$$s.type",
+                                    "ratio":{
+                                        "$round":[
+                                            {"$divide":["$$s.current", "$$s.full"]},
+                                            1
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "$addFields":{ #sort by descending ratio
+                        "stock":{
+                            "$sortArray":{
+                                "input":"$stock",
+                                "sortBy":{
+                                    "ratio": -1
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "$project":{
+                        "_id": {"$toString": "$_id"},
+                        "name":1,
+                        "address":1,
+                        "email":1,
+                        "phone_number":1,
+                        "stock":{"$slice":["$stock", 3]}, #only get the top 3 ratio items
+                        "stream":1,
+                    }
+                }
+            ])
+        )
