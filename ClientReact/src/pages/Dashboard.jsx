@@ -41,7 +41,7 @@ import {
   import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
-  const API_BASE_URL = 'http://localhost:3000';
+  const API_BASE_URL = 'https://yellow-team.onrender.com';
   const getPantryId = () => {
     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
     return userData._id;
@@ -187,26 +187,51 @@ import {
 
  
 
-  function InvItems({ item, editing, onSave }){
+ function InvItems({ item, editing, onSave, onDelete }){
     const [currentValue, setCurrentValue] = useState(item.current)
     const [fullValue, setFullValue] = useState(item.full)
     const [isEditing, setIsEditing] = useState(false)
+    const [nameValue, setNameValue] = useState(item.name)
+    
+    useEffect(() => {
+      setNameValue(item.name)
+      setCurrentValue(item.current)
+      setFullValue(item.full)
+    }, [item.name, item.current, item.full])
     
     const handleSave = () => {
-      onSave(item.name, currentValue, fullValue)
+      onSave(item.name, nameValue, currentValue, fullValue, item.type)
       setIsEditing(false)
     }
     
     const handleCancel = () => {
       setCurrentValue(item.current)
       setFullValue(item.full)
+      setNameValue(item.name)
       setIsEditing(false)
     }
     
     return(
       <Grid.Col span={2} key={`${item.name}-${item.type}`}>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: item.current / item.full >= .35 ? '#f4fbf6' : '#fff5f5' }} >
-          <Text size="lg" color="darks">{item.name}</Text>
+          {!isEditing ? (
+            <Text size="lg" color="darks">{nameValue}</Text>
+          ) : (
+            <TextInput
+              variant="filled"
+              size="xs"
+              placeholder={item.name}
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              styles={{
+                input: {
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  fontWeight: 600
+                }
+              }}
+            />
+          )}
           {!isEditing ? (
             <Text size="xl" fw={700} style={{ color: item.current / item.full >= .35 ? 'green' : 'red' }}>
               {item.current}/{item.full}
@@ -268,23 +293,32 @@ import {
             </Stack>
           )}
           {editing && !isEditing && (
-            <Button 
-              size="xs" 
-              variant="light" 
-              color="blue" 
-              onClick={() => setIsEditing(true)}
-              mt="xs"
-              radius="sm"
-              fullWidth
-            >
-              Edit
-            </Button>
+            <Group gap="xs" mt="xs">
+              <Button 
+                size="xs" 
+                variant="light" 
+                color="blue" 
+                onClick={() => setIsEditing(true)}
+                radius="sm"
+              >
+                Edit
+              </Button>
+              <Button 
+                size="xs" 
+                variant="light" 
+                color="red" 
+                onClick={() => onDelete(item.name)}
+                radius="sm"
+              >
+                Delete
+              </Button>
+            </Group>
           )}
         </Paper>
       </Grid.Col>
     )
   }
-  const Inventory = ()=> {
+  const Inventory = ({ foodBankName })=> {
     
     //maybe use a switch?
     const [sort, setSort] = useState("") 
@@ -350,7 +384,7 @@ import {
       fetchInventory();
     }, []);
 
-    const handleSaveItem = async (itemName, current, full) => {
+    const handleSaveItem = async (originalName, newName, current, full, type) => {
       try {
         const pantryId = getPantryId();
         if (!pantryId) {
@@ -363,36 +397,141 @@ import {
           });
           return;
         }
-        
-        // Update via API
-        await axios.put(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(itemName)}`, {
-          current,
-          full
-        });
-        
-        // Update local state
-        setItems(prevItems => 
-          prevItems.map(item => 
-            item.name === itemName 
-              ? { ...item, current, full }
-              : item
+        const trimmedName = (newName || '').trim();
+        if (!trimmedName) {
+          notifications.show({
+            title: 'Error',
+            message: 'Item name cannot be empty.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        if (current > full) {
+          notifications.show({
+            title: 'Error',
+            message: 'Current quantity cannot be greater than full capacity.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        const isRenaming = originalName !== trimmedName;
+        if (isRenaming) {
+          const nameExists = items.some(i => i.name.toLowerCase() === trimmedName.toLowerCase() && i.name.toLowerCase() !== originalName.toLowerCase());
+          if (nameExists) {
+            notifications.show({
+              title: 'Error!',
+              message: 'An item with this name already exists.',
+              color: 'red',
+              icon: <IconInfoCircle size={16} />,
+              autoClose: 3000,
+              withCloseButton: true,
+            });
+            return;
+          }
+
+          // Create new item with new name
+          await axios.post(`${API_BASE_URL}/pantry/${pantryId}/inventory`, {
+            name: trimmedName,
+            current,
+            full,
+            type
+          });
+
+          // Delete old item
+          await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(originalName)}`);
+
+          // Update local state
+          setItems(prevItems => 
+            prevItems.map(item => 
+              item.name === originalName 
+                ? { ...item, name: trimmedName, current, full }
+                : item
+            )
           )
-        )
-        
-        // Show success notification
-        notifications.show({
-          title: 'Inventory Updated!',
-          message: `${itemName} quantity has been updated to ${current}/${full}`,
-          color: 'green',
-          icon: <IconCheck size={16} />,
-          autoClose: 3000,
-          withCloseButton: true,
-        })
+
+          notifications.show({
+            title: 'Item Renamed',
+            message: `Updated to ${trimmedName} — ${current}/${full}`,
+            color: 'green',
+            icon: <IconCheck size={16} />,
+            autoClose: 3000,
+            withCloseButton: true,
+          })
+        } else {
+          // Update quantities via API
+          await axios.put(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(originalName)}`, {
+            current,
+            full
+          });
+          
+          // Update local state
+          setItems(prevItems => 
+            prevItems.map(item => 
+              item.name === originalName 
+                ? { ...item, current, full }
+                : item
+            )
+          )
+          
+          notifications.show({
+            title: 'Inventory Updated!',
+            message: `${originalName} quantity has been updated to ${current}/${full}`,
+            color: 'green',
+            icon: <IconCheck size={16} />,
+            autoClose: 3000,
+            withCloseButton: true,
+          })
+        }
       } catch (error) {
         console.error('Error updating inventory item:', error);
         notifications.show({
           title: 'Error',
           message: 'Failed to update inventory item. Please try again.',
+          color: 'red',
+          icon: <IconInfoCircle size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      }
+    }
+
+    const handleDeleteItem = async (itemName) => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          notifications.show({
+            title: 'Error',
+            message: 'Pantry ID not found. Please sign in again.',
+            color: 'red',
+            icon: <IconInfoCircle size={16} />,
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        await axios.delete(`${API_BASE_URL}/pantry/${pantryId}/inventory/${encodeURIComponent(itemName)}`);
+
+        setItems(prev => prev.filter(i => i.name !== itemName));
+
+        notifications.show({
+          title: 'Item Deleted',
+          message: `${itemName} has been removed from your inventory`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+          withCloseButton: true,
+        });
+      } catch (error) {
+        console.error('Error deleting inventory item:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to delete inventory item. Please try again.',
           color: 'red',
           icon: <IconInfoCircle size={16} />,
           autoClose: 3000,
@@ -531,6 +670,9 @@ import {
     case 'Nonperishable':
       filteredItems = items.filter((item) => item.type === 'Nonperishable');
       break;
+    case 'Carbs(perishable)':
+      filteredItems = items.filter((item) => item.type === 'Carbs(perishable)');
+      break;
     default:
       filteredItems = items; 
   }
@@ -543,7 +685,7 @@ import {
         align="center"
         direction="row"
         wrap="wrap">
-          <Text>TASK's Inventory</Text>
+          <Text>{`${foodBankName}'s Inventory`}</Text>
           <Group gap="md">
             <Button 
               variant="light" 
@@ -577,7 +719,7 @@ import {
         <Select
           label="Filter"
           placeholder="Pick value"
-          data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+          data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable', 'Carbs(perishable)']}
           searchable
           clearable
           style={{width: '10rem'}}
@@ -606,6 +748,7 @@ import {
                   item={item} 
                   editing={editing} 
                   onSave={handleSaveItem}
+                  onDelete={handleDeleteItem}
                 />
               ))
             )}
@@ -654,7 +797,7 @@ import {
               <Select
                 label="Item Type"
                 placeholder="Select item type"
-                data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable']}
+                data={['Fruits', 'Vegetables', 'Proteins', 'Nonperishable', 'Carbs(perishable)']}
                 value={newItem.type}
                 onChange={(value) => setNewItem({...newItem, type: value})}
                 radius="md"
@@ -775,7 +918,7 @@ import {
       </>
     )
   }
-  const Volunteer = ({ onScheduleUpdate })=> {
+  const Volunteer = ({ onScheduleUpdate, foodBankName })=> {
 
     const [volunteerInfo, setVolunteerInfo] = useState(false)
     const [inboxInfo, setInboxInfo] = useState(false)
@@ -821,8 +964,73 @@ import {
 
     const [isEditing, setIsEditing] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+    const [scheduleByDate, setScheduleByDate] = useState({});
 
-    
+    const getDefaultSchedule = () => ([
+      {
+        id: 1,
+        time: "8:00 AM - 12:00 PM",
+        shift: "Morning Shift",
+        volunteers: []
+      },
+      {
+        id: 2,
+        time: "12:00 PM - 4:00 PM",
+        shift: "Afternoon Shift",
+        volunteers: []
+      },
+      {
+        id: 3,
+        time: "4:00 PM - 8:00 PM",
+        shift: "Evening Shift",
+        volunteers: []
+      },
+      {
+        id: 4,
+        time: "On Call",
+        shift: "Backup Volunteers",
+        volunteers: []
+      }
+    ]);
+
+    const todayKey = new Date().toISOString().slice(0, 10);
+
+    // Load schedules cache from localStorage on mount (used as fallback)
+    useEffect(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem('volunteer_schedules') || '{}');
+        setScheduleByDate(stored);
+      } catch (e) {
+        setScheduleByDate({});
+      }
+    }, []);
+
+    // Backend: fetch schedule for a date
+    const fetchScheduleForDate = async (dateKey) => {
+      try {
+        const pantryId = getPantryId();
+        if (!pantryId) {
+          setVolunteerSchedule(getDefaultSchedule());
+          return;
+        }
+        const res = await axios.get(`${API_BASE_URL}/pantry/${pantryId}/schedule`, { params: { date: dateKey } });
+        const schedule = Array.isArray(res.data?.schedule) ? res.data.schedule : getDefaultSchedule();
+        setVolunteerSchedule(schedule);
+      } catch (e) {
+        // Fallback to local cache or defaults
+        const fallback = scheduleByDate[dateKey] || getDefaultSchedule();
+        setVolunteerSchedule(fallback);
+      } finally {
+        setIsEditing(false);
+      }
+    };
+
+    // When date changes, load that day's schedule from backend (fallback to cache/default)
+    useEffect(() => {
+      fetchScheduleForDate(selectedDate);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDate]);
 
     // Fetch volunteers from backend
     const fetchVolunteers = async () => {
@@ -954,12 +1162,52 @@ import {
       setIsEditing(true);
     };
 
-    const handleSave = () => {
-      setVolunteerSchedule(editingSchedule);
-      setIsEditing(false);
-      // Update the main dashboard's volunteer schedule
-      if (onScheduleUpdate) {
-        onScheduleUpdate(editingSchedule);
+    const handleSave = async () => {
+      try {
+        // Enrich schedule with emails before saving
+        const enriched = (editingSchedule || []).map(shift => ({
+          id: shift.id,
+          time: shift.time,
+          shift: shift.shift,
+          volunteers: (shift.volunteers || []).map(v => {
+            if ((v.email || '').trim()) return v;
+            const match = volunteers.find(m => `${m.first_name} ${m.last_name}` === (v.name || ''));
+            return { name: v.name || '', role: v.role || '', email: match?.email || '' };
+          })
+        }));
+
+        const pantryId = getPantryId();
+        if (pantryId) {
+          await axios.put(`${API_BASE_URL}/pantry/${pantryId}/schedule/${selectedDate}`, { schedule: enriched });
+        }
+
+        // Persist a local cache copy as well
+        const updatedSchedules = { ...(scheduleByDate || {}) };
+        updatedSchedules[selectedDate] = enriched;
+        setScheduleByDate(updatedSchedules);
+        localStorage.setItem('volunteer_schedules', JSON.stringify(updatedSchedules));
+
+        setVolunteerSchedule(enriched);
+        setIsEditing(false);
+        if (onScheduleUpdate && selectedDate === todayKey) {
+          onScheduleUpdate(enriched);
+        }
+
+        notifications.show({
+          title: 'Schedule Saved',
+          message: `Saved schedule for ${new Date(selectedDate).toLocaleDateString()}`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+          autoClose: 3000,
+        });
+      } catch (e) {
+      notifications.show({
+        title: 'Save Error',
+        message: 'Failed to save schedule. Please try again.',
+        color: 'red',
+        icon: <IconInfoCircle size={16} />,
+        autoClose: 4000,
+      });
       }
     };
 
@@ -973,11 +1221,15 @@ import {
           shift.id === shiftId 
             ? {
                 ...shift,
-                volunteers: shift.volunteers.map((vol, idx) => 
-                  idx === volunteerIndex 
-                    ? { ...vol, [field]: value }
-                    : vol
-                )
+                volunteers: shift.volunteers.map((vol, idx) => {
+                  if (idx !== volunteerIndex) return vol;
+                  if (field === 'name') {
+                    const match = volunteers.find(v => `${v.first_name} ${v.last_name}` === value);
+                    const email = match?.email || '';
+                    return { ...vol, name: value, email };
+                  }
+                  return { ...vol, [field]: value };
+                })
               }
             : shift
         )
@@ -1040,7 +1292,7 @@ import {
     return(
       <>
         <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
-          <Title order={1}>TASK's Volunteer Page</Title>
+          <Title order={1}>{`${foodBankName}'s Volunteer Page`}</Title>
         </Paper>
         <Grid>
           <Grid.Col span={6}>
@@ -1215,7 +1467,7 @@ import {
           <Grid.Col mt={'xl'} span={6}>
             <Paper p="md" radius="lg" shadow="xs" withBorder style={{ backgroundColor: '#f1f3f5' }}>
               <Group position="apart" mb="md">
-                <Title order={3}>Today's Volunteer Schedule</Title>
+                <Title order={3}>Volunteer Schedule</Title>
                 {!isEditing ? (
                   <Button variant="light" onClick={handleEdit} size="sm">
                     Edit Schedule
@@ -1230,6 +1482,30 @@ import {
                     </Button>
                   </Group>
                 )}
+              </Group>
+
+              {/* Date selector: today + next 7 days */}
+              <Group mb="md">
+                {(() => {
+                  const options = Array.from({ length: 8 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const key = d.toISOString().slice(0, 10);
+                    const label = i === 0 ? 'Today' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+                    return { value: key, label };
+                  });
+                  return (
+                    <Select
+                      size="sm"
+                      label="Select day"
+                      value={selectedDate}
+                      onChange={(val) => val && setSelectedDate(val)}
+                      data={options}
+                      leftSection={<IconCalendar size={16} />}
+                      style={{ maxWidth: 240 }}
+                    />
+                  );
+                })()}
               </Group>
 
               {isEditing && (
@@ -1545,35 +1821,21 @@ import {
       fetchInventory();
     }, []);
     
-    // Initialize volunteer schedule with default structure
+    // Initialize dashboard's view of today's schedule from localStorage (fallback to defaults)
     useEffect(() => {
       const defaultSchedule = [
-        {
-          id: 1,
-          time: "8:00 AM - 12:00 PM",
-          shift: "Morning Shift",
-          volunteers: []
-        },
-        {
-          id: 2,
-          time: "12:00 PM - 4:00 PM",
-          shift: "Afternoon Shift",
-          volunteers: []
-        },
-        {
-          id: 3,
-          time: "4:00 PM - 8:00 PM",
-          shift: "Evening Shift",
-          volunteers: []
-        },
-        {
-          id: 4,
-          time: "On Call",
-          shift: "Backup Volunteers",
-          volunteers: []
-        }
+        { id: 1, time: "8:00 AM - 12:00 PM", shift: "Morning Shift", volunteers: [] },
+        { id: 2, time: "12:00 PM - 4:00 PM", shift: "Afternoon Shift", volunteers: [] },
+        { id: 3, time: "4:00 PM - 8:00 PM", shift: "Evening Shift", volunteers: [] },
+        { id: 4, time: "On Call", shift: "Backup Volunteers", volunteers: [] }
       ];
-      setVolunteerSchedule(defaultSchedule);
+      try {
+        const stored = JSON.parse(localStorage.getItem('volunteer_schedules') || '{}');
+        const todayKey = new Date().toISOString().slice(0, 10);
+        setVolunteerSchedule(stored[todayKey] || defaultSchedule);
+      } catch (e) {
+        setVolunteerSchedule(defaultSchedule);
+      }
     }, []);
     
     // Callback to update volunteer schedule from Volunteer component
@@ -1607,7 +1869,6 @@ import {
                 address: foodBankAddress,
                 phone_number: foodBankPhone,
                 email: foodBankEmail,
-                password: "existing_password" // We need to include password for the update endpoint
             };
             
             // Call the pantry update API
@@ -1819,9 +2080,9 @@ import {
                   volunteerSchedule={volunteerSchedule} 
                 />;
               case 'inv':
-                return <Inventory />;
+                return <Inventory foodBankName={foodBankName} />;
               case 'vol':
-                return <Volunteer onScheduleUpdate={handleScheduleUpdate} />;
+                return <Volunteer onScheduleUpdate={handleScheduleUpdate} foodBankName={foodBankName} />;
               case 'stream':
                 return <Stream />
               default:

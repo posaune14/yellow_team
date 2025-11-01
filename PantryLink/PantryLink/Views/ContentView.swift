@@ -33,13 +33,23 @@ struct Colors {
 
 struct ContentView: View {
     @State private var path = NavigationPath()
+    //creating class object
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    //gives access to appdelegate here
+    
+    //Location Authentication 
+    @StateObject private var locationManager = LocationManager()
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     
     var body: some View {
         //if logged in or not, show login view path or home path
         NavigationStack(path: $path){
-            SignInView(path: $path)
+            SignInView(path: $path, isLoggedIn: $isLoggedIn).onAppear(perform: {
+                locationManager.checkLocationAuthorization()
+                appDelegate.app = self
+            })
             .navigationDestination(for: String.self){value in
-                if value == "Home" {
+                if value == "Home"{
                     HomeView(path: $path)
                 } else if value == "Volunteer"{
                     VolunteerView(path: $path)
@@ -47,6 +57,8 @@ struct ContentView: View {
                     SignUpView(path: $path)
                 } else if value == "Stock"{
                     StockView()
+                } else if isLoggedIn{
+                    HomeView(path: $path)
                 }
             }
         }

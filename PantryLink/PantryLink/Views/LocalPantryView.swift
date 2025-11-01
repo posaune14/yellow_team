@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct LocalPantryView: View {
-    let slides: [Color] = [.red, .green, .blue, .orange, .purple]
+    @StateObject var location = LocationManager()
+    let options: MKMapSnapshotter.Options = .init()
+    @State var popUp = false
+    
     
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.stockLightTan)
+                .fill(.white)
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 25)
                 .fill(.stockDarkTan)
@@ -24,19 +28,31 @@ struct LocalPantryView: View {
                     .bold()
                     .foregroundColor(.white)
                     .font(.title)
+                    .padding(.bottom, 0)
                 TabView{
-                    Image("H_FoodBank").resizable().scaledToFit()
-                    ForEach(1..<slides.count, id: \.self) { index in
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(slides[index])
-                            .frame(height:200)
-                            .padding(40)
-                            
+                    ForEach(location.pantries, id: \.self) { pantry in
+                        VStack(spacing: 20){
+                            SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)
+                                .frame(width: 200, height: 200)
+                                .cornerRadius(10)
+                            Button(action: {
+                                popUp = true
+                                })
+                            {
+                                Text(pantry.name ?? "none").frame(maxWidth: 300)
+                            }.padding(.bottom, 40)
+                             .frame(maxWidth: 300)
+                        }.sheet(isPresented: $popUp){
+                            LocalPantryPopUpView(pantryAddress: ("\(pantry.placemark.subThoroughfare ?? "") \(pantry.placemark.thoroughfare ?? "") \(pantry.placemark.locality ?? "") \(pantry.placemark.administrativeArea ?? "") \(pantry.placemark.postalCode ?? "")"), pantryNumber: pantry.phoneNumber ?? "none", pantryURL: pantry.url).presentationDetents([.fraction(1/4)])
+                        }
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                 .frame(height: 285)
             }
+        }.onAppear{
+            location.checkLocationAuthorization()
+            location.findPantries()
         }
     }
 }

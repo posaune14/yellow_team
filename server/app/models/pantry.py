@@ -46,7 +46,7 @@ class pantry_model:
         # Use a simple projection; convert ObjectId to string at the route level
         return self.collection.find_one(
             {"username": username},
-            {"username": 1, "password": 1, "_id": 1},
+            {"username": 1, "password": 1, "_id": {"$toString": "$_id"}},
         )
     
     def add_inventory_item(self, pantry_id, item):
@@ -125,3 +125,96 @@ class pantry_model:
         self.collection.update_one({"_id": pantry_id}, {"$pull": {"stream": None}})
         pantry = self.collection.find_one({"_id": pantry_id}, {"stream": 1, "_id": 0})
         return pantry.get("stream", [])
+
+    # --- Volunteer Schedules ---
+    def get_schedule_for_date(self, pantry_id, date_key: str):
+        """Return schedule array for a specific date key (YYYY-MM-DD)."""
+        pantry = self.collection.find_one(
+            {"_id": pantry_id},
+            {f"schedules.{date_key}": 1, "_id": 0}
+        )
+        schedules = pantry.get("schedules", {}) if pantry else {}
+        return schedules.get(date_key, [])
+
+    def save_schedule_for_date(self, pantry_id, date_key: str, schedule_array):
+        """Save schedule array for a specific date key (YYYY-MM-DD)."""
+        result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$set": {f"schedules.{date_key}": schedule_array}}
+        )
+        return result.matched_count > 0
+
+    def delete_schedule_for_date(self, pantry_id, date_key: str):
+        """Delete schedule for a specific date key (YYYY-MM-DD)."""
+        result = self.collection.update_one(
+            {"_id": pantry_id},
+            {"$unset": {f"schedules.{date_key}": ""}}
+        )
+        return result.matched_count > 0
+
+    def cleanup_past_schedules(self, pantry_id, today_key: str) -> int:
+        """Unset any schedules with a key older than today_key (YYYY-MM-DD). Returns number removed."""
+        pantry = self.collection.find_one({"_id": pantry_id}, {"schedules": 1})
+        if not pantry:
+            return 0
+        schedules = pantry.get("schedules")
+        if not isinstance(schedules, dict):
+            return 0
+        to_remove = [k for k in schedules.keys() if isinstance(k, str) and k < today_key]
+        if not to_remove:
+            return 0
+        unset_spec = {f"schedules.{k}": "" for k in to_remove}
+        self.collection.update_one({"_id": pantry_id}, {"$unset": unset_spec})
+        return len(to_remove)
+    
+    def get_pantries(self):
+        """Swift stream view functionality"""
+        return list(
+            self.collection.aggregate([
+                {
+                    "$addFields":{ #Calculate ratios
+                        "stock":{ #replace old stock array with new stock array
+                            "$map":{ #lets you transform element in array
+                                "input":"$stock", #current stock array
+                                "as":"s", #s represents each item in stock array
+                                "in":{ #defines what each new element will look like
+                                    "name": "$$s.name",
+                                    "current":"$$s.current",
+                                    "full":"$$s.full",
+                                    "type":"$$s.type",
+                                    "ratio":{
+                                        "$round":[
+                                            {"$divide":["$$s.current", "$$s.full"]},
+                                            1
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "$addFields":{ #sort by descending ratio
+                        "stock":{
+                            "$sortArray":{
+                                "input":"$stock",
+                                "sortBy":{
+                                    "ratio": -1
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "$project":{
+                        "_id": {"$toString": "$_id"},
+                        "name":1,
+                        "address":1,
+                        "email":1,
+                        "phone_number":1,
+                        "stock":{"$slice":["$stock", 3]}, #only get the top 3 ratio items
+                        "stream":1,
+                    }
+                }
+            ])
+        )

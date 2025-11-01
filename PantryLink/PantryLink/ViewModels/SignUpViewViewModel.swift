@@ -10,14 +10,16 @@ import Foundation
 
 extension SignUpView{    
     
-     func signUp(user: User){
+     func signUp(user: User) async -> Bool{
         
         
         // Add new code
-        
         //Checks for URL
-        guard let url = URL(string: "http://127.0.0.1:3000") else
-        {return}
+        guard let url = URL(string: "https://yellow-team.onrender.com/user/create") else
+         {
+            print("Error with URL")
+            return false
+        }
         
         //takes inputed data and creates a request object
         var request = URLRequest(url: url)
@@ -32,32 +34,13 @@ extension SignUpView{
             //attatching JSON data to the message that is sent to the server
             request.httpBody = jsonData
             
-            //sending messege to server
-            URLSession.shared.dataTask(with: request) {
-                data, response, error in
-                if let error = error{
-                    print(error)
-//                    DispatchQueue.main.async {
-//                        self.alert_message = "Failed to send feedback: \(error.localizedDescription)"
-//                        self.show_alert = true
-//                    }
-                    return
-                }
-                //waiting for server to respond after we sent the message
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else{
-                    DispatchQueue.main.async{
-                        //self.alert_message = "Failed with status code: \((response as? HTTPURLResponse)?.statusCode ?? -1)"
-                        //self.show_alert = true
-                        print("Failed with status code")
-                    }
-                    return
-                }
-            }.resume()
+            let (_, response) = try await URLSession.shared.data(for: request)
+                    guard let httpResponse = response as? HTTPURLResponse else { return false }
+                    return httpResponse.statusCode == 201
         }
-        
         catch{
             print("error uploading user data")
+            return false
         }
-        
     }
 }
