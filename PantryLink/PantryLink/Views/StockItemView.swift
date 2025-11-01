@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct StockItemView:View {
+struct StockItemView: View {
     let pantryName: String
     let itemName: String
     let current: Int
@@ -14,90 +14,71 @@ struct StockItemView:View {
     let type: String
     let ratio: Double
     
-    var body: some View{
-        ZStack{
+    var body: some View {
+        ZStack {
             RoundedRectangle(cornerRadius: 30)
-                .fill(Color(red: 0.9, green: 0.9, blue: 0.9, opacity: 1.0))
-                .frame(width: 310, height: 160)
+                .fill(Color(red: 0.9, green: 0.9, blue: 0.9))
+                .shadow(radius: 10)
+            
+            VStack(alignment: .leading, spacing: 10) {
                 
-            VStack{
-                HStack{
+                HStack {
                     Text(pantryName)
-                        .fontWeight(.bold)
                         .font(.title)
-                        .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3, opacity: 1.0))
+                        .fontWeight(.bold)
+                        .foregroundColor(.gray)
+                    
                     Spacer()
+                    
                     Button(action: {
                         print("directions button clicked")
                     }) {
                         HStack(spacing: 4) {
-                               Text("Directions")
+                            Text("Directions")
                                 .font(.callout)
-                               Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                                   .font(.caption)
-                           }
-                            .padding(6)
-                            .background(Color.white)
-                            .foregroundColor(.black)
-                            .cornerRadius(6)
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
+                                .font(.caption)
+                        }
+                        .padding(6)
+                        .background(Color.white)
+                        .cornerRadius(6)
+                        .foregroundColor(.black)
                     }
                 }
-                    HStack{
-                        Text("\(ratio, format:.percent) Capacity")
-                            .font(Font.title3)
-                            .foregroundColor(ratio < 0.5 ? .red : .green)
-                        Spacer()
-                    }
-                    Text("Top Items:")
-                    HStack{
-                        Text(itemName)
-                            .font(.caption2)
-                            .lineLimit(1)               // ensures single line
-                            .fixedSize(horizontal: true, vertical: false) // avoids truncation
-                            .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
-                            .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                            )
-
-                        
-                            Text("Tomato Soup")
-                                .font(.caption2)
-                                .lineLimit(1)               // ensures single line
-                                .fixedSize(horizontal: true, vertical: false) // avoids truncation
-                                .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
-                                .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
-                                .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                                )
-                        Text("Pasta")
-                            .font(.caption2)
-                            .lineLimit(1)               // ensures single line
-                            .fixedSize(horizontal: true, vertical: false) // avoids truncation
-                            .padding(.horizontal, 10)   // horizontal padding inside the rounded rectangle
-                            .padding(.vertical, 5)      // vertical padding inside the rounded rectangle
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-                            )
-                    }
-                    //                Text(itemName)
-                    //                Text("\(current)")
-                    //                Text("\(full)")
-                    //                Text("\(type)")
-                    //                Text("\(ratio, format:.percent)")
-                }
-            .padding()
-                .frame(width: 310)
-                .shadow(radius: 10) 
                 
+                Text("\(ratio, format: .percent) Capacity")
+                    .font(.title3)
+                    .foregroundColor(ratio < 0.5 ? .red : .green)
+                
+                Text("Top Items:")
+                    .font(.subheadline)
+                
+                HStack(spacing: 6) {
+                    makeTag(itemName)
+                    makeTag("Tomato Soup")
+                    makeTag("Pasta")
+                }
             }
-        
+            .padding()
         }
-        
+        .frame(maxWidth: .infinity) // stretch to screen width
+        .padding(.horizontal)       // keep nice side spacing
+        .padding(.vertical, 6)
     }
+    
+    // Tag builder to reduce repetition
+    func makeTag(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
+            )
+    }
+}
 
 #Preview {
     StockItemView(
