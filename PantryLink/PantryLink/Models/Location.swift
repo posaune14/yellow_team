@@ -9,6 +9,7 @@ import Foundation
 import CoreLocation
 import MapKit
 import SwiftUI
+import Contacts
 
 final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     //controls user location
@@ -18,6 +19,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
     var manager = CLLocationManager()
     
     @Published var pantries: [MKMapItem] = []
+    @Published var montgomery = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.42146272431577, longitude: -74.70969731904897)))
     
     func checkLocationAuthorization(){
         manager.delegate = self
@@ -82,6 +84,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
             }
 
             self.pantries = filteredPantries
+            
             print(self.pantries)
             print(self.lastKnownLocation ?? CLLocationCoordinate2D(latitude: 40, longitude: -74))
             
@@ -90,6 +93,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObje
                 $0.placemark.location?.distance(from: CLLocation(latitude: self.lastKnownLocation?.latitude ?? 40.4578517, longitude: self.lastKnownLocation?.longitude ?? -74.6598009)) ?? 1000
                 < $1.placemark.location?.distance(from: CLLocation(latitude: self.lastKnownLocation?.latitude ?? 40.4578517, longitude: self.lastKnownLocation?.longitude ?? -74.6598009)) ?? 1000
             })
+            
             /*var distancePantries = pantries.map{pantryLocation -> (pantryLocation: pantry, distance: CLLocationDistance) in
                 let pantryLocation = CLLocation(latitude: pantry.latitude, longitude: pantry.longitude)
                 let distance = lastKnownLocation.distance(from: pantryLocation)
