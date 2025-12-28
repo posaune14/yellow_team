@@ -43,9 +43,9 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // App-wide background that adapts to dark mode
+            // App-wide background that adapts to dark mode - extends behind tab bar
             Colors.flexibleWhite
-                .ignoresSafeArea()
+                .ignoresSafeArea(.all)
             
             if isLoggedIn {
                 // Show main tab view when authenticated

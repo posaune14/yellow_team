@@ -40,6 +40,7 @@ struct HomePageView: View {
 //                                .cornerRadius(10)
 //                        }
                     }
+                    .padding(.bottom, 20) // Add bottom padding for tab bar
                 }
                 .padding(1.0)
             }

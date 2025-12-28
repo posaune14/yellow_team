@@ -214,12 +214,12 @@ struct VolunteerContentView: View {
                     .multilineTextAlignment(.center)
                     
                     // Opportunities Section with Excitement
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Image(systemName: "sparkles")
                                 .foregroundColor(Colors.flexibleOrange)
                                 .font(.system(size: 20))
-                            Text("Volunteer Opportunities")
+                            Text("Available Opportunities")
                                 .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(Colors.flexibleBlack)
                             Image(systemName: "sparkles")
@@ -228,6 +228,11 @@ struct VolunteerContentView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 20)
+                        
+                        Text("Here are some examples of volunteer roles you can choose from:")
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundColor(Colors.flexibleDarkGray)
+                            .padding(.horizontal, 20)
                         
                         VStack(spacing: 14) {
                             let opportunities = [
@@ -242,6 +247,9 @@ struct VolunteerContentView: View {
                             ForEach(Array(opportunities.enumerated()), id: \.element.0) { index, opportunity in
                                 OpportunityCard(title: opportunity.0, icon: opportunity.1, index: index)
                             }
+                            
+                            // "And many more!" card
+                            OpportunityCard(title: "And many more!", icon: "ellipsis.circle.fill", index: opportunities.count)
                         }
                         .padding(.horizontal, 20)
                     }
@@ -525,7 +533,7 @@ struct VolunteerContentView: View {
     }
 }
 
-// Helper view for opportunity cards - Enhanced with excitement!
+// Helper view for opportunity cards - Informational style (not clickable)
 struct OpportunityCard: View {
     let title: String
     let icon: String
@@ -539,17 +547,17 @@ struct OpportunityCard: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Colors.flexibleOrange.opacity(0.2),
-                                Colors.flexibleGreen.opacity(0.2)
+                                Colors.flexibleOrange.opacity(0.15),
+                                Colors.flexibleGreen.opacity(0.15)
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 50, height: 50)
+                    .frame(width: 45, height: 45)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(
                         LinearGradient(
                             gradient: Gradient(colors: [
@@ -563,35 +571,20 @@ struct OpportunityCard: View {
             }
             
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(Colors.flexibleBlack)
             
             Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Colors.flexibleDarkGray)
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Colors.flexibleWhite)
-                .shadow(color: Color.black.opacity(0.05), radius: 8, y: 2)
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Colors.flexibleLightGray.opacity(0.5))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Colors.flexibleOrange.opacity(0.3),
-                            Colors.flexibleGreen.opacity(0.3)
-                        ]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    lineWidth: 1
-                )
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Colors.flexibleLightGray, lineWidth: 1)
         )
     }
 }
