@@ -20,22 +20,25 @@ struct HomePageView: View {
                     .ignoresSafeArea()
                 ScrollView{
                     VStack{
+                        Text("PantryLink")
+                            .font(.title)
+                            .bold()
                         LocalPantryView()
                             .padding()
                         StreamView()
                             .padding()
                         //for notification testing
-                        Button(action: {
-                            // Request permission and schedule the notification
-                            delegate.testNotification()
-                            print("test")
-                        }) {
-                            Text("Send Test Notification")
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
+//                        Button(action: {
+//                            // Request permission and schedule the notification
+//                            delegate.testNotification()
+//                            print("test")
+//                        }) {
+//                            Text("Send Test Notification")
+//                                .padding()
+//                                .background(Color.blue)
+//                                .foregroundColor(.white)
+//                                .cornerRadius(10)
+//                        }
                     }
                 }
                 .padding(1.0)

@@ -25,12 +25,8 @@ struct StockPageView: View {
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(Colors.flexibleWhite)
-                .ignoresSafeArea()
-            RoundedRectangle(cornerRadius: 15)
                 .fill(.stockDarkTan)
-                .frame(width:350, height:650)
-                .shadow(radius: 10)
+                .ignoresSafeArea()
             VStack{
                 Text("Stock")
                     .foregroundColor(.white)
