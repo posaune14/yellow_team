@@ -95,8 +95,8 @@ struct SignInView: View {
                         
                         switch result {
                         case .success:
-                            // Navigate to home on successful sign in
-                            path.append("Home")
+                            // Mark as logged in - ContentView will show MainTabView
+                            isLoggedIn = true
                         case .failure(let errorMessage):
                             // Show error alert
                             alert_message = errorMessage
@@ -118,7 +118,7 @@ struct SignInView: View {
                 // Guest Sign In Button
                 Button(action: {
                     // Navigate to home as guest
-                    path.append("Home")
+                    isLoggedIn = true
                 }) {
                     Text("Continue as Guest")
                         .frame(width: 350, height: 40)
