@@ -88,14 +88,19 @@ struct SignInView: View {
                         )
                         
                         // Call your authentication function here
-                        let loggedIn = await login_user(authData: authData)
+                        let result = await login_user(authData: authData)
                         
                         // Hide loading overlay
                         isLoading = false
                         
-                        if loggedIn == true{
+                        switch result {
+                        case .success:
                             // Navigate to home on successful sign in
                             path.append("Home")
+                        case .failure(let errorMessage):
+                            // Show error alert
+                            alert_message = errorMessage
+                            show_alert = true
                         }
                         
                     }
@@ -109,6 +114,21 @@ struct SignInView: View {
                         .cornerRadius(10)
                 }
                 .disabled(isLoading)
+                
+                // Guest Sign In Button
+                Button(action: {
+                    // Navigate to home as guest
+                    path.append("Home")
+                }) {
+                    Text("Continue as Guest")
+                        .frame(width: 350, height: 40)
+                        .font(.system(size: 20, weight: .semibold))
+                        .background(Colors.flexibleLightGray)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .cornerRadius(10)
+                }
+                .disabled(isLoading)
+                
                 Spacer()
                     .frame(height:30)
                 HStack(spacing: 2){
@@ -150,6 +170,11 @@ struct SignInView: View {
                     )
                 }
             }
+        }
+        .alert("Sign In Error", isPresented: $show_alert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alert_message)
         }
     }
 }
