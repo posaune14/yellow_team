@@ -66,23 +66,29 @@ struct AccountView: View {
                 .frame(width: 300, height: 50)
                 .foregroundStyle(Color.flexibleLightGray)
                 .padding(.top, 50)
-                .overlay(Text("Log Out")
-                    .padding(.top, 50)
-                    .bold(true)
+                .overlay(Button{print("log out")}label:{Text("Log Out")
+                        .padding(.top, 50)
+                        .font(.title3)
+                        .bold(true)
+                        .foregroundColor(.black)
+                }
                 )
             
-            
-            
-            RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 20)
                 .fill()
                 .stroke(Color(red: 216/255, green: 82/255, blue: 82/255), lineWidth: 5)
                 .frame(width: 300, height: 50)
                 .foregroundStyle(Color(red: 255/255, green: 103/255, blue: 103/255))
                 .padding(.top, 10)
-                .overlay(Text("Delete Account")
-                    .padding(.top, 10)
-                    .bold(true)
+                .overlay(Button{print("delete account")}label:{Text("Delete Account")
+                        .padding(.top, 10)
+                        .font(.title3)
+                        .bold(true)
+                        .foregroundColor(.black)
+                }
+                                     
                 )
+            
                 
             
             

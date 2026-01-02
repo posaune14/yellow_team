@@ -20,6 +20,10 @@ struct HomePageView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
+            HStack{
+                Spacer()
+                Button{print("Account")} label:{Image(systemName: "person.crop.circle")}
+            }
             ZStack{
                 Rectangle()
                     .fill(Colors.flexibleWhite)
@@ -99,7 +103,7 @@ struct HomeView: View {
     }
 }
 
-/*#Preview {
-    HomeView()
+#Preview {
+    HomeView(path: .constant(NavigationPath()))
 }
-*/
+
