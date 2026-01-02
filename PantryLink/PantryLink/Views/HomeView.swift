@@ -12,6 +12,12 @@ struct HomePageView: View {
     @Binding var path: NavigationPath
     @StateObject var delegate = AppDelegate()
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
     var body: some View {
         NavigationStack(path: $path) {
             ZStack{
@@ -40,6 +46,7 @@ struct HomePageView: View {
 //                                .cornerRadius(10)
 //                        }
                     }
+                    .frame(maxWidth: isIPad ? 800 : .infinity)
                     .padding(.bottom, 20) // Add bottom padding for tab bar
                 }
                 .padding(1.0)

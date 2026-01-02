@@ -22,6 +22,12 @@ struct StockPageView: View {
     @StateObject var streamViewViewModel = StreamViewViewModel()
     @State var pantries: [Pantry]?
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
     var body: some View {
         ZStack{
             Rectangle()
@@ -40,8 +46,9 @@ struct StockPageView: View {
                         }
                     }
                 }
-                .frame(width: 340, height: 560)
+                .frame(width: isIPad ? 700 : 340, height: isIPad ? 700 : 560)
             }
+            .frame(maxWidth: isIPad ? 800 : .infinity)
         }
         .task{
             pantries = try? await streamViewViewModel.getStreams().pantries

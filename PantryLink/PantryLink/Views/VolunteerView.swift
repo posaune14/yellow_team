@@ -137,6 +137,12 @@ struct VolunteerContentView: View {
     
     @State private var show_success_alert = false
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
     var body: some View {
         ZStack {
             // Gradient Background
@@ -496,6 +502,7 @@ struct VolunteerContentView: View {
                     .padding(.bottom, 40)
                 }
                 .padding(.vertical, 20)
+                .frame(maxWidth: isIPad ? 800 : .infinity)
             }
         }
         .alert("Error", isPresented: $show_alert) {

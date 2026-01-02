@@ -56,6 +56,12 @@ struct StreamView: View {
     @StateObject var streamViewViewModel = StreamViewViewModel()
     @State var pantries: [Pantry]?
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
     // Computed property to get sorted alerts from all pantries
     var sortedAlerts: [StreamAlertWithPantry] {
         guard let pantries = pantries else { return [] }
@@ -79,7 +85,7 @@ struct StreamView: View {
             //new colors I created for stock are in dark mode branch, so make sure I (or you) add them
             RoundedRectangle(cornerRadius: 25)
                 .fill(.stockDarkTan)
-                .frame(width: 350, height: 700)
+                .frame(width: isIPad ? 600 : 350, height: isIPad ? 800 : 700)
                 .shadow(radius: 10)
             ScrollView{
                 VStack(spacing: 10){
@@ -107,9 +113,9 @@ struct StreamView: View {
                     }
                 }
                 .padding()
-                .frame(width:325)
+                .frame(width: isIPad ? 575 : 325)
             }
-            .frame(width:325, height: 675)
+            .frame(width: isIPad ? 575 : 325, height: isIPad ? 775 : 675)
         }.task{
             // If request succeeds we get pantries otherwise we get nil and error is ignored
             pantries = try? await streamViewViewModel.getStreams().pantries

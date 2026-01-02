@@ -14,6 +14,11 @@ struct LocalPantryView: View {
     @State var popUp1 = false
     @State var popUp2 = false
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
     
     var body: some View {
         ZStack{
@@ -22,7 +27,7 @@ struct LocalPantryView: View {
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 25)
                 .fill(.stockDarkTan)
-                .frame(width:350, height:470)
+                .frame(width: isIPad ? 600 : 350, height: isIPad ? 600 : 470)
                 .shadow(radius: 10)
             VStack{
                 Text("Local Pantries")
@@ -52,17 +57,17 @@ struct LocalPantryView: View {
                         .padding(.bottom, 10)
                         
                         SnapshotImageView(coordinate: location.montgomery.placemark.coordinate, location: location)
-                            .frame(width: 300, height: 200)
+                            .frame(width: isIPad ? 550 : 300, height: isIPad ? 350 : 200)
                             .cornerRadius(10)
                         
                         Button(action: {
                             popUp1 = true
                         })
                         {
-                            Text("Montgomery Food Pantry").frame(maxWidth: 300)
+                            Text("Montgomery Food Pantry").frame(maxWidth: isIPad ? 550 : 300)
                         }
                         .padding(.bottom, 40)
-                        .frame(maxWidth: 300)
+                        .frame(maxWidth: isIPad ? 550 : 300)
                     }
                     .sheet(isPresented: $popUp1){
                         LocalPantryPopUpView(pantryAddress: "356 Skillman Road Skillman, NJ 08558", pantryNumber: "609-446-1054", pantryURL: URL(string: "https://www.montgomerynj.gov/600/Food-Resources")).presentationDetents([.fraction(1/4)])
@@ -86,23 +91,23 @@ struct LocalPantryView: View {
                             }
                             .padding(.bottom, 10)
                             SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)
-                                .frame(width: 300, height: 200)
+                                .frame(width: isIPad ? 550 : 300, height: isIPad ? 350 : 200)
                                 .cornerRadius(10)
                             
                             Button(action: {
                                 popUp2 = true
                                 })
                             {
-                                Text(pantry.name ?? "none").frame(maxWidth: 300)
+                                Text(pantry.name ?? "none").frame(maxWidth: isIPad ? 550 : 300)
                             }.padding(.bottom, 40)
-                             .frame(maxWidth: 300)
+                             .frame(maxWidth: isIPad ? 550 : 300)
                         }.sheet(isPresented: $popUp2){
                             LocalPantryPopUpView(pantryAddress: ("\(pantry.placemark.subThoroughfare ?? "") \(pantry.placemark.thoroughfare ?? "") \(pantry.placemark.locality ?? "") \(pantry.placemark.administrativeArea ?? "") \(pantry.placemark.postalCode ?? "")"), pantryNumber: pantry.phoneNumber ?? "none", pantryURL: pantry.url).presentationDetents([.fraction(1/4)])
                         }
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                .frame(height: 355)
+                .frame(height: isIPad ? 485 : 355)
              //   .padding()
             }
         }.onAppear{

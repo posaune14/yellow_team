@@ -26,6 +26,12 @@ struct SignUpView: View {
     @State var show_alert = false
     let notificationCenter = UNUserNotificationCenter.current()
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
     var body: some View {
         ZStack {
             // Background that adapts to dark mode
@@ -40,6 +46,11 @@ struct SignUpView: View {
                         .foregroundColor(Colors.flexibleBlack)
                         .frame(maxWidth: .infinity,alignment: .leading)
                         .fontWeight(.bold)
+                }
+                .frame(maxWidth: isIPad ? 500 : .infinity)
+                .padding(20)
+                
+                VStack(alignment: .leading){
                     Spacer()
                         .frame(height: 5)
                     Text("Please enter your details to Sign Up")
@@ -144,13 +155,14 @@ struct SignUpView: View {
                         
                     }) {
                         Text("Sign Up")
-                            .frame(width: 350, height: 40)
+                            .frame(width: isIPad ? 500 : 350, height: 40)
                             .font(.system(size: 27, weight: .bold))
                             .background(Colors.flexibleOrange)
                             .foregroundColor(Colors.flexibleWhite)
                             .cornerRadius(10)
                     }
                 }
+                .frame(maxWidth: isIPad ? 500 : .infinity)
                 .padding(20)
                 
                 HStack(spacing: 0){
