@@ -32,7 +32,7 @@ def log_in():
         hashed_password = user_database["password"]
 
         is_valid = bcrypt.check_password_hash(hashed_password, password)
-        if is_valid and user_database["username"]==username:
+        if is_valid and user_database["username"].lower() == username.lower():
             user_database.pop("password", None) 
 
             return jsonify(

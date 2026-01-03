@@ -22,7 +22,8 @@ class UserModel:
         #Returns the id of the document as a string
         return str(result.inserted_id)
     def find_user_by_username(self, username):
-        user = self.collection.find_one({"username": username})
+        # Case-insensitive username lookup using regex
+        user = self.collection.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
         if user:
             user['_id'] = str(user['_id'])
         return user
