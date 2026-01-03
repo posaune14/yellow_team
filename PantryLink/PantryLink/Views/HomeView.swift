@@ -34,7 +34,7 @@ struct HomePageView: View {
                                 .font(.title)
                                 .bold()
                             Spacer()
-                            Button{print("Account")} label:{Image(systemName: "person.crop.circle")}
+                            NavigationLink{AccountView(path: $path)} label:{Image(systemName: "person.crop.circle")}
                                 .padding()
                                 .scaleEffect(2)
                                 .foregroundStyle(.black)
