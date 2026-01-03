@@ -40,6 +40,7 @@ struct ContentView: View {
     //Location Authentication 
     @StateObject private var locationManager = LocationManager()
     @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("isGuest") private var isGuest = false
     
     var body: some View {
         ZStack {
@@ -57,7 +58,7 @@ struct ContentView: View {
             } else {
                 // Show sign in view
                 NavigationStack(path: $path) {
-                    SignInView(path: $path, isLoggedIn: $isLoggedIn)
+                    SignInView(path: $path, isLoggedIn: $isLoggedIn, isGuest: $isGuest)
                         .onAppear(perform: {
                             locationManager.checkLocationAuthorization()
                             appDelegate.app = self

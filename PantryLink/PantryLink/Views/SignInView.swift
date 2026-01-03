@@ -18,6 +18,7 @@ struct SignInView: View {
     //@StateObject var viewModel = SignInViewModel()
     @Binding var path: NavigationPath
     @Binding var isLoggedIn: Bool
+    @Binding var isGuest: Bool
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
@@ -170,6 +171,7 @@ struct SignInView: View {
             Button(action: {
                 // Navigate to home as guest
                 isLoggedIn = true
+                isGuest = true
             }) {
                 Text("Continue as Guest")
                     .frame(width: isIPad ? 500 : 350, height: 40)
