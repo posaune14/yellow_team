@@ -114,14 +114,40 @@ struct SignUpView: View {
                         )
                     Spacer()
                         .frame(height: 15)
-                    TextField("Phone Number (Optional)", text: $phone_number)
-                        .foregroundColor(Colors.flexibleBlack)
-                        .padding()
-                        .background(Colors.flexibleWhite)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
-                        )
+                    // SwiftUI does not have a built-in phone number formatter or masked text field as of iOS 17. You need to manually format the input, as in the previous implementation.
+                    TextField("Phone Number (Optional)", text: Binding(
+                        get: {
+                            phone_number
+                        },
+                        set: { newValue in
+                            // Allow only numeric input and format as (111)111-1111
+                            let digits = newValue.filter { $0.isWholeNumber }
+                            let maxLength = 10
+                            let limited = digits.prefix(maxLength)
+                            var formatted = ""
+                            if limited.count > 0 {
+                                formatted += "("
+                                formatted += limited.prefix(3)
+                            }
+                            if limited.count > 3 {
+                                formatted += ")"
+                                formatted += limited.dropFirst(3).prefix(3)
+                            }
+                            if limited.count > 6 {
+                                formatted += "-"
+                                formatted += limited.dropFirst(6)
+                            }
+                            phone_number = formatted
+                        }
+                    ))
+                    .keyboardType(.numberPad)
+                    .foregroundColor(Colors.flexibleBlack)
+                    .padding()
+                    .background(Colors.flexibleWhite)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                    )
                     Spacer()
                         .frame(height:60)
                     
@@ -148,7 +174,17 @@ struct SignUpView: View {
                             let loggedIn = await signUp(user: userData)
                             
                             if (loggedIn == true){
-                               isLoggedIn = true
+                                // Store user data in UserManager (without password)
+                                let userToStore = User(
+                                    username: userData.username,
+                                    password: "", // Don't store password
+                                    first_name: userData.first_name,
+                                    last_name: userData.last_name,
+                                    email: userData.email,
+                                    phone_number: userData.phone_number
+                                )
+                                UserManager.shared.setUser(userToStore)
+                                isLoggedIn = true
                             }
                         }
                         
