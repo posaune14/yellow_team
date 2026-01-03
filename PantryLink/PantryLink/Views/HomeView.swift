@@ -20,19 +20,26 @@ struct HomePageView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            HStack{
-                Spacer()
-                Button{print("Account")} label:{Image(systemName: "person.crop.circle")}
-            }
+           
             ZStack{
                 Rectangle()
                     .fill(Colors.flexibleWhite)
                     .ignoresSafeArea()
                 ScrollView{
                     VStack{
-                        Text("PantryLink")
-                            .font(.title)
-                            .bold()
+                        HStack{
+                            Spacer()
+                            Spacer()
+                            Text("PantryLink")
+                                .font(.title)
+                                .bold()
+                            Spacer()
+                            Button{print("Account")} label:{Image(systemName: "person.crop.circle")}
+                                .padding()
+                                .scaleEffect(2)
+                                .foregroundStyle(.black)
+                    }
+                        
                         LocalPantryView()
                             .padding()
                         StreamView()
@@ -78,7 +85,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
             ScrollView{
                 VStack{
-                    NavView(path: $path)
+                   // NavView(path: $path)
                     LocalPantryView()
                         .padding()
                     StreamView()
