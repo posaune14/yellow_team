@@ -25,7 +25,7 @@ struct SignUpView: View {
     @State var alert_message = ""
     @State var show_alert = false
     let notificationCenter = UNUserNotificationCenter.current()
-    
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     var isIPad: Bool {
@@ -148,8 +148,7 @@ struct SignUpView: View {
                             let loggedIn = await signUp(user: userData)
                             
                             if (loggedIn == true){
-                                // Navigate after successful signup
-                                path.append("Home")
+                               isLoggedIn = true
                             }
                         }
                         

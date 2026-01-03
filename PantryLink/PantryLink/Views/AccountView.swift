@@ -10,11 +10,14 @@ import SwiftUI
 struct AccountView: View {
     @Binding var path: NavigationPath
     @State private var showAlert = false
+    @State private var showAlert1 = false
+    @State private var showLoader = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isGuest") private var isGuest = false
     @ObservedObject private var userManager = UserManager.shared
     var body: some View {
         NavigationStack(path: $path){
+            
             if isGuest == true{
                 VStack(){
                     Text("You are logged in as a guest.")
@@ -129,15 +132,45 @@ struct AccountView: View {
                     }
                     .alert("Delete Account", isPresented: $showAlert) {
                         Button("Delete", role: .destructive){
-                            print("Delete Account")
+                            Task {
+                                showLoader = true
+                                await deleteAccount()
+                                isLoggedIn = false
+                                showLoader = false
+                                showAlert1 = true
+                            }
+                            
                         }
                         Button("Cancel", role: .cancel){}
                     } message: {
                         Text("Are you sure you want to delete your account? This action is permanent.")
                     }
+                    .alert("Account Deleted", isPresented: $showAlert1) {
+                        Button("Dismiss", role: .cancel){}
+                    }
                     
                     
-                    
+                    if showLoader {
+                        ZStack {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                            
+                            VStack(spacing: 20) {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                
+                                Text("Deleting...")
+                                    .foregroundColor(.white)
+                                    .font(.headline)
+                            }
+                            .padding(30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(Color.black.opacity(0.8))
+                            )
+                        }
+                    }
                     
                     
                     
@@ -145,6 +178,38 @@ struct AccountView: View {
                     Spacer()
                 }
             }
+        }
+    }
+}
+
+extension AccountView {
+    func deleteAccount() async {
+        guard let username = userManager.currentUser?.username else {
+            return
+        }
+        
+        guard let url = URL(string: "https://yellow-team.onrender.com/user/delete") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let jsonData = try JSONEncoder().encode(["username": username])
+            request.httpBody = jsonData
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                await MainActor.run {
+                    userManager.clearUser()
+                    isLoggedIn = false
+                }
+            }
+        } catch {
+            print("Error deleting account: \(error)")
         }
     }
 }
