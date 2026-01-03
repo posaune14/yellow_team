@@ -27,3 +27,7 @@ class UserModel:
             user['_id'] = str(user['_id'])
         return user
     
+    def delete_user_by_username(self, username):
+        result = self.collection.delete_one({"username": username})
+        return result
+    
