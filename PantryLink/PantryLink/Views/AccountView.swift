@@ -185,10 +185,14 @@ struct AccountView: View {
 extension AccountView {
     func deleteAccount() async {
         guard let username = userManager.currentUser?.username else {
+            print("Error: No username found")
             return
         }
         
+        print("Attempting to delete account with username: '\(username)'")
+        
         guard let url = URL(string: "https://yellow-team.onrender.com/user/delete") else {
+            print("Error: Invalid URL")
             return
         }
         
@@ -200,12 +204,23 @@ extension AccountView {
             let jsonData = try JSONEncoder().encode(["username": username])
             request.httpBody = jsonData
             
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                await MainActor.run {
-                    userManager.clearUser()
-                    isLoggedIn = false
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    await MainActor.run {
+                        userManager.clearUser()
+                        isLoggedIn = false
+                    }
+                } else {
+                    // Log error response
+                    if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                        print("Delete account error response: \(errorData)")
+                    } else if let errorString = String(data: data, encoding: .utf8) {
+                        print("Delete account error response (string): \(errorString)")
+                    }
+                    print("Delete account failed with status code: \(httpResponse.statusCode)")
+                    print("Username sent: '\(username)'")
                 }
             }
         } catch {
