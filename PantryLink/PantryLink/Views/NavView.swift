@@ -22,7 +22,7 @@ struct NavView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 28)
-                .fill(Color(red: 0.97, green: 0.94, blue: 0.90)) // warm cream
+                .fill(Colors.flexibleLightGray)
                 .shadow(color: Color.black.opacity(0.05), radius: 6, y: 4)
         )
         .padding(.top, 8)
@@ -43,15 +43,15 @@ struct NavBarButton: View {
                 .background(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.98, green: 0.69, blue: 0.44), // muted peach
-                            Color(red: 0.94, green: 0.57, blue: 0.39)  // warm apricot
+                            Colors.flexibleOrange.opacity(0.9), // lighter orange
+                            Colors.flexibleOrange  // darker orange
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .clipShape(Capsule())
-                .shadow(color: Color(red: 0.94, green: 0.57, blue: 0.39).opacity(0.22),
+                .shadow(color: Colors.flexibleOrange.opacity(0.22),
                         radius: 6,
                         y: 3)
         }

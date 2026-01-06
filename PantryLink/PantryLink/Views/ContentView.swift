@@ -43,22 +43,28 @@ struct ContentView: View {
     
     var body: some View {
         //if logged in or not, show login view path or home path
-        NavigationStack(path: $path){
-            SignInView(path: $path, isLoggedIn: $isLoggedIn).onAppear(perform: {
-                locationManager.checkLocationAuthorization()
-                appDelegate.app = self
-            })
-            .navigationDestination(for: String.self){value in
-                if value == "Home"{
-                    HomeView(path: $path)
-                } else if value == "Volunteer"{
-                    VolunteerView(path: $path)
-                } else if value == "SignUp"{
-                    SignUpView(path: $path)
-                } else if value == "Stock"{
-                    StockView()
-                } else if isLoggedIn{
-                    HomeView(path: $path)
+        ZStack {
+            // App-wide background that adapts to dark mode
+            Colors.flexibleWhite
+                .ignoresSafeArea()
+            
+            NavigationStack(path: $path){
+                SignInView(path: $path, isLoggedIn: $isLoggedIn).onAppear(perform: {
+                    locationManager.checkLocationAuthorization()
+                    appDelegate.app = self
+                })
+                .navigationDestination(for: String.self){value in
+                    if value == "Home"{
+                        HomeView(path: $path)
+                    } else if value == "Volunteer"{
+                        VolunteerView(path: $path)
+                    } else if value == "SignUp"{
+                        SignUpView(path: $path)
+                    } else if value == "Stock"{
+                        StockView()
+                    } else if isLoggedIn{
+                        HomeView(path: $path)
+                    }
                 }
             }
         }

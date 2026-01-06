@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct VolunteerView: View {
+    @ObservedObject private var userManager = UserManager.shared
+    
     //form 1 data fields
     @State var first_name: String = ""
     @State var last_name: String = ""
@@ -227,7 +229,23 @@ struct VolunteerView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.brownBlack)
         .toolbarBackground(.flexibleDarkGray)
-        
+        .onAppear {
+            // Autofill form fields from logged-in user data
+            if let user = userManager.currentUser {
+                if first_name.isEmpty {
+                    first_name = user.first_name
+                }
+                if last_name.isEmpty {
+                    last_name = user.last_name
+                }
+                if email.isEmpty {
+                    email = user.email
+                }
+                if phone_number.isEmpty {
+                    phone_number = user.phone_number
+                }
+            }
+        }
     }
 }
 
