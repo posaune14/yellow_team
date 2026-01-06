@@ -7,6 +7,7 @@ import { useRef } from 'react'
 import InventoryEx from '../components/InventoryEx'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
+import Privacy from './Privacy'
 import VolunteerEx from '../components/VolunteerEx'
 import JFCS from '../assets/JFCS.png'
 import Somerset from '../assets/Somerset.png'
@@ -283,8 +284,9 @@ function Landing() {
                       
                     </Group>
                     <Text size="xs" style={{ opacity: 0.6 }} mt="md" ta="center">
-                      Copyright 2025 <a href="https://thecoderschool.com/montgomery" target="_blank" rel="noopener noreferrer" style={{color: 'white'}}>theCoderSchool Montgomery</a>. All Rights Reserved.
+                      Copyright 2025 <a href="https://thecoderschool.com/montgomery" target="_blank" rel="noopener noreferrer" style={{color: 'white'}}>theCoderSchool Montgomery</a>. All Rights Reserved.                      
                     </Text>
+                    <Link to="/privacy" style={{color: 'white'}}>Privacy Policy</Link>
                   </Paper>
                 </Container>
               </motion.div>
