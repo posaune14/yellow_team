@@ -17,6 +17,39 @@ class Pantry {
 
 //https://www.programiz.com/swift-programming/classes-objects
 //https://developer.apple.com/documentation/swiftui/foreach
+// StockPageView - Full page version for TabView
+struct StockPageView: View {
+    @StateObject var streamViewViewModel = StreamViewViewModel()
+    @State var pantries: [Pantry]?
+    
+    var body: some View {
+        ZStack{
+            Rectangle()
+                .fill(.stockDarkTan)
+                .ignoresSafeArea()
+            VStack{
+                Text("Stock")
+                    .foregroundColor(.white)
+                    .bold()
+                    .font(.largeTitle)
+                ScrollView{
+                    // Use this spacing for space between stock items
+                    VStack(spacing:24){
+                        ForEach(pantries ?? []){pantry in
+                            PantryStockCard(pantry: pantry)
+                        }
+                    }
+                }
+                .frame(width: 340, height: 560)
+            }
+        }
+        .task{
+            pantries = try? await streamViewViewModel.getStreams().pantries
+        }
+    }
+}
+
+// Legacy StockView (keeping for compatibility)
 struct StockView: View{
     @StateObject var streamViewViewModel = StreamViewViewModel()
     @State var pantries: [Pantry]?
