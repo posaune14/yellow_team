@@ -17,6 +17,46 @@ class Pantry {
 
 //https://www.programiz.com/swift-programming/classes-objects
 //https://developer.apple.com/documentation/swiftui/foreach
+// StockPageView - Full page version for TabView
+struct StockPageView: View {
+    @StateObject var streamViewViewModel = StreamViewViewModel()
+    @State var pantries: [Pantry]?
+    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
+    
+    var body: some View {
+        ZStack{
+            Rectangle()
+                .fill(.stockDarkTan)
+                .ignoresSafeArea()
+            VStack{
+                Text("Stock")
+                    .foregroundColor(.white)
+                    .bold()
+                    .font(.largeTitle)
+                ScrollView{
+                    // Use this spacing for space between stock items
+                    VStack(spacing:24){
+                        ForEach(pantries ?? []){pantry in
+                            PantryStockCard(pantry: pantry)
+                        }
+                    }
+                }
+                .frame(width: isIPad ? 700 : 340, height: isIPad ? 700 : 560)
+            }
+            .frame(maxWidth: isIPad ? 800 : .infinity)
+        }
+        .task{
+            pantries = try? await streamViewViewModel.getStreams().pantries
+        }
+    }
+}
+
+// Legacy StockView (keeping for compatibility)
 struct StockView: View{
     @StateObject var streamViewViewModel = StreamViewViewModel()
     @State var pantries: [Pantry]?
@@ -24,7 +64,7 @@ struct StockView: View{
     var body: some View {
         ZStack{
             Rectangle()
-                .fill(.white)
+                .fill(Colors.flexibleWhite)
                 .ignoresSafeArea()
             RoundedRectangle(cornerRadius: 15)
                 .fill(.stockDarkTan)
@@ -39,9 +79,7 @@ struct StockView: View{
                     // Use this spacing for space between stock items
                     VStack(spacing:24){
                         ForEach(pantries ?? []){pantry in
-                            ForEach(pantry.stock ?? []){item in
-                                StockItemView(pantryName:pantry.name,itemName:item.name,current:item.current, full:item.full, type:item.type, ratio:item.ratio)
-                            }
+                            PantryStockCard(pantry: pantry)
                         }
                     }
                 }
@@ -50,6 +88,22 @@ struct StockView: View{
         }
         .task{
             pantries = try? await streamViewViewModel.getStreams().pantries
+        }
+    }
+}
+
+// Helper view to display a single pantry's stock card
+struct PantryStockCard: View {
+    let pantry: Pantry
+    
+    var topItems: [PantryItem] {
+        guard let stock = pantry.stock, !stock.isEmpty else { return [] }
+        return Array(stock.prefix(3))
+    }
+    
+    var body: some View {
+        if !topItems.isEmpty {
+            StockItemView(pantryName: pantry.name, topItems: topItems, pantryAddress: pantry.address)
         }
     }
 }

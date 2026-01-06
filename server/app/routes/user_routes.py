@@ -56,3 +56,30 @@ def post_users():
             "_id": response 
         }
     ), 201
+
+@user_routes.route("/delete", methods=["DELETE"])
+def delete_user():
+    try:
+        data = request.get_json()
+        username = data.get("username")
+        
+        if not username:
+            return jsonify({"message": "Username is required"}), 400
+        
+        user_model = UserModel(current_app.mongo)
+        # First check if user exists (for debugging)
+        user = user_model.find_user_by_username(username)
+        print(f"Attempting to delete user with username: '{username}'")
+        print(f"User found: {user is not None}")
+        if user:
+            print(f"Actual username in DB: '{user.get('username')}'")
+        
+        result = user_model.delete_user_by_username(username)
+        
+        if result.deleted_count == 0:
+            return jsonify({"message": "User not found", "username_received": username}), 404
+        
+        return jsonify({"message": "Account deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error in delete_user: {str(e)}")
+        return jsonify({"message": "Error deleting account", "error": str(e)}), 400

@@ -40,25 +40,37 @@ struct ContentView: View {
     //Location Authentication 
     @StateObject private var locationManager = LocationManager()
     @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @AppStorage("isGuest") private var isGuest = false
     
     var body: some View {
-        //if logged in or not, show login view path or home path
-        NavigationStack(path: $path){
-            SignInView(path: $path, isLoggedIn: $isLoggedIn).onAppear(perform: {
-                locationManager.checkLocationAuthorization()
-                appDelegate.app = self
-            })
-            .navigationDestination(for: String.self){value in
-                if value == "Home"{
-                    HomeView(path: $path)
-                } else if value == "Volunteer"{
-                    VolunteerView(path: $path)
-                } else if value == "SignUp"{
-                    SignUpView(path: $path)
-                } else if value == "Stock"{
-                    StockView()
-                } else if isLoggedIn{
-                    HomeView(path: $path)
+        ZStack {
+            // App-wide background that adapts to dark mode - extends behind tab bar
+            Colors.flexibleWhite
+                .ignoresSafeArea(.all)
+            
+            if isLoggedIn {
+                // Show main tab view when authenticated
+                MainTabView()
+                    .onAppear {
+                        locationManager.checkLocationAuthorization()
+                        appDelegate.app = self
+                    }
+            } else {
+                // Show sign in view
+                NavigationStack(path: $path) {
+                    SignInView(path: $path, isLoggedIn: $isLoggedIn, isGuest: $isGuest)
+                        .onAppear(perform: {
+                            locationManager.checkLocationAuthorization()
+                            appDelegate.app = self
+                        })
+                        .navigationDestination(for: String.self) { value in
+                            if value == "SignUp" {
+                                SignUpView(path: $path)
+                            } else {
+                                // Fallback - should not reach here if login is handled properly
+                                EmptyView()
+                            }
+                        }
                 }
             }
         }

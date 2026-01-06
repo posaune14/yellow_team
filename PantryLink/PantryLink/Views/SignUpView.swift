@@ -25,133 +25,201 @@ struct SignUpView: View {
     @State var alert_message = ""
     @State var show_alert = false
     let notificationCenter = UNUserNotificationCenter.current()
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    var isIPad: Bool {
+        horizontalSizeClass == .regular
+    }
     
     var body: some View {
-        VStack(alignment: .leading){
-            Text("Create Your Account")
-                .font(.title)
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity,alignment: .leading)
-                .fontWeight(.bold)
-            Spacer()
-                .frame(height: 5)
-            Text("Please enter your details to Sign Up")
-                .foregroundColor(.gray)
-            Spacer()
-                .frame(height:25)
-            Text("Sign Up")
-                .font(.title)
-                .foregroundColor(.orange)
-                .fontWeight(.bold)
-            Spacer()
-                .frame(height: 27)
-            TextField("Username", text: $username)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height: 15)
-            SecureField("Password", text: $password)
-                .textContentType(.password)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height: 15)
-            TextField("First Name", text: $first_name)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height: 15)
-            TextField("Last Name", text: $last_name)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height: 15)
-            TextField("Email", text: $email)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height: 15)
-            TextField("Phone Number (Optional)", text: $phone_number)
-                .padding()
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.orange, lineWidth: 1.5)
-                        )
-            Spacer()
-                .frame(height:60)
+        ZStack {
+            // Background that adapts to dark mode
+            Rectangle()
+                .fill(Colors.flexibleWhite)
+                .ignoresSafeArea()
             
-            Button(action: {
-                Task{
-                    guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
-                        empty_field = true
-                        alert_message = "Please fill in all required fields"
-                        show_alert = true
-                        return
-                    }
-                    
-                    // Create user data dictionary instead of User object to avoid conflicts
-                    let userData = User(
-                        username: username,
-                        password: password,
-                        first_name: first_name,
-                        last_name: last_name,
-                        email: email,
-                        phone_number: phone_number
+            ScrollView {
+                VStack(alignment: .leading){
+                    Text("Create Your Account")
+                        .font(.title)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .frame(maxWidth: .infinity,alignment: .leading)
+                        .fontWeight(.bold)
+                }
+                .frame(maxWidth: isIPad ? 500 : .infinity)
+                .padding(20)
+                
+                VStack(alignment: .leading){
+                    Spacer()
+                        .frame(height: 5)
+                    Text("Please enter your details to Sign Up")
+                        .foregroundColor(Colors.flexibleDarkGray)
+                    Spacer()
+                        .frame(height:25)
+                    Text("Sign Up")
+                        .font(.title)
+                        .foregroundColor(Colors.flexibleOrange)
+                        .fontWeight(.bold)
+                    Spacer()
+                        .frame(height: 27)
+                    TextField("Username", text: $username)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .padding()
+                        .background(Colors.flexibleWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                        )
+                    Spacer()
+                        .frame(height: 15)
+                    SecureField("Password", text: $password)
+                        .textContentType(.password)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .padding()
+                        .background(Colors.flexibleWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                        )
+                    Spacer()
+                        .frame(height: 15)
+                    TextField("First Name", text: $first_name)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .padding()
+                        .background(Colors.flexibleWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                        )
+                    Spacer()
+                        .frame(height: 15)
+                    TextField("Last Name", text: $last_name)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .padding()
+                        .background(Colors.flexibleWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                        )
+                    Spacer()
+                        .frame(height: 15)
+                    TextField("Email", text: $email)
+                        .foregroundColor(Colors.flexibleBlack)
+                        .padding()
+                        .background(Colors.flexibleWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Colors.flexibleOrange, lineWidth: 1.5)
+                        )
+                    Spacer()
+                        .frame(height: 15)
+                    // SwiftUI does not have a built-in phone number formatter or masked text field as of iOS 17. You need to manually format the input, as in the previous implementation.
+                    TextField("Phone Number (Optional)", text: Binding(
+                        get: {
+                            phone_number
+                        },
+                        set: { newValue in
+                            // Allow only numeric input and format as (111)111-1111
+                            let digits = newValue.filter { $0.isWholeNumber }
+                            let maxLength = 10
+                            let limited = digits.prefix(maxLength)
+                            var formatted = ""
+                            if limited.count > 0 {
+                                formatted += "("
+                                formatted += limited.prefix(3)
+                            }
+                            if limited.count > 3 {
+                                formatted += ")"
+                                formatted += limited.dropFirst(3).prefix(3)
+                            }
+                            if limited.count > 6 {
+                                formatted += "-"
+                                formatted += limited.dropFirst(6)
+                            }
+                            phone_number = formatted
+                        }
+                    ))
+                    .keyboardType(.numberPad)
+                    .foregroundColor(Colors.flexibleBlack)
+                    .padding()
+                    .background(Colors.flexibleWhite)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Colors.flexibleOrange, lineWidth: 1.5)
                     )
+                    Spacer()
+                        .frame(height:60)
                     
-                    // Call your signup function
-                    let loggedIn = await signUp(user: userData)
-                    
-                    if (loggedIn == true){
-                        // Navigate after successful signup
-                        path.append("Home")
+                    Button(action: {
+                        Task{
+                            guard !username.isEmpty, !password.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !email.isEmpty else {
+                                empty_field = true
+                                alert_message = "Please fill in all required fields"
+                                show_alert = true
+                                return
+                            }
+                            
+                            // Create user data dictionary instead of User object to avoid conflicts
+                            let userData = User(
+                                username: username,
+                                password: password,
+                                first_name: first_name,
+                                last_name: last_name,
+                                email: email,
+                                phone_number: phone_number
+                            )
+                            
+                            // Call your signup function
+                            let loggedIn = await signUp(user: userData)
+                            
+                            if (loggedIn == true){
+                                // Store user data in UserManager (without password)
+                                let userToStore = User(
+                                    username: userData.username,
+                                    password: "", // Don't store password
+                                    first_name: userData.first_name,
+                                    last_name: userData.last_name,
+                                    email: userData.email,
+                                    phone_number: userData.phone_number
+                                )
+                                UserManager.shared.setUser(userToStore)
+                                isLoggedIn = true
+                            }
+                        }
+                        
+                    }) {
+                        Text("Sign Up")
+                            .frame(width: isIPad ? 500 : 350, height: 40)
+                            .font(.system(size: 27, weight: .bold))
+                            .background(Colors.flexibleOrange)
+                            .foregroundColor(Colors.flexibleWhite)
+                            .cornerRadius(10)
                     }
                 }
+                .frame(maxWidth: isIPad ? 500 : .infinity)
+                .padding(20)
                 
-            }) {
-                Text("Sign Up")
-                    .frame(width: 350, height: 40)
-                    .font(.system(size: 27, weight: .bold))
-                    .background(.orange) // Changed from .flexibleOrange
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-        }
-        .padding(20)
-        HStack(spacing: 0){
-            Text("Already have an account?")
-                .foregroundStyle(.black) // Changed from .flexibleBlack
-                .frame(maxWidth: .infinity,alignment: .leading)
-                .padding(.leading,30)
-                .fontWeight(.bold)
-            
-            Button("Sign In") {
+                HStack(spacing: 0){
+                    Text("Already have an account?")
+                        .foregroundStyle(Colors.flexibleBlack)
+                        .frame(maxWidth: .infinity,alignment: .leading)
+                        .padding(.leading,30)
+                        .fontWeight(.bold)
+                    
+                    Button("Sign In") {
                         print("Sign in button pressed")
                         path.removeLast() // Go back to sign in view
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.orange) // Changed from .flexibleBlue
+                    .foregroundStyle(Colors.flexibleOrange)
                     .fontWeight(.bold)
                     .padding(.trailing,36)
                 }
-            
+            }
         }
     }
+}
 
 
 /*#Preview {

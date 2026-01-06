@@ -1,4 +1,5 @@
 from flask_pymongo import PyMongo
+from pymongo.results import DeleteResult
 
 class UserModel:
     def __init__(self, mongo: PyMongo):
@@ -22,8 +23,19 @@ class UserModel:
         #Returns the id of the document as a string
         return str(result.inserted_id)
     def find_user_by_username(self, username):
-        user = self.collection.find_one({"username": username})
+        # Case-insensitive username lookup using regex
+        user = self.collection.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
         if user:
             user['_id'] = str(user['_id'])
         return user
+    
+    def delete_user_by_username(self, username):
+        # Case-insensitive username deletion: first find user, then delete by exact username
+        user = self.collection.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
+        if user:
+            # Delete using the exact username from the database
+            result = self.collection.delete_one({"username": user["username"]})
+            return result
+        # Return a DeleteResult with deleted_count = 0 if user not found
+        return DeleteResult({"n": 0}, acknowledged=True)
     
