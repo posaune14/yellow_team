@@ -30,6 +30,7 @@ struct HomePageView: View {
                         HStack{
                             Spacer()
                             Spacer()
+                            Spacer()
                             Text("PantryLink")
                                 .font(.title)
                                 .bold()
@@ -38,6 +39,7 @@ struct HomePageView: View {
                                 .padding()
                                 .scaleEffect(2)
                                 .foregroundStyle(.black)
+                            Spacer()
                     }
                         
                         LocalPantryView()
