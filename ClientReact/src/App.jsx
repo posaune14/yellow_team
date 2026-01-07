@@ -5,6 +5,7 @@ import SignUp from './pages/SignUp'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Credits from './pages/Credits'
+import Privacy from './pages/Privacy'
 import './App.css'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/credits" element={<Credits />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
     </Router>
   )
