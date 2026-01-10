@@ -37,7 +37,7 @@ struct HomePageView: View {
                             Spacer()
                             NavigationLink{AccountView(path: $path)} label:{Image(systemName: "person.crop.circle")}
                                 .padding()
-                                .scaleEffect(2)
+                                .scaleEffect(1.7)
                                 .foregroundStyle(.black)
                             Spacer()
                     }

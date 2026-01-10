@@ -65,6 +65,8 @@ struct LocalPantryView: View {
                         })
                         {
                             Text("Montgomery Food Pantry").frame(maxWidth: isIPad ? 550 : 300)
+                                .foregroundStyle(.white)
+                                .underline()
                         }
                         .padding(.bottom, 40)
                         .frame(maxWidth: isIPad ? 550 : 300)
@@ -99,6 +101,8 @@ struct LocalPantryView: View {
                                 })
                             {
                                 Text(pantry.name ?? "none").frame(maxWidth: isIPad ? 550 : 300)
+                                    .foregroundStyle(.flexibleWhite)
+                                    .underline()
                             }.padding(.bottom, 40)
                              .frame(maxWidth: isIPad ? 550 : 300)
                         }.sheet(isPresented: $popUp2){
