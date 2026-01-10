@@ -17,165 +17,167 @@ struct AccountView: View {
     @ObservedObject private var userManager = UserManager.shared
     var body: some View {
         NavigationStack(path: $path){
-            
-            if isGuest == true{
-                VStack(){
-                    Text("You are logged in as a guest.")
-                        .font(.title2)
-                    Button{
-                        print("Log Out")
-                        isLoggedIn = false
-                        isGuest = false
-                    }label:{
+            ScrollView(){
+                
+                if isGuest == true{
+                    VStack(){
+                        Text("You are logged in as a guest.")
+                            .font(.title2)
+                        Button{
+                            print("Log Out")
+                            isLoggedIn = false
+                            isGuest = false
+                        }label:{
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill()
+                                .stroke(Color.flexibleDarkGray, lineWidth: 5)
+                                .frame(width: 300, height: 50)
+                                .foregroundStyle(Color.flexibleLightGray)
+                                .padding(.top, 50)
+                                .overlay(Text("Sign In")
+                                    .padding(.top, 50)
+                                    .font(.title3)
+                                    .bold(true)
+                                    .foregroundColor(.black)
+                                )
+                        }
+                    }
+                }else{
+                    VStack(){
+                        Text("Account Information")
+                            .font(.title)
+                            .padding(.bottom, 20)
+                        Text("Username")
                         RoundedRectangle(cornerRadius: 20)
                             .fill()
                             .stroke(Color.flexibleDarkGray, lineWidth: 5)
                             .frame(width: 300, height: 50)
-                            .foregroundStyle(Color.flexibleLightGray)
-                            .padding(.top, 50)
-                            .overlay(Text("Sign In")
-                                .padding(.top, 50)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
+                            .foregroundStyle(.flexibleLightGray)
+                            .overlay(
+                                Text(userManager.currentUser?.username ?? "N/A")
                             )
-                    }
-                }
-            }else{
-                VStack(){
-                    Text("Account Information")
-                        .font(.title)
-                        .padding(.bottom, 20)
-                    Text("Username")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.username ?? "N/A")
-                        )
-                    
-                    Text("First Name")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.first_name ?? "N/A")
-                        )
-                    Text("Last Name")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.last_name ?? "N/A")
-                        )
-                    
-                    Text("Email")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.email ?? "N/A")
-                        )
-                    
-                    Text("Phone Number")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.phone_number ?? "N/A")
-                        )
-                    
-                    
-                    Button{
-                        print("Log Out")
-                        isLoggedIn = false
-                    }label:{
+                        
+                        Text("First Name")
                         RoundedRectangle(cornerRadius: 20)
                             .fill()
                             .stroke(Color.flexibleDarkGray, lineWidth: 5)
                             .frame(width: 300, height: 50)
-                            .foregroundStyle(Color.flexibleLightGray)
-                            .padding(.top, 50)
-                            .overlay(Text("Log Out")
-                                .padding(.top, 50)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
+                            .foregroundStyle(.flexibleLightGray)
+                            .overlay(
+                                Text(userManager.currentUser?.first_name ?? "N/A")
                             )
-                    }
-                    Button{
-                        showAlert = true
-                    }
-                    label: {
+                        Text("Last Name")
                         RoundedRectangle(cornerRadius: 20)
                             .fill()
-                            .stroke(Color(red: 216/255, green: 82/255, blue: 82/255), lineWidth: 5)
+                            .stroke(Color.flexibleDarkGray, lineWidth: 5)
                             .frame(width: 300, height: 50)
-                            .foregroundStyle(Color(red: 255/255, green: 103/255, blue: 103/255))
-                            .padding(.top, 10)
-                            .overlay(Text("Delete Account")
+                            .foregroundStyle(.flexibleLightGray)
+                            .overlay(
+                                Text(userManager.currentUser?.last_name ?? "N/A")
+                            )
+                        
+                        Text("Email")
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill()
+                            .stroke(Color.flexibleDarkGray, lineWidth: 5)
+                            .frame(width: 300, height: 50)
+                            .foregroundStyle(.flexibleLightGray)
+                            .overlay(
+                                Text(userManager.currentUser?.email ?? "N/A")
+                            )
+                        
+                        Text("Phone Number")
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill()
+                            .stroke(Color.flexibleDarkGray, lineWidth: 5)
+                            .frame(width: 300, height: 50)
+                            .foregroundStyle(.flexibleLightGray)
+                            .overlay(
+                                Text(userManager.currentUser?.phone_number ?? "N/A")
+                            )
+                        
+                        
+                        Button{
+                            print("Log Out")
+                            isLoggedIn = false
+                        }label:{
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill()
+                                .stroke(Color.flexibleDarkGray, lineWidth: 5)
+                                .frame(width: 300, height: 50)
+                                .foregroundStyle(Color.flexibleLightGray)
+                                .padding(.top, 50)
+                                .overlay(Text("Log Out")
+                                    .padding(.top, 50)
+                                    .font(.title3)
+                                    .bold(true)
+                                    .foregroundColor(.black)
+                                )
+                        }
+                        Button{
+                            showAlert = true
+                        }
+                        label: {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill()
+                                .stroke(Color(red: 216/255, green: 82/255, blue: 82/255), lineWidth: 5)
+                                .frame(width: 300, height: 50)
+                                .foregroundStyle(Color(red: 255/255, green: 103/255, blue: 103/255))
                                 .padding(.top, 10)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
-                            )
-                    }
-                    .alert("Delete Account", isPresented: $showAlert) {
-                        Button("Delete", role: .destructive){
-                            Task {
-                                showLoader = true
-                                await deleteAccount()
-                                isLoggedIn = false
-                                showLoader = false
-                                showAlert1 = true
-                            }
-                            
+                                .overlay(Text("Delete Account")
+                                    .padding(.top, 10)
+                                    .font(.title3)
+                                    .bold(true)
+                                    .foregroundColor(.black)
+                                )
                         }
-                        Button("Cancel", role: .cancel){}
-                    } message: {
-                        Text("Are you sure you want to delete your account? This action is permanent.")
-                    }
-                    .alert("Account Deleted", isPresented: $showAlert1) {
-                        Button("Dismiss", role: .cancel){}
-                    }
-                    
-                    
-                    if showLoader {
-                        ZStack {
-                            Color.black.opacity(0.4)
-                                .ignoresSafeArea()
-                            
-                            VStack(spacing: 20) {
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .alert("Delete Account", isPresented: $showAlert) {
+                            Button("Delete", role: .destructive){
+                                Task {
+                                    showLoader = true
+                                    await deleteAccount()
+                                    isLoggedIn = false
+                                    showLoader = false
+                                    showAlert1 = true
+                                }
                                 
-                                Text("Deleting...")
-                                    .foregroundColor(.white)
-                                    .font(.headline)
                             }
-                            .padding(30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(Color.black.opacity(0.8))
-                            )
+                            Button("Cancel", role: .cancel){}
+                        } message: {
+                            Text("Are you sure you want to delete your account? This action is permanent.")
                         }
+                        .alert("Account Deleted", isPresented: $showAlert1) {
+                            Button("Dismiss", role: .cancel){}
+                        }
+                        
+                        
+                        if showLoader {
+                            ZStack {
+                                Color.black.opacity(0.4)
+                                    .ignoresSafeArea()
+                                
+                                VStack(spacing: 20) {
+                                    ProgressView()
+                                        .scaleEffect(1.5)
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    
+                                    Text("Deleting...")
+                                        .foregroundColor(.white)
+                                        .font(.headline)
+                                }
+                                .padding(30)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.black.opacity(0.8))
+                                )
+                            }
+                        }
+                        
+                        
+                        
+                        
+                        Spacer()
                     }
-                    
-                    
-                    
-                    
-                    Spacer()
                 }
             }
         }
