@@ -10,8 +10,8 @@ import MapKit
 
 struct LocalPantryView: View {
     @ObservedObject var location = LocationManager.shared
-    @State var showPopup = false
-    @State var selectedPantry: MKMapItem? = nil
+    @State var selectedPantry: IdentifiableMapItem? = nil
+    @State private var scrolledIndex: Int? = 0
 
     private var locationDenied: Bool {
         location.manager.authorizationStatus == .denied
@@ -47,11 +47,9 @@ struct LocalPantryView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .sheet(isPresented: $showPopup) {
-            if let pantry = selectedPantry {
-                BasicPantryPopUpView(mapItem: pantry)
-                    .presentationDetents([.medium, .large])
-            }
+        .sheet(item: $selectedPantry) { pantry in
+            BasicPantryPopUpView(mapItem: pantry.mapItem)
+                .presentationDetents([.medium, .large])
         }
         .onAppear {
             location.checkLocationAuthorization()
@@ -63,27 +61,46 @@ struct LocalPantryView: View {
         }
     }
 
-    // Swipeable carousel of nearby pantries (sorted by distance, max 20)
+    // Swipeable carousel of nearby pantries (sorted by distance, max 20).
+    // Cards are slightly narrower than the screen so the next card peeks in
+    // from the edge, making it obvious there's more to swipe to.
     private var pantryCarousel: some View {
-        ScrollView(.horizontal) {
-            LazyHStack(spacing: PL.spacingM) {
-                ForEach(Array(location.allPantries.enumerated()), id: \.offset) { _, pantry in
-                    pantryCard(for: pantry)
-                        .containerRelativeFrame(.horizontal)
+        VStack(spacing: PL.spacingS) {
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: PL.spacingM) {
+                    ForEach(Array(location.allPantries.enumerated()), id: \.offset) { index, pantry in
+                        pantryCard(for: pantry)
+                            .containerRelativeFrame(.horizontal) { length, _ in
+                                length * 0.85
+                            }
+                            .id(index)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .scrollTargetLayout()
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $scrolledIndex)
+            .scrollIndicators(.hidden)
+
+            // Position indicator so users know they can swipe through the list
+            HStack(spacing: PL.spacingXS) {
+                Image(systemName: "hand.draw")
+                    .font(.caption)
+                    .accessibilityHidden(true)
+                Text("Pantry \((scrolledIndex ?? 0) + 1) of \(location.allPantries.count) — swipe to see more")
+                    .font(.caption)
+            }
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
+            .accessibilityLabel("Pantry \((scrolledIndex ?? 0) + 1) of \(location.allPantries.count). Swipe left or right to browse pantries.")
         }
-        .scrollTargetBehavior(.viewAligned)
-        .scrollIndicators(.hidden)
     }
 
     private func pantryCard(for pantry: MKMapItem) -> some View {
         PLCard {
             VStack(alignment: .leading, spacing: PL.spacingM) {
                 Button {
-                    selectedPantry = pantry
-                    showPopup = true
+                    selectedPantry = IdentifiableMapItem(mapItem: pantry)
                 } label: {
                     VStack(alignment: .leading, spacing: PL.spacingS) {
                         SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)

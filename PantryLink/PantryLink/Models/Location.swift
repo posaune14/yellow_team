@@ -11,6 +11,14 @@ import MapKit
 import SwiftUI
 import Contacts
 
+/// Identifiable wrapper so MKMapItem can drive .sheet(item:) presentations
+/// (presenting from optional state with .sheet(isPresented:) shows an empty
+/// sheet the first time because the content closure captures stale state).
+struct IdentifiableMapItem: Identifiable {
+    let id = UUID()
+    let mapItem: MKMapItem
+}
+
 final class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     // Singleton instance
     static let shared = LocationManager()

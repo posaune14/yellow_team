@@ -14,8 +14,7 @@ struct ScheduleView: View {
     @State private var userWeekSchedule: [UserWeekScheduleItem] = []
     @State private var isLoading = false
     @State private var loadErrorMessage: String?
-    @State private var selectedPantryId: String?
-    @State private var showPantrySchedule = false
+    @State private var selectedPantry: Pantry?
 
     var body: some View {
         ScrollView {
@@ -31,8 +30,7 @@ struct ScheduleView: View {
                         ForEach(userWeekSchedule) { item in
                             WeekScheduleCard(item: item, onTap: {
                                 if let pantry = pantries.first(where: { $0._id == item.pantry_id }) {
-                                    selectedPantryId = pantry._id
-                                    showPantrySchedule = true
+                                    selectedPantry = pantry
                                 }
                             })
                         }
@@ -69,8 +67,7 @@ struct ScheduleView: View {
                     } else {
                         ForEach(pantries) { pantry in
                             PantryCard(pantry: pantry) {
-                                selectedPantryId = pantry._id
-                                showPantrySchedule = true
+                                selectedPantry = pantry
                             }
                         }
                     }
@@ -88,11 +85,8 @@ struct ScheduleView: View {
         .refreshable {
             await refreshData()
         }
-        .sheet(isPresented: $showPantrySchedule) {
-            if let pantryId = selectedPantryId,
-               let pantry = pantries.first(where: { $0._id == pantryId }) {
-                PantryScheduleDetailView(pantry: pantry)
-            }
+        .sheet(item: $selectedPantry) { pantry in
+            PantryScheduleDetailView(pantry: pantry)
         }
     }
 

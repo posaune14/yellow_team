@@ -17,9 +17,8 @@ struct SearchPantryView: View {
     @State private var isLoading = true
     @State private var loadFailed = false
     @State private var selectedPantry: Pantry?
-    @State private var selectedMapItem: MKMapItem?
+    @State private var selectedMapItem: IdentifiableMapItem?
     @State private var showDetailView = false
-    @State private var showMapItemPopup = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -198,8 +197,7 @@ struct SearchPantryView: View {
 
                                     ForEach(Array(filteredGoogleSheetPantries.enumerated()), id: \.offset) { _, mapItem in
                                         BasicPantryCard(mapItem: mapItem) {
-                                            selectedMapItem = mapItem
-                                            showMapItemPopup = true
+                                            selectedMapItem = IdentifiableMapItem(mapItem: mapItem)
                                         }
                                     }
                                 }
@@ -220,11 +218,9 @@ struct SearchPantryView: View {
                     PantryDetailView(pantry: pantry)
                 }
             }
-            .sheet(isPresented: $showMapItemPopup) {
-                if let mapItem = selectedMapItem {
-                    BasicPantryPopUpView(mapItem: mapItem)
-                        .presentationDetents([.medium, .large])
-                }
+            .sheet(item: $selectedMapItem) { mapItem in
+                BasicPantryPopUpView(mapItem: mapItem.mapItem)
+                    .presentationDetents([.medium, .large])
             }
         }
         .task {
