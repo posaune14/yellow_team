@@ -210,7 +210,7 @@ extension AccountView {
         
         print("Attempting to delete account with username: '\(username)'")
         
-        guard let url = URL(string: "https://yellow-team.onrender.com/user/delete") else {
+        guard let url = URL(string: "\(API.baseURL)/user/delete") else {
             print("Error: Invalid URL")
             return
         }
