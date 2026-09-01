@@ -1,5 +1,5 @@
 //
-//  SignInView2.swift
+//  SignInView.swift
 //  PantryLink
 //
 //  Created by Naisha Singh on 10/6/25.
@@ -10,196 +10,146 @@ import SwiftUI
 struct SignInView: View {
     @State private var username: String = ""
     @State private var password: String = ""
-    @State var alert_message = ""
-    @State var show_alert = false
+    @State private var errorMessage: String?
     @State private var isLoading = false
-    
-    @State var empty_field = false
-    //@StateObject var viewModel = SignInViewModel()
+
     @Binding var path: NavigationPath
     @Binding var isLoggedIn: Bool
     @Binding var isGuest: Bool
-    
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    var isIPad: Bool {
-        horizontalSizeClass == .regular
-    }
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        ZStack {
-            // Background that adapts to dark mode
-            Rectangle()
-                .fill(Colors.flexibleWhite)
-                .ignoresSafeArea()
-            
-            Group {
-                if isIPad {
-                    HStack {
-                        Spacer()
-                        signInContent
-                            .frame(maxWidth: 600)
-                        Spacer()
-                    }
-                } else {
-                    signInContent
+        ScrollView {
+            VStack(alignment: .leading, spacing: PL.spacingL) {
+                // Welcoming header
+                VStack(alignment: .leading, spacing: PL.spacingS) {
+                    Text("PantryLink")
+                        .font(.largeTitle.bold())
+                        .foregroundStyle(PL.accent)
+                    Text("Find food pantries near you and see what they have today.")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
                 }
-            }
-            
-            // ProgressView overlay when loading
-            if isLoading {
-                ZStack {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                    
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        
-                        Text("Signing in...")
-                            .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isHeader)
+
+                // Sign-in fields
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        PLSectionHeader(
+                            title: "Sign in",
+                            subtitle: "Welcome back. Enter your details below."
+                        )
+
+                        PLTextField(
+                            label: "Username",
+                            text: $username,
+                            placeholder: "Your username",
+                            contentType: .username
+                        )
+
+                        PLTextField(
+                            label: "Password",
+                            text: $password,
+                            placeholder: "Your password",
+                            isSecure: true,
+                            contentType: .password
+                        )
+
+                        if let errorMessage {
+                            Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
+                                .font(.subheadline)
+                                .foregroundStyle(PL.critical)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        PLPrimaryButton(
+                            title: "Sign In",
+                            systemImage: "arrow.right.circle.fill",
+                            isLoading: isLoading
+                        ) {
+                            signIn()
+                        }
+                        .accessibilityHint("Signs in with the username and password you entered")
+
+                        if isLoading {
+                            Text("Signing you in...")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                    }
+                }
+
+                // New account
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        Text("New to PantryLink?")
                             .font(.headline)
+                        PLSecondaryButton(
+                            title: "Create an account",
+                            systemImage: "person.badge.plus"
+                        ) {
+                            path.append("SignUp")
+                        }
+                        .disabled(isLoading)
                     }
-                    .padding(30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.8))
-                    )
+                }
+
+                // Guest option
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        Text("Just browsing? You can look up pantries and their food without an account.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        PLSecondaryButton(
+                            title: "Continue without an account",
+                            systemImage: "person.fill.questionmark"
+                        ) {
+                            isLoggedIn = true
+                            isGuest = true
+                        }
+                        .disabled(isLoading)
+                    }
                 }
             }
+            .padding(PL.spacingM)
+            .frame(maxWidth: .infinity)
         }
-        .alert("Sign In Error", isPresented: $show_alert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(alert_message)
-        }
+        .background(PL.background)
+        .animation(reduceMotion ? nil : .default, value: errorMessage)
     }
-    
-    private var signInContent: some View {
-        VStack {
-            VStack(alignment: .leading) {
-                Text("Sign In To Your Account")
-                    .font(.title)
-                    .foregroundColor(Colors.flexibleBlack)
-                    .frame(maxWidth: .infinity,alignment: .leading)
-                    .fontWeight(.bold)
-                Spacer()
-                    .frame(height: 20)
-                Text("Please enter your details to Sign In")
-                    .foregroundColor(Colors.flexibleDarkGray)
-                Spacer()
-                    .frame(height: 50)
-                //Text("Sign In")
-                    //.font(.title)
-                    //.foregroundColor(.orange)
-                    //.fontWeight(.bold)
-                Spacer()
-                    .frame(height: 40)
-                TextField("Username", text: $username)
-                    .foregroundColor(Colors.flexibleBlack)
-                    .padding()
-                    .background(Colors.flexibleWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Colors.flexibleOrange, lineWidth: 1.5)
-                            )
-                Spacer()
-                    .frame(height: 25)
-                SecureField("Password", text: $password)
-                    .foregroundColor(Colors.flexibleBlack)
-                    .padding()
-                    .background(Colors.flexibleWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Colors.flexibleOrange, lineWidth: 1.5)
-                            )
-            }
-            .frame(maxWidth: isIPad ? 500 : .infinity)
-            .padding(20)
-            Spacer()
-                .frame(height: 100)
-            Button(action: {
-                Task{
-                    print("Sign In")
-                    guard !username.isEmpty, !password.isEmpty else {
-                        empty_field = true
-                        alert_message = "Please fill in all fields"
-                        show_alert = true
-                        print("Fill in all fields")
-                        return
-                    }
-                    
-                    // Show loading overlay
-                    isLoading = true
-                    
-                    // Create user object for authentication
-                    let authData = AuthData(
-                        username: username,
-                        password: password
-                    )
-                    
-                    // Call your authentication function here
-                    let result = await login_user(authData: authData)
-                    
-                    // Hide loading overlay
-                    isLoading = false
-                    
-                    switch result {
-                    case .success:
-                        // Mark as logged in - ContentView will show MainTabView
-                        isLoggedIn = true
-                    case .failure(let errorMessage):
-                        // Show error alert
-                        alert_message = errorMessage
-                        show_alert = true
-                    }
-                    
-                }
-                
-            }) {
-                Text("Sign In")
-                    .frame(width: isIPad ? 500 : 350, height: 40)
-                    .font(.system(size: 27, weight: .bold))
-                    .background(Colors.flexibleOrange)
-                    .foregroundColor(Colors.flexibleWhite)
-                    .cornerRadius(10)
-            }
-            .disabled(isLoading)
-            
-            // Guest Sign In Button
-            Button(action: {
-                // Navigate to home as guest
+
+    private func signIn() {
+        guard !username.isEmpty, !password.isEmpty else {
+            errorMessage = "Please enter both your username and your password."
+            return
+        }
+
+        errorMessage = nil
+        isLoading = true
+
+        Task {
+            let authData = AuthData(username: username, password: password)
+            let result = await login_user(authData: authData)
+            isLoading = false
+
+            switch result {
+            case .success:
                 isLoggedIn = true
-                isGuest = true
-            }) {
-                Text("Continue as Guest")
-                    .frame(width: isIPad ? 500 : 350, height: 40)
-                    .font(.system(size: 20, weight: .semibold))
-                    .background(Colors.flexibleLightGray)
-                    .foregroundColor(Colors.flexibleBlack)
-                    .cornerRadius(10)
-            }
-            .disabled(isLoading)
-            
-            Spacer()
-                .frame(height:30)
-            HStack(spacing: 2){
-                //Text("Don't Have Account?")
-                    //.foregroundStyle(.black) // Changed from .flexibleBlack
-                    //.frame(maxWidth: .infinity,alignment: .leading)
-                    //.padding()
-                    //.fontWeight(.bold)
-                    Button("Don't Have An Account? Create One Today") {
-                        print("Sign up button pressed")
-                        path.append("SignUp") // Go back to sign in view
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Colors.flexibleOrange)
-                    .fontWeight(.bold)
-                    .padding(27)
+            case .failure:
+                errorMessage = "We couldn't sign you in. Check your username and password and try again."
             }
         }
-        .frame(maxWidth: isIPad ? 600 : .infinity, maxHeight: .infinity)
     }
+}
+
+#Preview {
+    SignInView(
+        path: .constant(NavigationPath()),
+        isLoggedIn: .constant(false),
+        isGuest: .constant(false)
+    )
 }

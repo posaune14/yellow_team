@@ -9,241 +9,218 @@ import SwiftUI
 
 struct AccountView: View {
     @Binding var path: NavigationPath
-    @State private var showAlert = false
-    @State private var showAlert1 = false
-    @State private var showLoader = false
+    @State private var showDeleteConfirmation = false
+    @State private var showDeleteResult = false
+    @State private var deleteSucceeded = false
+    @State private var isDeleting = false
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isGuest") private var isGuest = false
     @ObservedObject private var userManager = UserManager.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        ScrollView(){
-            
-            if isGuest == true{
-                VStack(){
-                    Text("You are logged in as a guest.")
-                        .font(.title2)
-                    Button{
-                        print("Log Out")
-                        isLoggedIn = false
-                        isGuest = false
-                    }label:{
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill()
-                            .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                            .frame(width: 300, height: 50)
-                            .foregroundStyle(Color.flexibleLightGray)
-                            .padding(.top, 50)
-                            .overlay(Text("Sign In")
-                                .padding(.top, 50)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
-                            )
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: PL.spacingL) {
+                if isGuest {
+                    guestSection
+                } else {
+                    profileSection
+                    signOutSection
+                    deleteSection
                 }
-            }else{
-                VStack(){
-                    Text("Account Information")
-                        .font(.title)
-                        .padding(.bottom, 20)
-                    Text("Username")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.username ?? "N/A")
-                        )
-                    
-                    Text("First Name")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.first_name ?? "N/A")
-                        )
-                    Text("Last Name")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.last_name ?? "N/A")
-                        )
-                    
-                    Text("Email")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.email ?? "N/A")
-                        )
-                    
-                    Text("Phone Number")
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill()
-                        .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                        .frame(width: 300, height: 50)
-                        .foregroundStyle(.flexibleLightGray)
-                        .overlay(
-                            Text(userManager.currentUser?.phone_number ?? "N/A")
-                        )
-                    
-                    
-                    Button{
-                        print("Log Out")
-                        isLoggedIn = false
-                    }label:{
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill()
-                            .stroke(Color.flexibleDarkGray, lineWidth: 5)
-                            .frame(width: 300, height: 50)
-                            .foregroundStyle(Color.flexibleLightGray)
-                            .padding(.top, 50)
-                            .overlay(Text("Log Out")
-                                .padding(.top, 50)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
-                            )
-                    }
-                    Button{
-                        showAlert = true
-                    }
-                    label: {
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill()
-                            .stroke(Color(red: 216/255, green: 82/255, blue: 82/255), lineWidth: 5)
-                            .frame(width: 300, height: 50)
-                            .foregroundStyle(Color(red: 255/255, green: 103/255, blue: 103/255))
-                            .padding(.top, 10)
-                            .overlay(Text("Delete Account")
-                                .padding(.top, 10)
-                                .font(.title3)
-                                .bold(true)
-                                .foregroundColor(.black)
-                            )
-                    }
-                    .alert("Delete Account", isPresented: $showAlert) {
-                        Button("Delete", role: .destructive){
-                            Task {
-                                showLoader = true
-                                await deleteAccount()
-                                isLoggedIn = false
-                                showLoader = false
-                                showAlert1 = true
-                            }
-                            
-                        }
-                        Button("Cancel", role: .cancel){}
-                    } message: {
-                        Text("Are you sure you want to delete your account? This action is permanent.")
-                    }
-                    .alert("Account Deleted", isPresented: $showAlert1) {
-                        Button("Dismiss", role: .cancel){}
-                    }
-                    
-                    
-                    if showLoader {
-                        ZStack {
-                            Color.black.opacity(0.4)
-                                .ignoresSafeArea()
-                            
-                            VStack(spacing: 20) {
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                
-                                Text("Deleting...")
-                                    .foregroundColor(.white)
-                                    .font(.headline)
-                            }
-                            .padding(30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(Color.black.opacity(0.8))
-                            )
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    Spacer()
-                    VStack{
-                        Text("Credits")
-                            .font(Font.largeTitle.bold())
-                        Text("Made with ❤️ by the Yellow Team:")
-                            .font(Font.headline.bold())
-                        Link(destination: URL(string: "https://joshuasambol.com")!) {
-                            Text("Joshua Sambol")
-                        }
-                        Text("Michael Youtz")
-                        Text("Nippur Bhavsar")
-                        Text("Naisha Singh")
-                        Text("Sina Hernandez")
-                        Spacer()
-                        (
-                            Text("PantryLink was recognized as a winner of the 2025 ") +
-                            Text("[Congressional App Challenge](https://congressionalappchallenge.us)").foregroundColor(.blue).underline()
-                        )
-                        .padding()
-                    }
+                creditsSection
+            }
+            .padding(PL.spacingM)
+            .frame(maxWidth: .infinity)
+        }
+        .background(PL.background)
+        .navigationTitle("Account")
+        .animation(reduceMotion ? nil : .default, value: isDeleting)
+        .confirmationDialog(
+            "Are you sure?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete My Account", role: .destructive) {
+                Task {
+                    isDeleting = true
+                    deleteSucceeded = await deleteAccount()
+                    isDeleting = false
+                    showDeleteResult = true
                 }
             }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Deleting your account is permanent. Your saved information will be removed and can't be brought back.")
+        }
+        .alert(
+            deleteSucceeded ? "Account Deleted" : "Something Went Wrong",
+            isPresented: $showDeleteResult
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteSucceeded
+                 ? "Your account has been deleted."
+                 : "We couldn't delete your account right now. Please try again in a few minutes.")
+        }
+    }
+
+    // MARK: - Guest
+
+    private var guestSection: some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(
+                    title: "You're browsing as a guest",
+                    subtitle: "Sign in or create an account to save your information."
+                )
+                PLPrimaryButton(
+                    title: "Sign In",
+                    systemImage: "person.crop.circle"
+                ) {
+                    isLoggedIn = false
+                    isGuest = false
+                }
+            }
+        }
+    }
+
+    // MARK: - Profile
+
+    private var profileSection: some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(title: "Your information")
+                infoRow(label: "Username", value: userManager.currentUser?.username)
+                infoRow(label: "First name", value: userManager.currentUser?.first_name)
+                infoRow(label: "Last name", value: userManager.currentUser?.last_name)
+                infoRow(label: "Email", value: userManager.currentUser?.email)
+                infoRow(label: "Phone number", value: userManager.currentUser?.phone_number)
+            }
+        }
+    }
+
+    private func infoRow(label: String, value: String?) -> some View {
+        VStack(alignment: .leading, spacing: PL.spacingXS) {
+            Text(label)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+            Text((value?.isEmpty == false ? value! : "Not provided"))
+                .font(.body)
+                .foregroundStyle(.primary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Sign out
+
+    private var signOutSection: some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                Text("Signing out keeps your account safe on shared phones. You can sign back in any time.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                PLSecondaryButton(
+                    title: "Sign Out",
+                    systemImage: "rectangle.portrait.and.arrow.right"
+                ) {
+                    isLoggedIn = false
+                }
+            }
+        }
+    }
+
+    // MARK: - Delete account
+
+    private var deleteSection: some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                Text("Delete account")
+                    .font(.headline)
+                    .foregroundStyle(PL.critical)
+                Text("This permanently removes your account and information. This can't be undone.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                if isDeleting {
+                    PLLoadingView(message: "Deleting your account...")
+                } else {
+                    Button {
+                        showDeleteConfirmation = true
+                    } label: {
+                        HStack(spacing: PL.spacingS) {
+                            Image(systemName: "trash.fill")
+                                .accessibilityHidden(true)
+                            Text("Delete My Account")
+                                .font(.body.weight(.semibold))
+                        }
+                        .frame(maxWidth: .infinity, minHeight: PL.tapTarget)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(PL.critical)
+                }
+            }
+        }
+    }
+
+    // MARK: - Credits
+
+    private var creditsSection: some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingS) {
+                PLSectionHeader(title: "Credits", subtitle: "Made with ❤️ by the Yellow Team")
+                Link(destination: URL(string: "https://joshuasambol.com")!) {
+                    Text("Joshua Sambol")
+                        .font(.body)
+                        .underline()
+                        .frame(minHeight: PL.tapTarget, alignment: .leading)
+                }
+                .tint(PL.accent)
+                Text("Michael Youtz")
+                Text("Nippur Bhavsar")
+                Text("Naisha Singh")
+                Text("Sina Hernandez")
+                (
+                    Text("PantryLink was recognized as a winner of the 2025 ") +
+                    Text("[Congressional App Challenge](https://congressionalappchallenge.us)")
+                        .foregroundColor(PL.accent)
+                        .underline()
+                )
+                .font(.subheadline)
+                .padding(.top, PL.spacingS)
+            }
+            .font(.body)
         }
     }
 }
 
 extension AccountView {
-    func deleteAccount() async {
-        guard let username = userManager.currentUser?.username else {
-            print("Error: No username found")
-            return
+    /// Deletes the account on the server. Returns true on success.
+    func deleteAccount() async -> Bool {
+        guard let username = userManager.currentUser?.username,
+              let url = URL(string: "\(API.baseURL)/user/delete") else {
+            return false
         }
-        
-        print("Attempting to delete account with username: '\(username)'")
-        
-        guard let url = URL(string: "\(API.baseURL)/user/delete") else {
-            print("Error: Invalid URL")
-            return
-        }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         do {
-            let jsonData = try JSONEncoder().encode(["username": username])
-            request.httpBody = jsonData
-            
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    await MainActor.run {
-                        userManager.clearUser()
-                        isLoggedIn = false
-                    }
-                } else {
-                    // Log error response
-                    if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                        print("Delete account error response: \(errorData)")
-                    } else if let errorString = String(data: data, encoding: .utf8) {
-                        print("Delete account error response (string): \(errorString)")
-                    }
-                    print("Delete account failed with status code: \(httpResponse.statusCode)")
-                    print("Username sent: '\(username)'")
+            request.httpBody = try JSONEncoder().encode(["username": username])
+            let (_, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                await MainActor.run {
+                    userManager.clearUser()
+                    isLoggedIn = false
                 }
+                return true
             }
+            return false
         } catch {
-            print("Error deleting account: \(error)")
+            return false
         }
     }
 }

@@ -7,6 +7,7 @@
 import SwiftUI
 import MapKit
 
+/// Renders a static map image for a coordinate, with a loading placeholder.
 struct SnapshotImageView: View {
     let coordinate: CLLocationCoordinate2D
     @State private var snapshot: UIImage?
@@ -19,9 +20,13 @@ struct SnapshotImageView: View {
                     .resizable()
                     .scaledToFill()
             } else {
-                ProgressView()
+                ZStack {
+                    PL.background
+                    ProgressView()
+                }
             }
         }
+        .accessibilityLabel("Map showing the pantry's location")
         .onAppear {
             if snapshot == nil {
                 location.generateSnapshot(for: coordinate) { image in
