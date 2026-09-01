@@ -13,26 +13,21 @@ struct ScheduleView: View {
     @State private var pantries: [Pantry] = []
     @State private var userWeekSchedule: [UserWeekScheduleItem] = []
     @State private var isLoading = false
+    @State private var loadErrorMessage: String?
     @State private var selectedPantryId: String?
     @State private var showPantrySchedule = false
-    
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: PL.spacingL) {
                 // Your Week at a Glance Section (only show if user has schedules)
                 if !userWeekSchedule.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Your Week at a Glance")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(Colors.flexibleBlack)
-                            .padding(.horizontal)
-                        
-                        Text("Your upcoming volunteer shifts for the next 7 days")
-                            .font(.subheadline)
-                            .foregroundColor(Colors.flexibleDarkGray)
-                            .padding(.horizontal)
-                        
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        PLSectionHeader(
+                            title: "Your Week at a Glance",
+                            subtitle: "Shifts you're signed up for over the next 7 days"
+                        )
+
                         ForEach(userWeekSchedule) { item in
                             WeekScheduleCard(item: item, onTap: {
                                 if let pantry = pantries.first(where: { $0._id == item.pantry_id }) {
@@ -42,32 +37,35 @@ struct ScheduleView: View {
                             })
                         }
                     }
-                    .padding(.top)
-                    
+
                     Divider()
-                        .padding(.vertical)
                 }
-                
+
                 // All Pantries Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Available Opportunities")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(Colors.flexibleBlack)
-                        .padding(.horizontal)
-                    
-                    Text("Tap a pantry to view their schedule and sign up")
-                        .font(.subheadline)
-                        .foregroundColor(Colors.flexibleDarkGray)
-                        .padding(.horizontal)
-                    
+                VStack(alignment: .leading, spacing: PL.spacingM) {
+                    PLSectionHeader(
+                        title: "Places to Volunteer",
+                        subtitle: "Tap a pantry to see its schedule and sign up for a shift"
+                    )
+
                     if isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, minHeight: 200)
+                        PLLoadingView(message: "Finding pantries near you...")
+                    } else if let loadErrorMessage {
+                        PLEmptyState(
+                            icon: "wifi.exclamationmark",
+                            title: "We couldn't load the pantries",
+                            message: loadErrorMessage,
+                            actionTitle: "Try Again",
+                            action: { fetchPantries() }
+                        )
                     } else if pantries.isEmpty {
-                        Text("No food pantries available")
-                            .foregroundColor(Colors.flexibleDarkGray)
-                            .frame(maxWidth: .infinity, minHeight: 200)
+                        PLEmptyState(
+                            icon: "building.2",
+                            title: "No pantries yet",
+                            message: "There are no food pantries listed right now. Please check back soon.",
+                            actionTitle: "Refresh",
+                            action: { fetchPantries() }
+                        )
                     } else {
                         ForEach(pantries) { pantry in
                             PantryCard(pantry: pantry) {
@@ -78,8 +76,10 @@ struct ScheduleView: View {
                     }
                 }
             }
-            .padding(.bottom, 100)
+            .padding(PL.spacingM)
+            .padding(.bottom, PL.spacingXL)
         }
+        .background(PL.background.ignoresSafeArea())
         .navigationTitle("Volunteer Schedule")
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
@@ -95,33 +95,37 @@ struct ScheduleView: View {
             }
         }
     }
-    
+
     private func refreshData() async {
         fetchPantries()
     }
-    
+
     private func fetchPantries() {
         isLoading = true
-        
+        loadErrorMessage = nil
+
         guard let url = URL(string: "\(API.baseURL)/pantry/") else {
             isLoading = false
+            loadErrorMessage = "Something went wrong on our end. Please try again."
             return
         }
-        
+
         URLSession.shared.dataTask(with: url) { data, response, error in
             defer { DispatchQueue.main.async { isLoading = false } }
-            
+
             guard let data = data, error == nil else {
-                print("Error fetching pantries: \(error?.localizedDescription ?? "Unknown")")
+                DispatchQueue.main.async {
+                    self.loadErrorMessage = "Please check your internet connection, then tap Try Again."
+                }
                 return
             }
-            
+
             do {
                 struct PantryResponse: Codable {
                     let pantries: [Pantry]
                     let message: String
                 }
-                
+
                 let result = try JSONDecoder().decode(PantryResponse.self, from: data)
                 DispatchQueue.main.async {
                     self.pantries = result.pantries
@@ -129,22 +133,21 @@ struct ScheduleView: View {
                     self.fetchUserWeekSchedule()
                 }
             } catch {
-                print("Error decoding pantries: \(error)")
+                DispatchQueue.main.async {
+                    self.loadErrorMessage = "We had trouble reading the pantry list. Please try again."
+                }
             }
         }.resume()
     }
-    
+
     private func fetchUserWeekSchedule() {
         guard let username = userManager.currentUser?.username else { return }
-        
+
         guard let url = URL(string: "\(API.baseURL)/pantry/user-schedule/\(username)") else { return }
-        
+
         URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error fetching user schedule: \(error?.localizedDescription ?? "Unknown")")
-                return
-            }
-            
+            guard let data = data, error == nil else { return }
+
             do {
                 let result = try JSONDecoder().decode(UserWeekScheduleResponse.self, from: data)
                 DispatchQueue.main.async {
@@ -152,7 +155,6 @@ struct ScheduleView: View {
                     self.userWeekSchedule = result.schedules.sorted { $0.date < $1.date }
                 }
             } catch {
-                print("Error decoding user schedule: \(error)")
                 DispatchQueue.main.async {
                     self.userWeekSchedule = []
                 }
@@ -164,114 +166,125 @@ struct ScheduleView: View {
 struct PantryCard: View {
     let pantry: Pantry
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(pantry.name)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(Colors.flexibleBlack)
-                
-                if let address = pantry.address {
-                    Text(address)
-                        .font(.subheadline)
-                        .foregroundColor(Colors.flexibleDarkGray)
-                }
-                
-                // Show if scheduling is available
-                if let settings = pantry.schedule_settings {
-                    if settings.isSchedulingEnabled {
-                        Text("Accepting volunteers")
-                            .font(.caption)
-                            .foregroundColor(Colors.flexibleGreen)
-                    } else {
-                        Text("Not accepting volunteers")
-                            .font(.caption)
-                            .foregroundColor(Colors.flexibleDarkGray)
+            PLCard {
+                HStack(spacing: PL.spacingM) {
+                    VStack(alignment: .leading, spacing: PL.spacingS) {
+                        Text(pantry.name)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        if let address = pantry.address {
+                            Text(address)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+
+                        // Show if scheduling is available
+                        if let settings = pantry.schedule_settings {
+                            if settings.isSchedulingEnabled {
+                                Label("Accepting volunteers", systemImage: "checkmark.circle.fill")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(PL.good)
+                            } else {
+                                Label("Not accepting volunteers right now", systemImage: "pause.circle")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: "chevron.right")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Colors.flexibleLightGray.opacity(0.3))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Colors.flexibleLightGray, lineWidth: 1)
-            )
         }
-        .buttonStyle(PlainButtonStyle())
-        .padding(.horizontal)
+        .buttonStyle(.plain)
+        .frame(minHeight: PL.tapTarget)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Opens this pantry's volunteer schedule")
     }
 }
 
 struct WeekScheduleCard: View {
     let item: UserWeekScheduleItem
     let onTap: () -> Void
-    
+
     var formattedDate: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        
+
         guard let date = dateFormatter.date(from: item.date) else { return item.date }
-        
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "EEEE, MMMM d"
+        let fullDate = displayFormatter.string(from: date)
+
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return "Today"
+            return "Today - \(fullDate)"
         } else if calendar.isDateInTomorrow(date) {
-            return "Tomorrow"
+            return "Tomorrow - \(fullDate)"
         } else {
-            let displayFormatter = DateFormatter()
-            displayFormatter.dateFormat = "EEE, MMM d"
-            return displayFormatter.string(from: date)
+            return fullDate
         }
     }
-    
+
     var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
+            PLCard {
+                HStack(spacing: PL.spacingM) {
+                    VStack(alignment: .leading, spacing: PL.spacingS) {
+                        Label("You're signed up", systemImage: "checkmark.circle.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(PL.good)
+
                         Text(item.pantry_name)
                             .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(Colors.flexibleBlack)
-                        
-                        HStack(spacing: 4) {
-                            Text(formattedDate)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(Colors.flexibleOrange)
-                            Text("•")
-                                .foregroundColor(Colors.flexibleDarkGray)
-                            Text(item.shift)
-                                .font(.subheadline)
-                                .foregroundColor(Colors.flexibleBlack)
-                        }
-                        
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        Text(formattedDate)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.primary)
+
+                        Text(item.shift)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
                         if !item.time.isEmpty && item.time != "Flexible" {
                             Text(item.time)
-                                .font(.caption)
-                                .foregroundColor(Colors.flexibleDarkGray)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                     }
-                    
-                    Spacer()
-                    
+
+                    Spacer(minLength: 0)
+
                     Image(systemName: "chevron.right")
-                        .foregroundColor(Colors.flexibleDarkGray)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
-            .padding()
-            .background(Colors.flexibleOrange.opacity(0.1))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Colors.flexibleOrange, lineWidth: 1.5)
-            )
         }
-        .buttonStyle(PlainButtonStyle())
-        .padding(.horizontal)
+        .buttonStyle(.plain)
+        .frame(minHeight: PL.tapTarget)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Opens this pantry's volunteer schedule")
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ScheduleView()
     }
 }

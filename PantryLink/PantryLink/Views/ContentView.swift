@@ -7,52 +7,27 @@
 
 import SwiftUI
 
-//create colors
-struct Colors {
-    static let brownBlack: Color = Color("brownBlack")
-    static let flexibleGreen: Color = Color("flexibleGreen")
-    static let flexibleLightGray: Color = Color("flexibleLightGray")
-    static let flexibleDarkGray: Color = Color("flexibleDarkGray")
-    static let flexibleBlack: Color = Color("flexibleBlack")
-    static let flexibleRed: Color = Color("flexibleRed")
-    static let flexibleOrange: Color = Color("flexibleOrange")
-    static let flexibleBlue: Color = Color("flexibleBlue")
-    static let flexibleWhite: Color = Color("flexibleWhite")
-    static let stockLightTan: Color = Color("stockLightTan")
-    static let stockDarkTan: Color = Color("stockDarkTan")
-    static let flexibleDarkBrown: Color = Color("flexibleDarkBrown")
-    static let maroonWhite: Color = Color("maroonWhite")
-    static let stockRed: Color = Color("stockRed")
-    static let stockOrange: Color = Color("stockOrange")
-    static let clearBlack: Color = Color("clearBlack")
-    //nomenclature (someone should probably change this):
-    //flexible: changes shades from light to dark for darkmode
-    //view+color: only used in that view
-    //two colors: switches from one color to that color
-}
-
 struct ContentView: View {
     @State private var path = NavigationPath()
     //creating class object
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     //gives access to appdelegate here
-    
+
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @AppStorage("isGuest") private var isGuest = false
-    
-    // Initialize LocationManager singleton immediately to request permission
-    init() {
-        // Access the singleton to trigger init and permission request
-        _ = LocationManager.shared
-    }
-    
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
     var body: some View {
         ZStack {
             // App-wide background that adapts to dark mode - extends behind tab bar
-            Colors.flexibleWhite
+            PL.background
                 .ignoresSafeArea(.all)
-            
-            if isLoggedIn {
+
+            if !hasCompletedOnboarding {
+                // First-launch tour. Location permission is requested later,
+                // when the Home screen actually needs it.
+                OnboardingView()
+            } else if isLoggedIn {
                 // Show main tab view when authenticated
                 MainTabView()
                     .onAppear {

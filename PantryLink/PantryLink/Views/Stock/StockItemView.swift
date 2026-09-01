@@ -7,119 +7,100 @@
 import SwiftUI
 import MapKit
 
+/// Card summarizing a pantry: name, address, its top items with stock levels,
+/// and a clear "tap to see more" affordance.
 struct StockItemView: View {
     let pantryName: String
     let topItems: [PantryItem]
     let pantryAddress: String?
-    
+
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 30)
-                .fill(Colors.flexibleWhite)
-                .shadow(radius: 10)
-            
-            VStack(alignment: .leading, spacing: 10) {
-                
-                HStack {
-                    Text(pantryName)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(Colors.flexibleBlack)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        if let address = pantryAddress {
-                            openInMaps(address: address)
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingS) {
+                HStack(alignment: .top, spacing: PL.spacingS) {
+                    VStack(alignment: .leading, spacing: PL.spacingXS) {
+                        Text(pantryName)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        if let address = pantryAddress, !address.isEmpty {
+                            Text(address)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
                         }
-                    }) {
-                        HStack(spacing: 4) {
-                            Text("Directions")
-                                .font(.caption)
-                            Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                                .font(.caption)
+                    }
+
+                    Spacer(minLength: PL.spacingS)
+
+                    if pantryAddress != nil {
+                        Button {
+                            if let address = pantryAddress {
+                                openInMaps(address: address)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
+                                .font(.title3)
+                                .foregroundStyle(PL.accent)
+                                .frame(minWidth: PL.tapTarget, minHeight: PL.tapTarget)
                         }
-                        .padding(6)
-                        .background(Colors.flexibleDarkGray.opacity(0.15))
-                        .cornerRadius(6)
-                        .foregroundColor(Colors.flexibleBlack)
+                        .buttonStyle(.bordered)
+                        .tint(PL.accent)
+                        .accessibilityLabel("Get directions to \(pantryName)")
                     }
                 }
-                
-                Text("Top Items:")
-                    .font(.subheadline)
-                    .foregroundColor(Colors.flexibleBlack)
-                    .padding(.top, 4)
-                
-                HStack(spacing: 8) {
+
+                if topItems.isEmpty {
+                    Text("This pantry hasn't listed its food yet.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, PL.spacingXS)
+                } else {
+                    Divider()
+
                     ForEach(topItems) { item in
-                        makeItemCard(item: item)
+                        VStack(alignment: .leading, spacing: PL.spacingXS) {
+                            Text(item.name)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.primary)
+                            PLStockLevel(current: item.current, full: item.full)
+                        }
                     }
                 }
-                
-                // View Details indicator
-                HStack {
+
+                HStack(spacing: PL.spacingXS) {
                     Spacer()
-                    Text("Tap to view all items")
-                        .font(.caption)
-                        .foregroundColor(Colors.flexibleOrange)
-                        .fontWeight(.semibold)
+                    Text("See all items")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(PL.accent)
                     Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(Colors.flexibleOrange)
+                        .font(.subheadline)
+                        .foregroundStyle(PL.accent)
+                        .accessibilityHidden(true)
                 }
-                .padding(.top, 4)
+                .padding(.top, PL.spacingXS)
             }
-            .padding()
         }
-        .frame(maxWidth: .infinity) // stretch to screen width
-        .padding(.horizontal)       // keep nice side spacing
-        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
     }
-    
-    // Create a rounded rectangle card for each top item
-    func makeItemCard(item: PantryItem) -> some View {
-        VStack(spacing: 4) {
-            Text(item.name)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundColor(Colors.flexibleBlack)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-            
-            Text("\(item.current)/\(item.full)")
-                .font(.caption2)
-                .foregroundColor(item.ratio < 0.5 ? Colors.flexibleRed : Colors.flexibleGreen)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Colors.flexibleDarkGray.opacity(1))
-        )
-    }
-    
+
     // Open Apple Maps with the pantry address
     func openInMaps(address: String) {
         let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(address) { placemarks, error in
-            guard let location = placemarks?.first?.location else {
-                print("Failed to geocode address: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
-            
+        geocoder.geocodeAddressString(address) { placemarks, _ in
+            guard let location = placemarks?.first?.location else { return }
+
             let regionDistance: CLLocationDistance = 500
             let coordinates = location.coordinate
-            
+
             let regionSpan = MKCoordinateRegion(center: coordinates,
                                                 latitudinalMeters: regionDistance,
                                                 longitudinalMeters: regionDistance)
-            
+
             let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinates))
             mapItem.name = pantryName
-            
+
             mapItem.openInMaps(launchOptions: [
                 MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: regionSpan.center),
                 MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: regionSpan.span)
@@ -129,46 +110,17 @@ struct StockItemView: View {
 }
 
 #Preview {
-    StockItemView(
-        pantryName: "Flemmington Pantry",
-        topItems: [
-            PantryItem(name: "Canned Beans", current: 3, full: 10, type: "Cans", ratio: 0.3),
-            PantryItem(name: "Tomato Soup", current: 5, full: 10, type: "Cans", ratio: 0.5),
-            PantryItem(name: "Pasta", current: 8, full: 10, type: "Dry Goods", ratio: 0.8)
-        ],
-        pantryAddress: "373 Burnt Hill Road, Skillman, NJ 08558"
-    )
+    ScrollView {
+        StockItemView(
+            pantryName: "Flemmington Pantry",
+            topItems: [
+                PantryItem(name: "Canned Beans", current: 3, full: 10, type: "Cans", ratio: 0.3),
+                PantryItem(name: "Tomato Soup", current: 5, full: 10, type: "Cans", ratio: 0.5),
+                PantryItem(name: "Pasta", current: 8, full: 10, type: "Dry Goods", ratio: 0.8)
+            ],
+            pantryAddress: "373 Burnt Hill Road, Skillman, NJ 08558"
+        )
+        .padding()
+    }
+    .background(PL.background)
 }
-//VStack{
-//    RoundedRectangle(cornerRadius: 15)
-//        .fill(Color.white)
-//        .frame(width:325, height:110)
-//        .overlay(
-//            VStack{
-//                Text(pantry.name)
-//                    .bold()
-//                    .font(.title2)
-//                Text("\(pantry.stock)% Capacity")
-//                  /*  if pantry.stock < 50 {
-//                        .foregroundColor(.red)
-//                } else {
-//                    .foregroundColor(.green)
-//                    }*/
-//                    .foregroundColor(pantry.stock < 50 ? .red : .green) //shorthand if kinda like js
-//                    .font(.caption)
-//                
-//                HStack{
-//                    ForEach(pantry.items, id: \.self){ item in
-//                        RoundedRectangle(cornerRadius: 10)
-//                            .fill(Color(red: 214/255, green: 214/255, blue: 214/255))
-//                            .frame(width: 75, height: 30)
-//                            .overlay(
-//                                Text(item)
-//                                        .scaledToFit()
-//                                
-//                            )
-//                    }
-//                }
-//            }
-//        )
-//}

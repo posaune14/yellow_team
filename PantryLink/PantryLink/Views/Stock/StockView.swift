@@ -5,140 +5,85 @@
 //  Created by Joshua Sambol on 5/29/25.
 //
 import SwiftUI
-/*
-class Pantry {
-    let name = "Princeton Mobile"
-    let stock = 78
-    let items = ["Beans", "Soup", "Vegis"]
-}
- */
 
-
-
-//https://www.programiz.com/swift-programming/classes-objects
-//https://developer.apple.com/documentation/swiftui/foreach
 // StockPageView - Full page version for TabView
 struct StockPageView: View {
     @StateObject var streamViewViewModel = StreamViewViewModel()
     @State var pantries: [Pantry]?
     @State var isLoading = true
+    @State private var loadFailed = false
     @State var selectedPantry: Pantry?
     @State var showDetailView = false
-    
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    var isIPad: Bool {
-        horizontalSizeClass == .regular
-    }
-    
+
     var body: some View {
         NavigationStack {
-            ZStack{
-                Rectangle()
-                    .fill(.stockDarkTan)
+            ZStack {
+                PL.background
                     .ignoresSafeArea()
-                
-                VStack(spacing: 0){
-                    Text("Stock")
-                        .foregroundColor(.white)
-                        .bold()
-                        .font(.largeTitle)
-                        .padding(.top, 20)
-                        .padding(.bottom, 16)
-                    SearchView()
-                        .padding()
-                    if isLoading {
-                        VStack(spacing: 20) {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .scaleEffect(1.5)
-                            Text("This may take a moment...")
-                                .foregroundColor(.white)
-                                .font(.subheadline)
-                        }
-                        .frame(maxHeight: .infinity)
-                    } else {
-                        
-                        ScrollView{
-                            // Use this spacing for space between stock items
-                            VStack(spacing:24){
-                                ForEach(pantries ?? []){pantry in
-                                    PantryStockCard(pantry: pantry, onTap: {
-                                        selectedPantry = pantry
-                                        showDetailView = true
-                                    })
+
+                if isLoading {
+                    PLLoadingView(message: "Finding pantries near you...")
+                } else if loadFailed {
+                    PLEmptyState(
+                        icon: "wifi.exclamationmark",
+                        title: "We couldn't load pantries",
+                        message: "Please check your internet connection and try again.",
+                        actionTitle: "Try Again",
+                        action: { Task { await loadPantries() } }
+                    )
+                } else if (pantries ?? []).isEmpty {
+                    PLEmptyState(
+                        icon: "building.2",
+                        title: "No pantries yet",
+                        message: "No pantries are sharing their food stock right now. Please check back soon.",
+                        actionTitle: "Try Again",
+                        action: { Task { await loadPantries() } }
+                    )
+                } else {
+                    ScrollView {
+                        VStack(spacing: PL.spacingM) {
+                            SearchView()
+
+                            PLSectionHeader(
+                                title: "Pantries",
+                                subtitle: "Tap a pantry to see everything it has."
+                            )
+
+                            ForEach(pantries ?? []) { pantry in
+                                PantryStockCard(pantry: pantry) {
+                                    selectedPantry = pantry
+                                    showDetailView = true
                                 }
                             }
-                            .padding(.top, 8)
-                            .padding(.bottom, 100)
-                            .frame(maxWidth: isIPad ? 700 : 340)
                         }
+                        .padding(PL.spacingM)
+                        .padding(.bottom, PL.spacingXL)
+                        .frame(maxWidth: 700)
+                        .frame(maxWidth: .infinity)
                     }
                 }
-                .frame(maxWidth: isIPad ? 800 : .infinity)
             }
-            .ignoresSafeArea(.container, edges: .bottom)
+            .navigationTitle("Food Stock")
             .navigationDestination(isPresented: $showDetailView) {
                 if let pantry = selectedPantry {
                     PantryDetailView(pantry: pantry)
                 }
             }
         }
-        .task{
-            pantries = try? await streamViewViewModel.getStreams().pantries
-            isLoading = false
+        .task {
+            await loadPantries()
         }
     }
-}
 
-// Legacy StockView (keeping for compatibility)
-struct StockView: View{
-    @StateObject var streamViewViewModel = StreamViewViewModel()
-    @State var pantries: [Pantry]?
-    @State var isLoading = true
-    
-    var body: some View {
-        ZStack{
-            Rectangle()
-                .fill(Colors.flexibleWhite)
-                .ignoresSafeArea()
-            RoundedRectangle(cornerRadius: 15)
-                .fill(.stockDarkTan)
-                .frame(width:350, height:650)
-                .shadow(radius: 10)
-            VStack{
-                Text("Stock")
-                    .foregroundColor(.white)
-                    .bold()
-                    .font(.largeTitle)
-                
-                if isLoading {
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("This may take a moment...")
-                            .foregroundColor(.white)
-                            .font(.subheadline)
-                    }
-                    .frame(width: 340, height: 560)
-                } else {
-                    ScrollView{
-                        // Use this spacing for space between stock items
-                        VStack(spacing:24){
-                            ForEach(pantries ?? []){pantry in
-                                PantryStockCard(pantry: pantry)
-                            }
-                        }
-                    }
-                    .frame(width: 340, height: 560)
-                }
-            }
+    private func loadPantries() async {
+        isLoading = true
+        loadFailed = false
+        do {
+            pantries = try await streamViewViewModel.getStreams().pantries
+        } catch {
+            loadFailed = true
         }
-        .task{
-            pantries = try? await streamViewViewModel.getStreams().pantries
-            isLoading = false
-        }
+        isLoading = false
     }
 }
 
@@ -146,24 +91,24 @@ struct StockView: View{
 struct PantryStockCard: View {
     let pantry: Pantry
     var onTap: () -> Void = {}
-    
+
     var topItems: [PantryItem] {
         guard let stock = pantry.stock, !stock.isEmpty else { return [] }
         return Array(stock.prefix(3))
     }
-    
+
     var body: some View {
-        if !topItems.isEmpty {
-            Button(action: onTap) {
-                StockItemView(pantryName: pantry.name, topItems: topItems, pantryAddress: pantry.address)
-            }
-            .buttonStyle(PlainButtonStyle())
+        Button(action: onTap) {
+            StockItemView(
+                pantryName: pantry.name,
+                topItems: topItems,
+                pantryAddress: pantry.address
+            )
         }
+        .buttonStyle(.plain)
     }
 }
-                                            
-#Preview {
-    StockView()
-}
 
-                            
+#Preview {
+    StockPageView()
+}

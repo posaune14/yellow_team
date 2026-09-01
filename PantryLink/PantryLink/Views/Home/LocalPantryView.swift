@@ -10,167 +10,50 @@ import MapKit
 
 struct LocalPantryView: View {
     @ObservedObject var location = LocationManager.shared
-    let options: MKMapSnapshotter.Options = .init()
     @State var showPopup = false
     @State var selectedPantry: MKMapItem? = nil
-    
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    var isIPad: Bool {
-        horizontalSizeClass == .regular
+
+    private var locationDenied: Bool {
+        location.manager.authorizationStatus == .denied
+            || location.manager.authorizationStatus == .restricted
     }
-    
+
     var body: some View {
-        ZStack{
-            Rectangle()
-                .fill(Colors.flexibleWhite)
-                .ignoresSafeArea()
-            
-            VStack{
-                Text("Local Pantries")
-                    .bold()
-                    .foregroundColor(.white)
-                    .font(.title)
-                    .padding(.top, 20)
-                
-                // Show loading or location status
-                if !location.locationReady {
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("Getting your location...")
-                            .foregroundColor(.white)
-                            .font(.subheadline)
-                        
-                        // Check if location is actually denied
-                        if location.manager.authorizationStatus == .denied {
-                            Text("Location access denied")
-                                .foregroundColor(.white)
-                                .font(.caption)
-                                .padding(.top, 10)
-                            Text("Please enable location access in Settings")
-                                .foregroundColor(.white.opacity(0.8))
-                                .font(.caption2)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 20)
-                        }
-                    }
-                    .padding(.vertical, 40)
-                } else if location.isLoadingPantries {
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("Finding nearby pantries...")
-                            .foregroundColor(.white)
-                            .font(.subheadline)
-                    }
-                    .padding(.vertical, 40)
-                } else if location.allPantries.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 50))
-                            .foregroundColor(.white)
-                        Text("No pantries found nearby")
-                            .foregroundColor(.white)
-                            .font(.subheadline)
-                        Button(action: {
-                            location.findPantries()
-                        }) {
-                            Text("Retry")
-                                .foregroundColor(.stockDarkTan)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                        }
-                    }
-                    .padding(.vertical, 40)
-                } else {
-                    // Display all pantries (sorted by distance, max 20)
-                    TabView{
-                        ForEach(Array(location.allPantries.enumerated()), id: \.offset) { index, pantry in
-                            VStack(spacing: 12){
-                                Button(action: {
-                                    DispatchQueue.main.async {
-                                        openPantryInMaps(pantry: pantry)
-                                    }
-                                }) {
-                                    HStack(spacing: 4) {
-                                        Text("Directions")
-                                            .font(.caption)
-                                        Image(systemName: "arrow.triangle.turn.up.right.diamond")
-                                            .font(.caption)
-                                    }
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(Colors.flexibleWhite)
-                                    .cornerRadius(6)
-                                    .foregroundColor(Colors.flexibleBlack)
-                                }
-                                .contentShape(Rectangle())
-                                .zIndex(1)
-                                
-                                SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)
-                                    .frame(width: isIPad ? 550 : 300, height: isIPad ? 350 : 200)
-                                    .cornerRadius(10)
-                                    .allowsHitTesting(false)
-                                
-                                VStack(spacing: 4) {
-                                    Button(action: {
-                                        selectedPantry = pantry
-                                        showPopup = true
-                                    })
-                                    {
-                                        Text(pantry.name ?? "Unknown Pantry")
-                                            .frame(maxWidth: isIPad ? 550 : 300)
-                                            .foregroundStyle(.white)
-                                            .underline()
-                                            .multilineTextAlignment(.center)
-                                            .lineLimit(2)
-                                    }
-                                    
-                                    // Show distance
-                                    if let pantryLocation = pantry.placemark.location,
-                                       let userLocation = location.lastKnownLocation {
-                                        let userCLLocation = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
-                                        let distance = pantryLocation.distance(from: userCLLocation)
-                                        let distanceInMiles = distance * 0.000621371
-                                        Text(String(format: "%.1f miles away", distanceInMiles))
-                                            .font(.caption)
-                                            .foregroundColor(.white.opacity(0.8))
-                                    }
-                                }
-                                .padding(.bottom, 10)
-                                .frame(maxWidth: isIPad ? 550 : 300)
-                            }
-                        }
-                    }
-                    .sheet(isPresented: $showPopup){
-                        if let pantry = selectedPantry {
-                            BasicPantryPopUpView(mapItem: pantry)
-                                .presentationDetents([.medium, .large])
-                        }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .automatic))
-                    .frame(height: isIPad ? 485 : 395)
-                    .padding(.vertical, 10)
-                    
-                    SearchView()
-                        .padding(.vertical, 10)
-                }
+        VStack(spacing: PL.spacingM) {
+            if locationDenied {
+                PLEmptyState(
+                    icon: "location.slash",
+                    title: "Location is turned off",
+                    message: "To show pantries near you, please allow location access. Tap the button below, then choose Location and select \"While Using the App\".",
+                    actionTitle: "Open Settings",
+                    action: openAppSettings
+                )
+            } else if !location.locationReady {
+                PLLoadingView(message: "Finding your location...")
+            } else if location.isLoadingPantries {
+                PLLoadingView(message: "Looking for pantries near you...")
+            } else if location.allPantries.isEmpty {
+                PLEmptyState(
+                    icon: "mappin.slash",
+                    title: "No pantries found nearby",
+                    message: "We couldn't find any pantries near you right now. Please try again.",
+                    actionTitle: "Try Again",
+                    action: { location.findPantries() }
+                )
+            } else {
+                pantryCarousel
+
+                SearchView()
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
-            .frame(width: isIPad ? 600 : 350)
-            .background(
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(.stockDarkTan)
-                    .shadow(radius: 10)
-            )
         }
-        .onAppear{
+        .frame(maxWidth: .infinity)
+        .sheet(isPresented: $showPopup) {
+            if let pantry = selectedPantry {
+                BasicPantryPopUpView(mapItem: pantry)
+                    .presentationDetents([.medium, .large])
+            }
+        }
+        .onAppear {
             location.checkLocationAuthorization()
         }
         .onChange(of: location.locationReady) { _, newValue in
@@ -179,16 +62,88 @@ struct LocalPantryView: View {
             }
         }
     }
-    
+
+    // Swipeable carousel of nearby pantries (sorted by distance, max 20)
+    private var pantryCarousel: some View {
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: PL.spacingM) {
+                ForEach(Array(location.allPantries.enumerated()), id: \.offset) { _, pantry in
+                    pantryCard(for: pantry)
+                        .containerRelativeFrame(.horizontal)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollIndicators(.hidden)
+    }
+
+    private func pantryCard(for pantry: MKMapItem) -> some View {
+        PLCard {
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                Button {
+                    selectedPantry = pantry
+                    showPopup = true
+                } label: {
+                    VStack(alignment: .leading, spacing: PL.spacingS) {
+                        SnapshotImageView(coordinate: pantry.placemark.coordinate, location: location)
+                            .frame(height: 200)
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .allowsHitTesting(false)
+
+                        Text(pantry.name ?? "Unknown Pantry")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        if let distanceText = distanceText(for: pantry) {
+                            Text(distanceText)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Text("Tap for details")
+                            .font(.caption)
+                            .foregroundStyle(PL.accent)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Shows details about this pantry")
+
+                PLSecondaryButton(
+                    title: "Get Directions",
+                    systemImage: "arrow.triangle.turn.up.right.diamond"
+                ) {
+                    openPantryInMaps(pantry: pantry)
+                }
+            }
+        }
+    }
+
+    // Friendly distance like "1.2 miles away"
+    private func distanceText(for pantry: MKMapItem) -> String? {
+        guard let pantryLocation = pantry.placemark.location,
+              let userLocation = location.lastKnownLocation else { return nil }
+        let userCLLocation = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
+        let distance = pantryLocation.distance(from: userCLLocation)
+        let distanceInMiles = distance * 0.000621371
+        return String(format: "%.1f miles away", distanceInMiles)
+    }
+
+    // Open the app's page in the Settings app so the user can allow location
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
+
     // Open Apple Maps with the pantry location
     func openPantryInMaps(pantry: MKMapItem) {
-        print("🗺️ Opening directions for: \(pantry.name ?? "Unknown")")
-        print("🗺️ Placemark coordinate: \(pantry.placemark.coordinate.latitude), \(pantry.placemark.coordinate.longitude)")
-        print("🗺️ Placemark location: \(pantry.placemark.location?.coordinate.latitude ?? -1), \(pantry.placemark.location?.coordinate.longitude ?? -1)")
-        
         // If placemark.location is nil, create a new placemark with just coordinate
         if pantry.placemark.location == nil {
-            print("⚠️ Location is nil, creating new placemark")
             let coordinate = pantry.placemark.coordinate
             let newPlacemark = MKPlacemark(coordinate: coordinate)
             let newMapItem = MKMapItem(placemark: newPlacemark)
@@ -203,9 +158,12 @@ struct LocalPantryView: View {
             ])
         }
     }
-    
 }
 
 #Preview {
-    LocalPantryView()
+    ScrollView {
+        LocalPantryView()
+            .padding()
+    }
+    .background(PL.background)
 }
