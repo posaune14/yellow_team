@@ -7,8 +7,9 @@
 import SwiftUI
 import MapKit
 
-/// Card summarizing a pantry: name, address, its top items with stock levels,
-/// and a clear "tap to see more" affordance.
+/// Card summarizing a pantry: name, address, and a clear
+/// "tap to see more" affordance. (topItems is kept for API compatibility
+/// and to show the "no food listed" note when empty.)
 struct StockItemView: View {
     let pantryName: String
     let topItems: [PantryItem]
@@ -56,17 +57,6 @@ struct StockItemView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding(.top, PL.spacingXS)
-                } else {
-                    Divider()
-
-                    ForEach(topItems) { item in
-                        VStack(alignment: .leading, spacing: PL.spacingXS) {
-                            Text(item.name)
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.primary)
-                            PLStockLevel(current: item.current, full: item.full)
-                        }
-                    }
                 }
 
                 HStack(spacing: PL.spacingXS) {

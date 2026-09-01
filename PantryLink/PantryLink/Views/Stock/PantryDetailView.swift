@@ -33,6 +33,13 @@ struct PantryDetailView: View {
             .sorted { $0.type < $1.type }
     }
 
+    // This pantry's announcements, newest first
+    var announcements: [StreamAlertWithPantry] {
+        (pantry.stream ?? [])
+            .map { StreamAlertWithPantry(pantryName: pantry.name, alert: $0) }
+            .sorted { $0.sortDate > $1.sortDate }
+    }
+
     var body: some View {
         ZStack {
             PL.background
@@ -49,6 +56,27 @@ struct PantryDetailView: View {
                             systemImage: "arrow.triangle.turn.up.right.diamond"
                         ) {
                             openInMaps(address: address)
+                        }
+                    }
+
+                    // Announcements from this pantry
+                    if !announcements.isEmpty {
+                        PLSectionHeader(title: "Announcements")
+                            .padding(.top, PL.spacingS)
+
+                        ForEach(announcements) { announcement in
+                            PLCard {
+                                VStack(alignment: .leading, spacing: PL.spacingXS) {
+                                    Text(announcement.alert.message)
+                                        .font(.body)
+                                        .foregroundStyle(.primary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    Text(announcement.displayDate)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityElement(children: .combine)
                         }
                     }
 

@@ -45,8 +45,8 @@ struct StockPageView: View {
                             SearchView()
 
                             PLSectionHeader(
-                                title: "Pantries",
-                                subtitle: "Tap a pantry to see everything it has."
+                                title: "All pantries",
+                                subtitle: "Tap a pantry to see its food and announcements."
                             )
 
                             ForEach(pantries ?? []) { pantry in
@@ -63,7 +63,7 @@ struct StockPageView: View {
                     }
                 }
             }
-            .navigationTitle("Food Stock")
+            .navigationTitle("Pantries")
             .navigationDestination(isPresented: $showDetailView) {
                 if let pantry = selectedPantry {
                     PantryDetailView(pantry: pantry)
