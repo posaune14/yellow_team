@@ -1,6 +1,7 @@
 import { Box, Text, TextInput, Button, Center, Container, Title, Fieldset, Anchor, Stack, Flex } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { API_BASE_URL } from '../config'
 import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
 import { IconCheck, IconX } from '@tabler/icons-react'
@@ -20,7 +21,6 @@ function SignupBox() {
     const navigate = useNavigate()
     
     // API Base URL - point to Render deployment
-    const API_BASE_URL = 'https://yellow-team.onrender.com';
     
     const handleInputChange = (field, value) => {
         setFormData(prev => ({

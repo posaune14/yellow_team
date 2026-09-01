@@ -16,7 +16,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
     @Published var deviceToken: String?
     
     // Base URL for the API
-    private let baseURL = "https://yellow-team.onrender.com"
+    private let baseURL = API.baseURL
     
     //testing only, no back end connection
     func testNotification() {

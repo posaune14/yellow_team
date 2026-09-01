@@ -232,7 +232,7 @@ struct ServePageView: View {
         
         // URL encode the username to handle special characters
         guard let encodedUsername = username.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-              let url = URL(string: "https://yellow-team.onrender.com/volunteer/check/\(encodedUsername)") else {
+              let url = URL(string: "\(API.baseURL)/volunteer/check/\(encodedUsername)") else {
             return false
         }
         

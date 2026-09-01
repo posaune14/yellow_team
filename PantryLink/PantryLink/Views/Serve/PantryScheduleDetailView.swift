@@ -144,7 +144,7 @@ struct PantryScheduleDetailView: View {
         isLoading = true
         let dateKey = dateFormatter.string(from: selectedDate)
         
-        guard let url = URL(string: "https://yellow-team.onrender.com/pantry/\(pantry._id)/schedule?date=\(dateKey)") else {
+        guard let url = URL(string: "\(API.baseURL)/pantry/\(pantry._id)/schedule?date=\(dateKey)") else {
             isLoading = false
             return
         }
@@ -179,7 +179,7 @@ struct PantryScheduleDetailView: View {
         }
         
         let dateKey = dateFormatter.string(from: selectedDate)
-        let urlString = "https://yellow-team.onrender.com/pantry/check-user-conflict?username=\(username)&date=\(dateKey)&exclude_pantry_id=\(pantry._id)"
+        let urlString = "\(API.baseURL)/pantry/check-user-conflict?username=\(username)&date=\(dateKey)&exclude_pantry_id=\(pantry._id)"
         
         guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString) else {
             completion(nil)
@@ -347,7 +347,7 @@ struct PantryScheduleDetailView: View {
     
     private func saveSchedule(updatedSchedule: ScheduleData) {
         let dateKey = dateFormatter.string(from: selectedDate)
-        guard let url = URL(string: "https://yellow-team.onrender.com/pantry/\(pantry._id)/schedule/\(dateKey)") else { return }
+        guard let url = URL(string: "\(API.baseURL)/pantry/\(pantry._id)/schedule/\(dateKey)") else { return }
         
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"

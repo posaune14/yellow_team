@@ -13,7 +13,7 @@ extension VolunteerContentView {
     //allows you to edit the properties of another view/class in a different structure, so in here, lets us edit alert_message
     
     func check_volunteer_exists(username: String) async -> Bool {
-        guard let url = URL(string: "https://yellow-team.onrender.com/volunteer/check/\(username)") else {
+        guard let url = URL(string: "\(API.baseURL)/volunteer/check/\(username)") else {
             return false
         }
         
@@ -43,7 +43,7 @@ extension VolunteerContentView {
     }
     
     func register_volunteer(volunteer: Volunteer, show_success: Binding<Bool>){
-        guard let url = URL(string: "https://yellow-team.onrender.com/volunteer/create") else
+        guard let url = URL(string: "\(API.baseURL)/volunteer/create") else
         { return }
         
         //request: takes inputed data, changes it to json, and sends it to the database
@@ -93,7 +93,7 @@ extension VolunteerContentView {
 // Legacy extension for VolunteerView (keeping for compatibility)
 extension VolunteerView {
     func register_volunteer(volunteer: Volunteer){
-        guard let url = URL(string: "https://yellow-team.onrender.com/volunteer/create") else
+        guard let url = URL(string: "\(API.baseURL)/volunteer/create") else
         { return }
         
         //request: takes inputed data, changes it to json, and sends it to the database

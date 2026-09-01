@@ -45,7 +45,7 @@ import {
   import { useState, useEffect } from 'react'
   import { notifications } from '@mantine/notifications'
   import axios from 'axios'
-  const API_BASE_URL = 'https://yellow-team.onrender.com';
+  import { API_BASE_URL } from '../config'
   const getPantryId = () => {
     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
     return userData._id;

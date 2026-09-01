@@ -103,7 +103,7 @@ struct ScheduleView: View {
     private func fetchPantries() {
         isLoading = true
         
-        guard let url = URL(string: "https://yellow-team.onrender.com/pantry/") else {
+        guard let url = URL(string: "\(API.baseURL)/pantry/") else {
             isLoading = false
             return
         }
@@ -137,7 +137,7 @@ struct ScheduleView: View {
     private func fetchUserWeekSchedule() {
         guard let username = userManager.currentUser?.username else { return }
         
-        guard let url = URL(string: "https://yellow-team.onrender.com/pantry/user-schedule/\(username)") else { return }
+        guard let url = URL(string: "\(API.baseURL)/pantry/user-schedule/\(username)") else { return }
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
