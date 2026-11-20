@@ -1,102 +1,40 @@
 //
-//  ContentView.swift
+//  VolunteerView.swift
 //  PantryLink
 //
-//  Created by Michael Youtz on 5/27/25.
+//  Volunteer signup form.
 //
 
 import SwiftUI
 
-// VolunteerPageView - Full page version for TabView
-struct VolunteerPageView: View {
-    @ObservedObject private var userManager = UserManager.shared
-    @Binding var path: NavigationPath
-    
-    //form 1 data fields
-    @State var username: String = ""
-    @State var first_name: String = ""
-    @State var last_name: String = ""
-    @State var date_of_birth: String = ""
-    @State var email: String = ""
-    @State var phone_number: String = ""
-    @State var zipcode: String = ""
-    
-    //form 2 data fields
-    @State var roles: String = ""
-    @State var availability: String = ""
-    @State var emergency_name: String = ""
-    @State var emergency_number: String = ""
-    
-    //pop up variable
-    @State var isClicked = false
-    
-    //alert
-    @State var alert_message = ""
-    @State var show_alert = false
-    
-    //unfinished
-    @State var empty_field = false
-    
-    var body: some View {
-        NavigationStack(path: $path) {
-            VolunteerContentView(
-                userManager: userManager,
-                username: $username,
-                first_name: $first_name,
-                last_name: $last_name,
-                date_of_birth: $date_of_birth,
-                email: $email,
-                phone_number: $phone_number,
-                zipcode: $zipcode,
-                roles: $roles,
-                availability: $availability,
-                emergency_name: $emergency_name,
-                emergency_number: $emergency_number,
-                isClicked: $isClicked,
-                alert_message: $alert_message,
-                show_alert: $show_alert,
-                empty_field: $empty_field,
-                path: $path
-            )
-            .navigationDestination(for: String.self) { value in
-                if value == "SignUp" {
-                    SignUpView(path: $path)
-                }
-            }
-        }
-    }
-}
-
-// Legacy VolunteerView for navigation-based access (keeping for compatibility)
+// Volunteer signup view, pushed from the Serve page.
 struct VolunteerView: View {
     @ObservedObject private var userManager = UserManager.shared
     @Binding var path: NavigationPath
-    
-    //form 1 data fields
+
+    // About you
     @State var username: String = ""
     @State var first_name: String = ""
     @State var last_name: String = ""
     @State var date_of_birth: String = ""
+
+    // Contact
     @State var email: String = ""
     @State var phone_number: String = ""
     @State var zipcode: String = ""
-    
-    //form 2 data fields
+
+    // Availability
     @State var roles: String = ""
     @State var availability: String = ""
+
+    // Emergency contact
     @State var emergency_name: String = ""
     @State var emergency_number: String = ""
-    
-    //pop up variable
-    @State var isClicked = false
-    
-    //alert
+
+    // Alert state (also used by the legacy extension in VolunteerViewModel).
     @State var alert_message = ""
     @State var show_alert = false
-    
-    //unfinished
-    @State var empty_field = false
-    
+
     var body: some View {
         VolunteerContentView(
             userManager: userManager,
@@ -111,16 +49,16 @@ struct VolunteerView: View {
             availability: $availability,
             emergency_name: $emergency_name,
             emergency_number: $emergency_number,
-            isClicked: $isClicked,
             alert_message: $alert_message,
             show_alert: $show_alert,
-            empty_field: $empty_field,
             path: $path
         )
     }
 }
 
-// Shared content view for volunteer functionality
+// Shared content view for volunteer functionality.
+// Note: check_volunteer_exists and register_volunteer live in an extension
+// in ViewModels/VolunteerViewModel.swift and rely on alert_message/show_alert.
 struct VolunteerContentView: View {
     @ObservedObject var userManager: UserManager
     @Binding var username: String
@@ -134,573 +72,451 @@ struct VolunteerContentView: View {
     @Binding var availability: String
     @Binding var emergency_name: String
     @Binding var emergency_number: String
-    @Binding var isClicked: Bool
     @Binding var alert_message: String
     @Binding var show_alert: Bool
-    @Binding var empty_field: Bool
     @Binding var path: NavigationPath
-    
-    @State private var show_success_alert = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var show_success = false
     @State private var isAutoFilled = false
-    @State private var isCheckingExisting = false
+    @State private var isSubmitting = false
     @State private var show_already_registered_alert = false
-    
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    var isIPad: Bool {
-        horizontalSizeClass == .regular
+
+    // Date of birth is entered with a DatePicker; the string binding keeps
+    // the MM/DD/YYYY format the server expects.
+    @State private var dobDate: Date = Calendar.current.date(byAdding: .year, value: -30, to: Date()) ?? Date()
+    @State private var hasChosenDOB = false
+
+    // Set after a submit attempt so error messages only appear once the
+    // person has tried to send the form.
+    @State private var attemptedSubmit = false
+
+    private var dobFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy"
+        return formatter
     }
-    
+
+    // MARK: - Validation
+
+    private var usernameError: String? {
+        username.isEmpty ? "Please enter a username" : nil
+    }
+    private var firstNameError: String? {
+        first_name.isEmpty ? "Please enter your first name" : nil
+    }
+    private var lastNameError: String? {
+        last_name.isEmpty ? "Please enter your last name" : nil
+    }
+    private var dobError: String? {
+        hasChosenDOB ? nil : "Please choose your date of birth"
+    }
+    private var emailError: String? {
+        if email.isEmpty { return "Please enter your email address" }
+        if !email.contains("@") || !email.contains(".") { return "Please enter a valid email address, like name@example.com" }
+        return nil
+    }
+    private var phoneError: String? {
+        phone_number.isEmpty ? "Please enter your phone number" : nil
+    }
+    private var zipcodeError: String? {
+        zipcode.isEmpty ? "Please enter your ZIP code" : nil
+    }
+    private var rolesError: String? {
+        roles.isEmpty ? "Please tell us which roles you'd like, like \"Sorting\" or \"Delivery\"" : nil
+    }
+    private var availabilityError: String? {
+        availability.isEmpty ? "Please tell us when you're available, like \"Weekday mornings\"" : nil
+    }
+    private var emergencyNameError: String? {
+        emergency_name.isEmpty ? "Please enter your emergency contact's name" : nil
+    }
+    private var emergencyNumberError: String? {
+        emergency_number.isEmpty ? "Please enter your emergency contact's phone number" : nil
+    }
+
+    private var isFormValid: Bool {
+        [usernameError, firstNameError, lastNameError, dobError,
+         emailError, phoneError, zipcodeError,
+         rolesError, availabilityError,
+         emergencyNameError, emergencyNumberError].allSatisfy { $0 == nil }
+    }
+
     var body: some View {
-        ZStack {
-            // Gradient Background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Colors.flexibleOrange.opacity(0.1),
-                    Colors.flexibleWhite,
-                    Colors.flexibleGreen.opacity(0.05)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: 32) {
-                    // Exciting Header Section
-                    VStack(spacing: 16) {
-                        // Celebration icon
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Colors.flexibleOrange.opacity(0.3),
-                                            Colors.flexibleGreen.opacity(0.3)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 100, height: 100)
-                            
-                            Image(systemName: "heart.fill")
-                                .font(.system(size: 50))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Colors.flexibleOrange,
-                                            Colors.flexibleGreen
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                        }
-                        .padding(.top, 20)
-                        
-                        VStack(spacing: 8) {
-                            Text("Volunteer today!")
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Colors.flexibleOrange,
-                                            Colors.flexibleGreen
-                                        ]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                            
-                            Text("Join us in making a difference")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(Colors.flexibleBlack)
-                            
-                            Text("Complete the following form to create a PantryLink volunteer profile")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Colors.flexibleDarkGray)
-                                .padding(.top, 4)
-                        }
-                    }
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
-                    .multilineTextAlignment(.center)
-                    
-                    // Opportunities Section with Excitement
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                                .foregroundColor(Colors.flexibleOrange)
-                                .font(.system(size: 20))
-                            Text("Available Opportunities")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(Colors.flexibleBlack)
-                            Image(systemName: "sparkles")
-                                .foregroundColor(Colors.flexibleOrange)
-                                .font(.system(size: 20))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        
-                        Text("Here are some examples of volunteer roles you can choose from:")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(Colors.flexibleDarkGray)
-                            .padding(.horizontal, 20)
-                        
-                        VStack(spacing: 14) {
-                            let opportunities = [
-                                ("Food Distribution", "tray.fill"),
-                                ("Sorting/Packing", "shippingbox.fill"),
-                                ("Delivery", "car.fill"),
-                                ("Admin Support", "doc.text.fill"),
-                                ("Fundraising Support", "dollarsign.circle.fill"),
-                                ("Cleaning/Sanitation", "sparkles.rectangle.stack.fill")
-                            ]
-                            
-                            ForEach(Array(opportunities.enumerated()), id: \.element.0) { index, opportunity in
-                                OpportunityCard(title: opportunity.0, icon: opportunity.1, index: index)
-                            }
-                            
-                            // "And many more!" card
-                            OpportunityCard(title: "And many more!", icon: "ellipsis.circle.fill", index: opportunities.count)
-                        }
-                        .padding(.horizontal, 20)
-                    }
-            
-                    // Registration Form Section with Excitement
-                    VStack(alignment: .leading, spacing: 24) {
-                        VStack(spacing: 8) {
-                            if !isClicked {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(Colors.flexibleOrange)
-                                    Text("Let's Get Started!")
-                                        .font(.system(size: 26, weight: .bold))
-                                        .foregroundColor(Colors.flexibleBlack)
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(Colors.flexibleOrange)
-                                }
-                                
-                                Text("Fill out the form below to begin your volunteer journey")
-                                    .font(.system(size: 14, weight: .regular))
-                                    .foregroundColor(Colors.flexibleDarkGray)
-                                    .multilineTextAlignment(.center)
-                            } else {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(Colors.flexibleGreen)
-                                    Text("Almost There! ✨")
-                                        .font(.system(size: 26, weight: .bold))
-                                        .foregroundColor(Colors.flexibleBlack)
-                                }
-                                
-                                Text("Just a few more details to complete your application")
-                                    .font(.system(size: 14, weight: .regular))
-                                    .foregroundColor(Colors.flexibleDarkGray)
-                                    .multilineTextAlignment(.center)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        
-                        if !isClicked {
-                            // First Form - Basic Information
-                            VStack(spacing: 20) {
-                                // Add some visual flair
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Colors.flexibleLightGray.opacity(0.5))
-                                    .frame(height: 1)
-                                    .padding(.horizontal, 20)
-                                
-                            VStack(spacing: 16) {
-                                FormTextField(
-                                    label: "Username",
-                                    text: $username,
-                                    placeholder: "Enter your username",
-                                    isEmpty: empty_field && username.isEmpty,
-                                    isDisabled: isAutoFilled
-                                )
-                                
-                                FormTextField(
-                                    label: "First Name",
-                                    text: $first_name,
-                                    placeholder: "Enter your first name",
-                                    isEmpty: empty_field && first_name.isEmpty,
-                                    isDisabled: isAutoFilled
-                                )
-                                
-                                FormTextField(
-                                    label: "Last Name",
-                                    text: $last_name,
-                                    placeholder: "Enter your last name",
-                                    isEmpty: empty_field && last_name.isEmpty,
-                                    isDisabled: isAutoFilled
-                                )
-                                
-                                FormTextField(
-                                    label: "Date of Birth",
-                                    text: $date_of_birth,
-                                    placeholder: "MM/DD/YYYY",
-                                    isEmpty: empty_field && date_of_birth.isEmpty
-                                )
-                                
-                                FormTextField(
-                                    label: "Email",
-                                    text: $email,
-                                    placeholder: "your.email@example.com",
-                                    isEmpty: empty_field && email.isEmpty,
-                                    keyboardType: .emailAddress,
-                                    isDisabled: isAutoFilled
-                                )
-                                
-                                FormTextField(
-                                    label: "Phone Number",
-                                    text: $phone_number,
-                                    placeholder: "(555) 123-4567",
-                                    isEmpty: empty_field && phone_number.isEmpty,
-                                    isDisabled: isAutoFilled
-                                )
-                                
-                                FormTextField(
-                                    label: "Zipcode",
-                                    text: $zipcode,
-                                    placeholder: "12345",
-                                    isEmpty: empty_field && zipcode.isEmpty
-                                )
-                                
-                                Button(action: {
-                                    guard !username.isEmpty, !first_name.isEmpty, !last_name.isEmpty, !date_of_birth.isEmpty, !email.isEmpty, !phone_number.isEmpty, !zipcode.isEmpty else {
-                                        empty_field = true
-                                        return
-                                    }
-                                    empty_field = false
-                                    
-                                    // Check if volunteer already exists before continuing
-                                    Task {
-                                        isCheckingExisting = true
-                                        let exists = await check_volunteer_exists(username: username)
-                                        isCheckingExisting = false
-                                        
-                                        if exists {
-                                            show_already_registered_alert = true
-                                        } else {
-                                            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                                                isClicked = true
-                                            }
-                                        }
-                                    }
-                                }) {
-                                    HStack(spacing: 10) {
-                                        if isCheckingExisting {
-                                            ProgressView()
-                                                .progressViewStyle(CircularProgressViewStyle(tint: Colors.flexibleWhite))
-                                            Text("Checking...")
-                                                .font(.system(size: 18, weight: .bold))
-                                        } else {
-                                            Text("Continue")
-                                                .font(.system(size: 18, weight: .bold))
-                                            Image(systemName: "arrow.right.circle.fill")
-                                                .font(.system(size: 20))
-                                        }
-                                    }
-                                    .foregroundColor(Colors.flexibleWhite)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 56)
-                                    .background(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Colors.flexibleOrange,
-                                                Colors.flexibleGreen
-                                            ]),
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .cornerRadius(16)
-                                    .shadow(color: Colors.flexibleGreen.opacity(0.4), radius: 8, y: 4)
-                                }
-                                .disabled(isCheckingExisting)
-                                .padding(.top, 12)
-                            }
-                            .padding(.horizontal, 20)
-                            }
-                            
-                        } else {
-                            // Second Form - Additional Information
-                            VStack(spacing: 20) {
-                                // Add some visual flair
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Colors.flexibleLightGray.opacity(0.5))
-                                    .frame(height: 1)
-                                    .padding(.horizontal, 20)
-                            
-                            VStack(spacing: 16) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: "heart.circle.fill")
-                                            .foregroundColor(Colors.flexibleOrange)
-                                        Text("We're thrilled you're joining us!")
-                                            .font(.system(size: 18, weight: .bold))
-                                            .foregroundColor(Colors.flexibleBlack)
-                                    }
-                                    
-                                    Text("Just a few more details to help us match you with the perfect opportunity!")
-                                        .font(.system(size: 14, weight: .regular))
-                                        .foregroundColor(Colors.flexibleDarkGray)
-                                }
-                                .padding(.bottom, 8)
-                                
-                                FormTextField(
-                                    label: "Preferred Roles",
-                                    text: $roles,
-                                    placeholder: "e.g., Delivery, Admin Support",
-                                    isEmpty: empty_field && roles.isEmpty
-                                )
-                                
-                                FormTextField(
-                                    label: "Availability",
-                                    text: $availability,
-                                    placeholder: "e.g., M-F 9AM to 5PM",
-                                    isEmpty: empty_field && availability.isEmpty
-                                )
-                                
-                                VStack(alignment: .leading, spacing: 12) {
-                                    Text("Emergency Contact")
-                                        .font(.system(size: 16, weight: .semibold))
-                                        .foregroundColor(Colors.flexibleBlack)
-                                    
-                                    FormTextField(
-                                        label: "Contact Name",
-                                        text: $emergency_name,
-                                        placeholder: "Full Name",
-                                        isEmpty: empty_field && emergency_name.isEmpty,
-                                        showLabel: false
-                                    )
-                                    
-                                    FormTextField(
-                                        label: "Contact Phone",
-                                        text: $emergency_number,
-                                        placeholder: "(555) 123-4567",
-                                        isEmpty: empty_field && emergency_number.isEmpty,
-                                        showLabel: false
-                                    )
-                                }
-                                
-                                Button(action: {
-                                    guard !availability.isEmpty, !roles.isEmpty, !emergency_name.isEmpty, !emergency_number.isEmpty else {
-                                        empty_field = true
-                                        return
-                                    }
-                                    
-                                    let new_volunteer = Volunteer(
-                                        username: username,
-                                        first_name: first_name,
-                                        last_name: last_name,
-                                        date_of_birth: date_of_birth,
-                                        email: email,
-                                        phone_number: phone_number,
-                                        zipcode: zipcode,
-                                        roles: roles,
-                                        availability: availability,
-                                        emergency_name: emergency_name,
-                                        emergency_number: emergency_number,
-                                        alert_message: alert_message,
-                                        show_alert: show_alert
-                                    )
-                                    
-                                    register_volunteer(volunteer: new_volunteer, show_success: $show_success_alert)
-                                }) {
-                                    HStack(spacing: 10) {
-                                        Text("Submit Application")
-                                            .font(.system(size: 18, weight: .bold))
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .font(.system(size: 20))
-                                    }
-                                    .foregroundColor(Colors.flexibleWhite)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 56)
-                                    .background(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Colors.flexibleGreen,
-                                                Colors.flexibleOrange
-                                            ]),
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .cornerRadius(16)
-                                    .shadow(color: Colors.flexibleGreen.opacity(0.4), radius: 8, y: 4)
-                                }
-                                .padding(.top, 12)
-                            }
-                            .padding(.horizontal, 20)
-                            }
-                        }
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 120)
-                }
-                .padding(.vertical, 20)
-                .frame(maxWidth: isIPad ? 800 : .infinity)
+        ScrollView {
+            if show_success {
+                successContent
+            } else {
+                formContent
             }
         }
-        .ignoresSafeArea(.container, edges: .bottom)
-        .alert("Error", isPresented: $show_alert) {
+        .background(PL.background.ignoresSafeArea())
+        .navigationTitle("Volunteer Sign Up")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Something Went Wrong", isPresented: $show_alert) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(alert_message)
         }
-        .alert("Application Submitted!", isPresented: $show_success_alert) {
-            Button("OK") {
-                // Navigate back after user dismisses the success alert
+        .alert("You're Already Signed Up", isPresented: $show_already_registered_alert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Good news - you already have a volunteer account. Visit the volunteer schedule page to see available shifts.")
+        }
+        .animation(reduceMotion ? nil : .default, value: show_success)
+        .onChange(of: show_alert) { isShowing in
+            if isShowing { isSubmitting = false }
+        }
+        .onChange(of: show_success) { succeeded in
+            if succeeded { isSubmitting = false }
+        }
+        .onAppear {
+            autofillFromAccount()
+        }
+    }
+
+    // MARK: - Success screen
+
+    private var successContent: some View {
+        VStack(spacing: PL.spacingL) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.largeTitle)
+                .foregroundStyle(PL.good)
+                .accessibilityHidden(true)
+
+            Text("Thank You, \(first_name)!")
+                .font(.title.bold())
+                .multilineTextAlignment(.center)
+
+            Text("Your volunteer application was submitted and you're now in our system. We'll be in touch soon. Next, you can visit the volunteer schedule to pick a shift.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            PLPrimaryButton(title: "Done", systemImage: "checkmark") {
                 if path.count > 0 {
                     path.removeLast()
                 }
             }
-        } message: {
-            Text("Thank you for your interest! Your volunteer application has been successfully submitted and you are now in our system. We'll be in touch soon!")
         }
-        .alert("Already Registered", isPresented: $show_already_registered_alert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("You already have a volunteer account registered. Please refer to the volunteer scheduling page for available shifts and opportunities.")
-        }
-        .onAppear {
-            // Autofill form fields from logged-in user data
-            if let user = userManager.currentUser {
-                if username.isEmpty {
-                    username = user.username
-                }
-                if first_name.isEmpty {
-                    first_name = user.first_name
-                }
-                if last_name.isEmpty {
-                    last_name = user.last_name
-                }
-                if email.isEmpty {
-                    email = user.email
-                }
-                if phone_number.isEmpty {
-                    phone_number = user.phone_number
-                }
-                // Mark fields as autofilled and locked
-                isAutoFilled = true
-            }
-        }
+        .padding(PL.spacingL)
+        .padding(.top, PL.spacingXL)
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isStaticText)
     }
-}
 
-// Helper view for opportunity cards - Informational style (not clickable)
-struct OpportunityCard: View {
-    let title: String
-    let icon: String
-    let index: Int
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            // Icon with gradient background
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Colors.flexibleOrange.opacity(0.15),
-                                Colors.flexibleGreen.opacity(0.15)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 45, height: 45)
-                
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Colors.flexibleOrange,
-                                Colors.flexibleGreen
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+    // MARK: - Form
+
+    private var formContent: some View {
+        VStack(alignment: .leading, spacing: PL.spacingL) {
+            // Intro
+            VStack(spacing: PL.spacingS) {
+                Image(systemName: "heart.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(PL.accent)
+                    .accessibilityHidden(true)
+
+                Text("Become a Volunteer")
+                    .font(.title.bold())
+                    .multilineTextAlignment(.center)
+
+                Text("Food pantries rely on volunteers for sorting, packing, deliveries, and more. Fill out this short form so pantries know who you are and how to reach you. All fields are required.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
-            
-            Text(title)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(Colors.flexibleBlack)
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Colors.flexibleLightGray.opacity(0.5))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Colors.flexibleLightGray, lineWidth: 1)
-        )
-    }
-}
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
 
-// Helper view for form text fields
-struct FormTextField: View {
-    let label: String
-    @Binding var text: String
-    let placeholder: String
-    var isEmpty: Bool = false
-    var keyboardType: UIKeyboardType = .default
-    var showLabel: Bool = true
-    var isDisabled: Bool = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if showLabel {
-                HStack(spacing: 6) {
-                    Text(label)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(isEmpty ? Colors.flexibleRed : Colors.flexibleBlack)
-                    
-                    if isDisabled {
-                        HStack(spacing: 4) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 10))
-                            Text("(Auto-filled)")
-                                .font(.system(size: 11, weight: .medium))
+            // About you
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(
+                    title: "About You",
+                    subtitle: "So pantries know who's coming to help"
+                )
+
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        if isAutoFilled {
+                            Label("Some fields were filled in from your account", systemImage: "lock.fill")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .foregroundColor(Colors.flexibleDarkGray.opacity(0.7))
+
+                        fieldWithError(error: usernameError) {
+                            PLTextField(
+                                label: "Username (required)",
+                                text: $username,
+                                placeholder: "Your PantryLink username",
+                                contentType: .username
+                            )
+                            .disabled(isAutoFilled)
+                            .opacity(isAutoFilled ? 0.6 : 1)
+                        }
+
+                        fieldWithError(error: firstNameError) {
+                            PLTextField(
+                                label: "First Name (required)",
+                                text: $first_name,
+                                placeholder: "For example: Mary",
+                                contentType: .givenName,
+                                autocapitalization: .words
+                            )
+                            .disabled(isAutoFilled)
+                            .opacity(isAutoFilled ? 0.6 : 1)
+                        }
+
+                        fieldWithError(error: lastNameError) {
+                            PLTextField(
+                                label: "Last Name (required)",
+                                text: $last_name,
+                                placeholder: "For example: Johnson",
+                                contentType: .familyName,
+                                autocapitalization: .words
+                            )
+                            .disabled(isAutoFilled)
+                            .opacity(isAutoFilled ? 0.6 : 1)
+                        }
+
+                        fieldWithError(error: dobError) {
+                            VStack(alignment: .leading, spacing: PL.spacingXS) {
+                                Text("Date of Birth (required)")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.secondary)
+                                DatePicker(
+                                    "Date of Birth",
+                                    selection: $dobDate,
+                                    in: ...Date(),
+                                    displayedComponents: .date
+                                )
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .frame(minHeight: PL.tapTarget, alignment: .leading)
+                                .onChange(of: dobDate) { newDate in
+                                    hasChosenDOB = true
+                                    date_of_birth = dobFormatter.string(from: newDate)
+                                }
+                                Text("Pantries need this to follow their volunteer age rules.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
             }
-            
-            TextField(placeholder, text: $text)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundColor(isDisabled ? Colors.flexibleDarkGray : Colors.flexibleBlack)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(isDisabled ? Colors.flexibleLightGray.opacity(0.3) : Colors.flexibleWhite)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(isEmpty ? Colors.flexibleRed : Colors.flexibleLightGray, lineWidth: isEmpty ? 2 : 1)
-                        )
+
+            // Contact
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(
+                    title: "How to Reach You",
+                    subtitle: "Pantries use this to confirm your shifts"
                 )
-                .keyboardType(keyboardType)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-                .disabled(isDisabled)
+
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        fieldWithError(error: emailError) {
+                            PLTextField(
+                                label: "Email (required)",
+                                text: $email,
+                                placeholder: "name@example.com",
+                                keyboard: .emailAddress,
+                                contentType: .emailAddress
+                            )
+                            .disabled(isAutoFilled)
+                            .opacity(isAutoFilled ? 0.6 : 1)
+                        }
+
+                        fieldWithError(error: phoneError) {
+                            PLTextField(
+                                label: "Phone Number (required)",
+                                text: $phone_number,
+                                placeholder: "(555) 123-4567",
+                                keyboard: .phonePad,
+                                contentType: .telephoneNumber
+                            )
+                            .disabled(isAutoFilled)
+                            .opacity(isAutoFilled ? 0.6 : 1)
+                        }
+
+                        fieldWithError(error: zipcodeError) {
+                            PLTextField(
+                                label: "ZIP Code (required)",
+                                text: $zipcode,
+                                placeholder: "12345",
+                                keyboard: .numberPad,
+                                contentType: .postalCode
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Availability
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(
+                    title: "How You'd Like to Help",
+                    subtitle: "This helps match you with the right pantry tasks"
+                )
+
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        Text("Common roles: Food Distribution, Sorting and Packing, Delivery, Admin Support, Fundraising, Cleaning - or anything else you enjoy.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        fieldWithError(error: rolesError) {
+                            PLTextField(
+                                label: "Preferred Roles (required)",
+                                text: $roles,
+                                placeholder: "For example: Delivery, Sorting",
+                                autocapitalization: .sentences
+                            )
+                        }
+
+                        fieldWithError(error: availabilityError) {
+                            PLTextField(
+                                label: "Availability (required)",
+                                text: $availability,
+                                placeholder: "For example: Weekdays 9 AM to 5 PM",
+                                autocapitalization: .sentences
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Emergency contact
+            VStack(alignment: .leading, spacing: PL.spacingM) {
+                PLSectionHeader(
+                    title: "Emergency Contact",
+                    subtitle: "Someone we can call if anything happens while you volunteer"
+                )
+
+                PLCard {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        fieldWithError(error: emergencyNameError) {
+                            PLTextField(
+                                label: "Contact Name (required)",
+                                text: $emergency_name,
+                                placeholder: "Full name",
+                                contentType: .name,
+                                autocapitalization: .words
+                            )
+                        }
+
+                        fieldWithError(error: emergencyNumberError) {
+                            PLTextField(
+                                label: "Contact Phone (required)",
+                                text: $emergency_number,
+                                placeholder: "(555) 123-4567",
+                                keyboard: .phonePad,
+                                contentType: .telephoneNumber
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Submit
+            VStack(alignment: .leading, spacing: PL.spacingS) {
+                if attemptedSubmit && !isFormValid {
+                    Label("Some fields still need attention. Please check the messages above.", systemImage: "exclamationmark.circle.fill")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(PL.critical)
+                }
+
+                PLPrimaryButton(
+                    title: isSubmitting ? "Sending Your Application..." : "Submit My Application",
+                    systemImage: isSubmitting ? nil : "paperplane.fill",
+                    isLoading: isSubmitting,
+                    action: { submit() }
+                )
+            }
+            .padding(.top, PL.spacingS)
+        }
+        .padding(PL.spacingM)
+        .padding(.bottom, PL.spacingXL)
+    }
+
+    // MARK: - Field + inline error helper
+
+    @ViewBuilder
+    private func fieldWithError<Field: View>(error: String?, @ViewBuilder field: () -> Field) -> some View {
+        VStack(alignment: .leading, spacing: PL.spacingXS) {
+            field()
+            if attemptedSubmit, let error {
+                Label(error, systemImage: "exclamationmark.circle.fill")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(PL.critical)
+            }
+        }
+    }
+
+    // MARK: - Actions
+
+    private func autofillFromAccount() {
+        // Autofill form fields from logged-in user data
+        if let user = userManager.currentUser {
+            if username.isEmpty { username = user.username }
+            if first_name.isEmpty { first_name = user.first_name }
+            if last_name.isEmpty { last_name = user.last_name }
+            if email.isEmpty { email = user.email }
+            if phone_number.isEmpty { phone_number = user.phone_number }
+            // Mark fields as autofilled and locked
+            isAutoFilled = true
+        }
+
+        // If a date of birth was already entered, keep it.
+        if !date_of_birth.isEmpty, let parsed = dobFormatter.date(from: date_of_birth) {
+            dobDate = parsed
+            hasChosenDOB = true
+        }
+    }
+
+    private func submit() {
+        attemptedSubmit = true
+
+        guard isFormValid else { return }
+
+        date_of_birth = dobFormatter.string(from: dobDate)
+        isSubmitting = true
+
+        Task {
+            let exists = await check_volunteer_exists(username: username)
+
+            await MainActor.run {
+                if exists {
+                    isSubmitting = false
+                    show_already_registered_alert = true
+                    return
+                }
+
+                let new_volunteer = Volunteer(
+                    username: username,
+                    first_name: first_name,
+                    last_name: last_name,
+                    date_of_birth: date_of_birth,
+                    email: email,
+                    phone_number: phone_number,
+                    zipcode: zipcode,
+                    roles: roles,
+                    availability: availability,
+                    emergency_name: emergency_name,
+                    emergency_number: emergency_number,
+                    alert_message: alert_message,
+                    show_alert: show_alert
+                )
+
+                register_volunteer(volunteer: new_volunteer, show_success: $show_success)
+            }
         }
     }
 }
 
-/* #Preview {
-    VolunteerView(path: path)
-    
+#Preview {
+    NavigationStack {
+        VolunteerView(path: .constant(NavigationPath()))
+    }
 }
-*/

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
+import { API_BASE_URL } from '../config'
 import { IconCheck, IconX } from '@tabler/icons-react'
 
 function SigninBox() {
@@ -12,7 +13,6 @@ function SigninBox() {
     const navigate = useNavigate()
     
     // API Base URL - point to Render deployment
-    const API_BASE_URL = 'https://yellow-team.onrender.com';
     
     const handleSignIn = async() => {
         if (!username.trim() || !password.trim()) {

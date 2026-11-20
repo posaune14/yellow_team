@@ -46,19 +46,21 @@ def reset_password_by_username():
     try:
         data = request.get_json()
         username = data.get("username")
+        current_password = data.get("current_password")
         new_password = data.get("new_password")
-        if not username or not new_password:
-            return jsonify({"message": "username and new_password required"}), 400
+        if not username or not current_password or not new_password:
+            return jsonify({"message": "username, current_password and new_password required"}), 400
 
-        bcrypt = Bcrypt(current_app)
-        hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
-
-        # Update by username
         model = pantry_model(current_app.mongo)
-        # Direct update on collection since model doesn't have a dedicated method
-        result = model.collection.update_one({"username": username}, {"$set": {"password": hashed}})
-        if result.matched_count == 0:
-            return jsonify({"message": "Pantry not found"}), 404
+        pantry = model.collection.find_one({"username": username})
+        bcrypt = Bcrypt(current_app)
+        # Same error for unknown username and wrong password so the endpoint
+        # can't be used to probe which usernames exist
+        if not pantry or not bcrypt.check_password_hash(pantry["password"], current_password):
+            return jsonify({"message": "Invalid credentials"}), 401
+
+        hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        model.collection.update_one({"_id": pantry["_id"]}, {"$set": {"password": hashed}})
         return jsonify({"message": "Password reset"}), 200
     except Exception as e:
         return jsonify({"message": "Error resetting password", "error": str(e)}), 400

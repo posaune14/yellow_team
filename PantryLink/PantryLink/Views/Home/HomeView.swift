@@ -8,112 +8,63 @@ import SwiftUI
 
 // HomePageView - Full page version for TabView
 struct HomePageView: View {
-    @State private var searchText = ""
     @Binding var path: NavigationPath
-    @StateObject var delegate = AppDelegate()
-    
+
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     var isIPad: Bool {
         horizontalSizeClass == .regular
     }
-    
+
     var body: some View {
         NavigationStack(path: $path) {
-           
-            ZStack{
-                Rectangle()
-                    .fill(Colors.flexibleWhite)
-                    .ignoresSafeArea()
-                ScrollView{
-                    VStack{
-                        HStack{
-                            Spacer()
-                            Spacer()
-                            Spacer()
-                            Text("PantryLink")
-                                .font(.title)
-                                .bold()
-                            Spacer()
-                            NavigationLink{AccountView(path: $path)} label:{Image(systemName: "person.crop.circle")}
-                                .padding()
-                                .scaleEffect(1.7)
-                                .foregroundStyle(.black)
-                            Spacer()
-                    }
-                      
+            ScrollView {
+                VStack(alignment: .leading, spacing: PL.spacingL) {
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        PLSectionHeader(
+                            title: "Pantries near you",
+                            subtitle: "Find food pantries close to home."
+                        )
                         LocalPantryView()
-                            .padding()
-                        StreamView()
-                            .padding()
-                        //for notification testing
-//                        Button(action: {
-//                            // Request permission and schedule the notification
-//                            delegate.testNotification()
-//                            print("test")
-//                        }) {
-//                            Text("Send Test Notification")
-//                                .padding()
-//                                .background(Color.blue)
-//                                .foregroundColor(.white)
-//                                .cornerRadius(10)
-//                        }
                     }
-                    .frame(maxWidth: isIPad ? 800 : .infinity)
-                    .padding(.bottom, 80) // Add bottom padding for tab bar
+
+                    VStack(alignment: .leading, spacing: PL.spacingM) {
+                        PLSectionHeader(
+                            title: "Announcements",
+                            subtitle: "The latest news from your local pantries."
+                        )
+                        StreamView()
+                    }
                 }
-                .padding(1.0)
+                .padding(PL.spacingM)
+                .frame(maxWidth: isIPad ? 800 : .infinity)
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 80) // Room for the tab bar
             }
-            .ignoresSafeArea(.container, edges: .bottom)
+            .background(PL.background.ignoresSafeArea())
+            .navigationTitle("PantryLink")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        AccountView(path: $path)
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                            .font(.title2)
+                            .frame(minWidth: PL.tapTarget, minHeight: PL.tapTarget)
+                    }
+                    .accessibilityLabel("Account")
+                    .accessibilityHint("View and manage your account")
+                }
+            }
             .navigationDestination(for: String.self) { value in
                 if value == "SignUp" {
                     SignUpView(path: $path)
                 }
             }
-            .toolbar(.hidden)
         }
     }
 }
 
-// Legacy HomeView for navigation-based access (keeping for compatibility)
-struct HomeView: View {
-    @State private var searchText = ""
-    @Binding var path: NavigationPath
-    @StateObject var delegate = AppDelegate()
-    
-    var body: some View {
-        ZStack{
-            Rectangle()
-                .fill(Colors.flexibleWhite)
-                .ignoresSafeArea()
-            ScrollView{
-                VStack{
-                   // NavView(path: $path)
-                    LocalPantryView()
-                        .padding()
-                    StreamView()
-                        .padding()
-                    //for notification testing
-                    Button(action: {
-                        // Request permission and schedule the notification
-                        delegate.testNotification()
-                        print("test")
-                    }) {
-                        Text("Send Test Notification")
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
-            }
-            .padding(1.0)
-            
-        }.toolbar(.hidden)
-    }
-}
-
 #Preview {
-    HomeView(path: .constant(NavigationPath()))
+    HomePageView(path: .constant(NavigationPath()))
 }
-

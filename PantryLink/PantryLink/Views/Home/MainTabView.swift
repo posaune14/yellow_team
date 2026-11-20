@@ -64,7 +64,7 @@ struct MainTabView: View {
                 }
                 .tag(2)
         }
-        .accentColor(Colors.flexibleOrange)
+        .tint(PL.accent)
     }
 }
 

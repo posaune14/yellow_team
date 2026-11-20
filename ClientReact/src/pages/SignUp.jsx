@@ -14,7 +14,7 @@ function SignUp() {
     }, [navigate]);
 
     return (
-        <div style={{ backgroundColor: '#917F7B', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+        <div style={{ backgroundColor: '#917F7B', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%', padding: '1rem 0', boxSizing: 'border-box', overflowX: 'hidden' }}>
             <motion.div
             initial={{y:-500}}
             animate={{y:0}}

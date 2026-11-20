@@ -17,7 +17,7 @@ extension SignInView {
     }
     
     func login_user(authData: AuthData) async -> LoginResult {
-        guard let url = URL(string: "https://yellow-team.onrender.com/auth/log_in") else {
+        guard let url = URL(string: "\(API.baseURL)/auth/log_in") else {
             return .failure("Invalid server URL")
         }
         
