@@ -104,12 +104,12 @@ function SignupBox() {
     
     return (
         <Center>
-            <Container style={{ borderRadius: '40px', backgroundColor: '#fff', height: '50rem', width: '30rem', margin: '1rem' }}>
+            <Container style={{ borderRadius: '40px', backgroundColor: '#fff', width: '30rem', maxWidth: 'calc(100vw - 2rem)', margin: '1rem', paddingBottom: '0.5rem', boxSizing: 'border-box' }}>
                 <Title order={1} style={{ padding: '2rem'}}>
                     Food Bank Sign Up
                 </Title>
                 <Center>
-                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width:"22rem", height: "29rem", margin: '2rem'}}>
+                    <Fieldset legend="Food bank information" bg="transparent" style={{textAlign:'left', width: "100%", maxWidth: "22rem", margin: '2rem 0', boxSizing: 'border-box'}}>
 
                         <Stack spacing="md">
                             <TextInput 
@@ -137,9 +137,9 @@ function SignupBox() {
                                 size="md" 
                                 required
                             />
-                            <Flex direction="row" justify="space-between" gap="md">
+                            <Flex direction="row" justify="space-between" gap="md" wrap="wrap">
                             <TextInput 
-                                label="Email" 
+                                label="Email" style={{ flex: '1 1 9rem', minWidth: 0 }} 
                                 placeholder="Enter your email"  
                                 value={formData.email} 
                                 onChange={(e) => handleInputChange('email', e.target.value)} 
@@ -148,7 +148,7 @@ function SignupBox() {
                                 required
                             />
                             <TextInput 
-                                label="Phone Number" 
+                                label="Phone Number" style={{ flex: '1 1 9rem', minWidth: 0 }} 
                                 placeholder="Enter your phone number"  
                                 value={formData.phone_number} 
                                 onChange={(e) => handleInputChange('phone_number', e.target.value)} 
